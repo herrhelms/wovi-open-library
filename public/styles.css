@@ -629,6 +629,10 @@ h1 {
     align-items: stretch;
   }
 
+  .search-input {
+    flex: 0 0 auto;
+  }
+
   .search-submit {
     width: 100%;
   }
