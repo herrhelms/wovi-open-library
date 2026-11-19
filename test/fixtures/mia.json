@@ -1,0 +1,32 @@
+{
+  "hits": {
+    "total": {
+      "value": 241,
+      "relation": "eq"
+    },
+    "hits": [
+      {
+        "_source": {
+          "id": 3241,
+          "title": "Moon flask",
+          "artist": "China",
+          "dated": "1723–35",
+          "image_width": 4532,
+          "image_height": 5073,
+          "rights_type": "Public Domain"
+        }
+      },
+      {
+        "_source": {
+          "id": 128363,
+          "title": "Moon",
+          "artist": "Wada Akira",
+          "dated": "2016",
+          "image_width": 6343,
+          "image_height": 6343,
+          "rights_type": "In Copyright"
+        }
+      }
+    ]
+  }
+}
