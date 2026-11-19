@@ -580,6 +580,10 @@ h1 {
 
 /* ---------- Selection bar ---------- */
 
+body:has(.selection-bar:not([hidden])) .site-main {
+  padding-bottom: 8rem;
+}
+
 .selection-bar {
   position: fixed;
   left: 0;
