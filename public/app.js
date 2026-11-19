@@ -20,6 +20,7 @@ const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
 const statusLineEl = document.getElementById('status-line');
+const subtitleEl = document.querySelector('.site-header .subtitle');
 const resultsEl = document.getElementById('results');
 const loadMoreButton = document.getElementById('load-more');
 const sentinelEl = document.getElementById('sentinel');
@@ -732,6 +733,11 @@ async function init() {
     sourceListError = 'The source list could not be loaded.';
   }
   registryById = new Map(registry.map((source) => [source.id, source]));
+
+  if (registry.length >= 1 && subtitleEl) {
+    subtitleEl.textContent =
+      `Search ${registry.length} open image libraries and download the full resolution.`;
+  }
 
   applyUrlState();
   if (sourceListError && statusLineEl.textContent === '') {

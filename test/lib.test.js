@@ -181,8 +181,13 @@ test('sources registry', () => {
     'nypl',
     'nasa',
     'nga',
+    'cleveland',
+    'smk',
+    'mia',
+    'wellcome',
+    'openverse',
   ];
-  assert.equal(sources.length, 10);
+  assert.equal(sources.length, 15);
   assert.deepEqual(
     sources.map((source) => source.id),
     ids,

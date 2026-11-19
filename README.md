@@ -1,6 +1,6 @@
 # Open Library Fetch
 
-A local web app that searches 10 open image libraries in one grid and downloads
+A local web app that searches 15 open image libraries in one grid and downloads
 the highest available resolution of each image.
 
 The libraries are:
@@ -15,6 +15,11 @@ The libraries are:
 - New York Public Library
 - NASA Image and Video Library
 - National Gallery of Art
+- Cleveland Museum of Art
+- SMK – National Gallery of Denmark
+- Minneapolis Institute of Art
+- Wellcome Collection
+- Openverse
 
 ## Requirements
 
@@ -48,6 +53,9 @@ PORT=5173
   <https://api.data.gov/signup/>.
 - `PORT` — default `5173`.
 
+The 5 new sources need no key: Cleveland Museum of Art, SMK, Minneapolis
+Institute of Art, Wellcome Collection and Openverse.
+
 The keys stay on the server. They are never sent to the browser.
 
 ## Known limits
@@ -63,12 +71,22 @@ The keys stay on the server. They are never sent to the browser.
 - **The Met**: the search can return objects that are not public domain. The app
   removes them, so a page can have fewer than 24 items.
 - **Rijksmuseum**: 12 items for each page (each item needs 3 requests).
+- **Openverse**: without a key, the API allows about 20 requests in each minute
+  and 200 in each day; results stop at about 240 (12 pages of 20). On HTTP 429
+  the app shows `Openverse rate limit reached. Try again in a few minutes.`
+  Openverse collects images from other sites (for example Flickr); the viewer
+  shows "via <provider>".
+- **Cleveland Museum of Art**: "Download full resolution" gives the print JPEG
+  (about 3400 px). The TIFF master can be more than 200 MB; the viewer shows it
+  as a separate link "Download TIFF (very large)".
+- **Minneapolis Institute of Art**: the image server sends no `Content-Type`;
+  the download proxy gets the type from the file extension.
 
 ## Downloads
 
-The server streams files through `/api/download`. Only hosts of the 10 libraries
-are allowed, so the app is not an open proxy. Europeana files come from the
-record API.
+The server streams files through `/api/download`. Only hosts of the libraries
+are allowed, so the app is not an open proxy. Europeana and Openverse files come
+from the record API of the source (their files can be on any host).
 
 ## Development
 
