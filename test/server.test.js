@@ -156,6 +156,11 @@ test('isAllowedHost', () => {
   assert.equal(isAllowedHost('METMUSEUM.ORG'), true);
   assert.equal(isAllowedHost('evilmetmuseum.org'), false);
   assert.equal(isAllowedHost('metmuseum.org.evil.com'), false);
+  assert.equal(isAllowedHost('openaccess-cdn.clevelandart.org'), true);
+  assert.equal(isAllowedHost('iip.smk.dk'), true);
+  assert.equal(isAllowedHost('1.api.artsmia.org'), true);
+  assert.equal(isAllowedHost('iiif.wellcomecollection.org'), true);
+  assert.equal(isAllowedHost('evilsmk.dk'), false);
   assert.equal(isAllowedHost('127.0.0.1'), false);
   assert.equal(isAllowedHost('localhost'), false);
   assert.equal(isAllowedHost(''), false);

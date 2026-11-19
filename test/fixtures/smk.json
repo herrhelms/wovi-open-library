@@ -1,0 +1,54 @@
+{
+  "found": 28,
+  "items": [
+    {
+      "object_number": "KMS1912",
+      "titles": [
+        {
+          "title": "Moonlight",
+          "language": "engelsk"
+        }
+      ],
+      "production": [
+        {
+          "creator": "Neer, Aert van der",
+          "creator_forename": "Aert van der",
+          "creator_surname": "Neer",
+          "creator_date_of_birth": "1603-01-01T00:00:00.000Z",
+          "creator_date_of_death": "1677-01-01T00:00:00.000Z",
+          "creator_nationality": "Dutch",
+          "creator_gender": "MALE",
+          "creator_qualifier": "copy after",
+          "creator_role": "copy after",
+          "creator_lref": "964_person"
+        }
+      ],
+      "production_date": [
+        {
+          "start": "1618-01-01T00:00:00.000Z",
+          "end": "1905-12-31T00:00:00.000Z",
+          "period": "1618-1905"
+        }
+      ],
+      "image_native": "https://api.smk.dk/api/v1/download/W3siaW1nX3VybCI6Imh0dHBzOi8vaWlwLnNtay5kay9paWlmL2pwMi82Mzk1d2IzNXBfS01TMTkxMi50aWYucmVjb25zdHJ1Y3RlZC50aWYuanAyL2Z1bGwvZnVsbC8wL25hdGl2ZS5qcGciLCJwdWJsaWNfZG9tYWluIjp0cnVlLCJvYmplY3RfbnVtYmVyIjoiS01TMTkxMiIsIm51bSI6IiJ9XQ==/KMS1912.jpg",
+      "image_iiif_id": "https://iip.smk.dk/iiif/jp2/6395wb35p_KMS1912.tif.reconstructed.tif.jp2",
+      "image_width": 1749,
+      "image_height": 1342,
+      "frontend_url": "https://open.smk.dk/artwork/image/KMS1912",
+      "rights": "https://creativecommons.org/publicdomain/mark/1.0/"
+    },
+    {
+      "object_number": "KAS163/2",
+      "titles": [
+        {
+          "title": "Sterope"
+        }
+      ],
+      "image_native": "https://api.smk.dk/api/v1/thumbnail/1b70f140-62c6-4f4a-85fa-dcf05bdd602d.jpg",
+      "image_width": 1600,
+      "image_height": 1018,
+      "frontend_url": "https://open.smk.dk/artwork/image/KAS163/2",
+      "rights": "https://creativecommons.org/publicdomain/mark/1.0/"
+    }
+  ]
+}
