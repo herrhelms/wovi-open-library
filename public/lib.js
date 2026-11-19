@@ -4,16 +4,19 @@
 
 /**
  * Build the local download URL for an item.
+ * `url` replaces `item.full` as the remote URL when it is a non-empty string.
  * @param {object} item
+ * @param {string} [url]
  * @returns {string}
  */
-export function downloadUrl(item) {
+export function downloadUrl(item, url) {
   const params = new URLSearchParams();
   params.set('source', item.source ?? '');
   params.set('id', item.id ?? '');
   params.set('title', item.title ?? '');
-  if (item.full && item.source !== 'europeana') {
-    params.set('url', item.full);
+  const target = typeof url === 'string' && url !== '' ? url : item.full;
+  if (target && item.source !== 'europeana') {
+    params.set('url', target);
   }
   return `/api/download?${params.toString()}`;
 }

@@ -283,7 +283,16 @@ function renderPanel(item) {
     return dd;
   };
 
-  const sourceValue = addFact('Source', document.createTextNode(item.source || 'Unknown source'));
+  const provider =
+    typeof item.provider === 'string' && item.provider.trim() !== ''
+      ? item.provider.trim()
+      : null;
+  const withProvider = (name) => (provider ? `${name} via ${provider}` : name);
+
+  const sourceValue = addFact(
+    'Source',
+    document.createTextNode(withProvider(item.source || 'Unknown source')),
+  );
 
   if (item.license || item.licenseUrl) {
     if (item.licenseUrl) {
@@ -332,6 +341,16 @@ function renderPanel(item) {
   });
   downloadButton.addEventListener('click', () => startDownload(item));
 
+  let tiffLink = null;
+  if (typeof item.fullTiff === 'string' && item.fullTiff !== '') {
+    tiffLink = el('a', {
+      class: 'viewer-tiff-link',
+      href: downloadUrl(item, item.fullTiff),
+      download: true,
+      text: 'Download TIFF (very large)',
+    });
+  }
+
   const copyButton = el('button', {
     class: 'viewer-button',
     type: 'button',
@@ -349,6 +368,7 @@ function renderPanel(item) {
   panel.append(
     el('div', { class: 'viewer-block viewer-actions' }, [
       downloadButton,
+      tiffLink,
       el('div', { class: 'viewer-action-row' }, [copyButton, zoomButton]),
     ]),
   );
@@ -362,7 +382,7 @@ function renderPanel(item) {
     if (!state || state.list[state.index] !== item) return;
     const name = names.get(item.source) || item.source || 'source';
     sourceLabel.textContent = name;
-    sourceValue.textContent = name;
+    sourceValue.textContent = withProvider(name);
     if (pageLink) pageLink.textContent = `View on ${name}`;
   });
 }
