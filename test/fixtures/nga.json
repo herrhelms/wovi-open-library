@@ -1,0 +1,42 @@
+{
+  "_note": "Hand-made from the real CSV columns of objects.csv and published_images.csv (NGA open data). The image row is real. The object row uses real columns; values are composed.",
+  "object": {
+    "objectid": "17387",
+    "accessionnum": "1955.11.10",
+    "title": "Two Jugs",
+    "displaydate": "c. 1938",
+    "attribution": "Index of American Design",
+    "medium": "watercolor and graphite on paper",
+    "classification": "Drawing"
+  },
+  "image": {
+    "uuid": "00007f61-4922-417b-8f27-893ea328206c",
+    "iiifurl": "https://api.nga.gov/iiif/00007f61-4922-417b-8f27-893ea328206c",
+    "iiifthumburl": "https://api.nga.gov/iiif/00007f61-4922-417b-8f27-893ea328206c/full/!200,200/0/default.jpg",
+    "viewtype": "primary",
+    "sequence": "0",
+    "width": "3365",
+    "height": "4332",
+    "maxpixels": "",
+    "openaccess": "1",
+    "created": "2013-07-05 15:41:08-04",
+    "modified": "2026-04-13 11:15:14-04",
+    "depictstmsobjectid": "17387",
+    "assistivetext": "The image shows a drawing of two ceramic jugs with a shared base and distinct necks."
+  },
+  "imageWithMaxpixels": {
+    "uuid": "0000bd8c-39de-4453-b55d-5e28a9beed38",
+    "iiifurl": "https://api.nga.gov/iiif/0000bd8c-39de-4453-b55d-5e28a9beed38",
+    "iiifthumburl": "https://api.nga.gov/iiif/0000bd8c-39de-4453-b55d-5e28a9beed38/full/!200,200/0/default.jpg",
+    "viewtype": "primary",
+    "sequence": "0",
+    "width": "3500",
+    "height": "4688",
+    "maxpixels": "3000",
+    "openaccess": "1",
+    "created": "2013-08-05 14:31:59-04",
+    "modified": "2026-04-13 11:17:34-04",
+    "depictstmsobjectid": "19245",
+    "assistivetext": ""
+  }
+}

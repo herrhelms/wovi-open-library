@@ -1,0 +1,789 @@
+{
+  "status": 200,
+  "responseCode": 1,
+  "response": {
+    "rows": [
+      {
+        "id": "ld1-1643399887910-1643399894674-1",
+        "title": "Moon and Clouds, Terni, Italy",
+        "unitCode": "CHNDM",
+        "type": "edanmdm",
+        "url": "edanmdm:chndm_1917-4-698",
+        "content": {
+          "freetext": {
+            "date": [
+              {
+                "label": "Date",
+                "content": "October 1, 1868"
+              }
+            ],
+            "name": [
+              {
+                "label": "Artist",
+                "content": "Frederic Edwin Church, American, 1826–1900"
+              }
+            ],
+            "notes": [
+              {
+                "label": "Catalogue Status",
+                "content": "Research in Progress"
+              },
+              {
+                "label": "Description",
+                "content": "Atmospheric sketch showing the moon reflecting off clouds at night over Terni, Italy. At center, the moon peeks over a cloud bank while other hazy clouds hang above."
+              },
+              {
+                "label": "Description",
+                "content": "Verso: Atmospheric sketch showing the moon shining through clouds at night over Terni, Italy. At center, the moon is visible behind hazy clouds while dark, heavy clouds hang above."
+              },
+              {
+                "label": "Inscribed",
+                "content": "Inscribed: in graphite, upper left: warm / luminous / shadows; upper center: bluer / yellowish warm luminous; in graphite, upper right: cool silvery / light on / clouds from / Twilight; in graphite, center: bluish Dark; in graphite, lower right: Moon yellow / beautifully reflected / into clouds; in graphite, verso center: Clouds over & near moon / [struckout: Black] Dark - Clouds / under moon soft shadows / warm suffused with / light - Open sky / warm neutral inclining / to yellow - Sky dark / well above moon / Lights on clouds luminous / and like delicate flakes / of cotton; in graphite, verso lower right: Oct 1st /68"
+              }
+            ],
+            "place": [
+              {
+                "label": "made in",
+                "content": "Terni, Italy"
+              },
+              {
+                "label": "place depicted",
+                "content": "Terni, Italy"
+              }
+            ],
+            "setName": [
+              {
+                "label": "See more items in",
+                "content": "Cooper Hewitt, Smithsonian Design Museum Collection"
+              },
+              {
+                "label": "See more items in",
+                "content": "Drawings, Prints, and Graphic Design Department"
+              }
+            ],
+            "creditLine": [
+              {
+                "label": "Credit Line",
+                "content": "Gift of Louis P. Church"
+              }
+            ],
+            "dataSource": [
+              {
+                "label": "Data Source",
+                "content": "Cooper Hewitt, Smithsonian Design Museum"
+              }
+            ],
+            "identifier": [
+              {
+                "label": "Accession Number",
+                "content": "1917-4-698"
+              }
+            ],
+            "objectType": [
+              {
+                "label": "Type",
+                "content": "landscapes"
+              },
+              {
+                "label": "Object Name",
+                "content": "Drawing"
+              },
+              {
+                "label": "Type",
+                "content": "Drawing"
+              }
+            ],
+            "objectRights": [
+              {
+                "label": "Restrictions & Rights",
+                "content": "CC0"
+              }
+            ],
+            "physicalDescription": [
+              {
+                "label": "Medium",
+                "content": "Graphite on gray-green wove paper; verso: graphite"
+              },
+              {
+                "label": "Dimensions",
+                "content": "12 × 21.3 cm (4 3/4 × 8 3/8 in.)"
+              }
+            ]
+          },
+          "indexedStructured": {
+            "date": [
+              "1860s"
+            ],
+            "name": [
+              "Church, Frederic Edwin"
+            ],
+            "place": [
+              "Terni",
+              "Italy"
+            ],
+            "topic": [
+              "Landscapes"
+            ],
+            "geoLocation": [
+              {
+                "L2": {
+                  "type": "Country",
+                  "content": "Italy"
+                },
+                "L5": {
+                  "type": "City",
+                  "content": "Terni"
+                }
+              },
+              {
+                "L2": {
+                  "type": "Country",
+                  "content": "Italy"
+                },
+                "L5": {
+                  "type": "City",
+                  "content": "Terni"
+                }
+              }
+            ],
+            "object_type": [
+              "Drawings"
+            ],
+            "online_media_type": [
+              "Images"
+            ]
+          },
+          "descriptiveNonRepeating": {
+            "guid": "http://n2t.net/ark:/65665/kq48029a008-bbff-402e-82df-c56210d7db37",
+            "title": {
+              "label": "Title",
+              "content": "Moon and Clouds, Terni, Italy"
+            },
+            "record_ID": "chndm_1917-4-698",
+            "unit_code": "CHNDM",
+            "title_sort": "MOON AND CLOUDS, TERNI, ITALY",
+            "data_source": "Cooper Hewitt, Smithsonian Design Museum",
+            "record_link": "https://collection.cooperhewitt.org/view/objects/asitem/id/23484",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:CHSDM-23484_03-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc937cac3eb-67ca-4281-b2e5-9997e7dbf884",
+                  "type": "Images",
+                  "idsId": "CHSDM-23484_03-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 6720,
+                  "height": 3838,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_03-000001",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_03-000001",
+                  "altTextAccessibility": "MOON AND CLOUDS, TERNI, ITALY",
+                  "extDescrAccessibility": "Atmospheric sketch showing the moon reflecting off clouds at night over Terni, Italy. At center, the moon peeks over a cloud bank while other hazy clouds hang above.\n\nVerso: Atmospheric sketch showing the moon shining through clouds at night over Terni, Italy. At center, the moon is visible behind hazy clouds while dark, heavy clouds hang above.",
+                  "resources": [
+                    {
+                      "label": "High-resolution TIFF",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_03-000001.tif",
+                      "width": 6765,
+                      "height": 3864,
+                      "dimensions": "6765x3864"
+                    },
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_03-000001.jpg",
+                      "width": 6765,
+                      "height": 3864,
+                      "dimensions": "6765x3864"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_03-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_03-000001_thumb"
+                    }
+                  ]
+                },
+                {
+                  "id": "media:CHSDM-23484_04-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc9500cea84-f548-40ba-9e00-aca23ddac9b8",
+                  "type": "Images",
+                  "idsId": "CHSDM-23484_04-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 3854,
+                  "height": 6720,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_04-000001",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_04-000001",
+                  "altTextAccessibility": "MOON AND CLOUDS, TERNI, ITALY",
+                  "extDescrAccessibility": "Atmospheric sketch showing the moon reflecting off clouds at night over Terni, Italy. At center, the moon peeks over a cloud bank while other hazy clouds hang above.\n\nVerso: Atmospheric sketch showing the moon shining through clouds at night over Terni, Italy. At center, the moon is visible behind hazy clouds while dark, heavy clouds hang above.",
+                  "resources": [
+                    {
+                      "label": "High-resolution TIFF",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_04-000001.tif",
+                      "width": 3908,
+                      "height": 6814,
+                      "dimensions": "3908x6814"
+                    },
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_04-000001.jpg",
+                      "width": 3908,
+                      "height": 6814,
+                      "dimensions": "3908x6814"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_04-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-23484_04-000001_thumb"
+                    }
+                  ]
+                },
+                {
+                  "id": "media:CHSDM-33CA2397A4CC2_001-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc941fecf22-3d52-46d3-9ca9-e94e0be8a7c6",
+                  "type": "Images",
+                  "idsId": "CHSDM-33CA2397A4CC2_001-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 3520,
+                  "height": 2127,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-33CA2397A4CC2_001-000001",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-33CA2397A4CC2_001-000001",
+                  "altTextAccessibility": "MOON AND CLOUDS, TERNI, ITALY",
+                  "extDescrAccessibility": "Atmospheric sketch showing the moon reflecting off clouds at night over Terni, Italy. At center, the moon peeks over a cloud bank while other hazy clouds hang above.\n\nVerso: Atmospheric sketch showing the moon shining through clouds at night over Terni, Italy. At center, the moon is visible behind hazy clouds while dark, heavy clouds hang above.",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-33CA2397A4CC2_001-000001.jpg",
+                      "width": 3817,
+                      "height": 2306,
+                      "dimensions": "3817x2306"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-33CA2397A4CC2_001-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-33CA2397A4CC2_001-000001_thumb"
+                    }
+                  ]
+                },
+                {
+                  "id": "media:CHSDM-33CA2397A4CC2_002-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc99adc9655-26c2-4e9b-a7b0-9ebeb6e69996",
+                  "type": "Images",
+                  "idsId": "CHSDM-33CA2397A4CC2_002-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 3520,
+                  "height": 2127,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-33CA2397A4CC2_002-000001",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-33CA2397A4CC2_002-000001",
+                  "altTextAccessibility": "MOON AND CLOUDS, TERNI, ITALY",
+                  "extDescrAccessibility": "Atmospheric sketch showing the moon reflecting off clouds at night over Terni, Italy. At center, the moon peeks over a cloud bank while other hazy clouds hang above.\n\nVerso: Atmospheric sketch showing the moon shining through clouds at night over Terni, Italy. At center, the moon is visible behind hazy clouds while dark, heavy clouds hang above.",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-33CA2397A4CC2_002-000001.jpg",
+                      "width": 3817,
+                      "height": 2306,
+                      "dimensions": "3817x2306"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-33CA2397A4CC2_002-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-33CA2397A4CC2_002-000001_thumb"
+                    }
+                  ]
+                }
+              ],
+              "mediaCount": 4
+            },
+            "metadata_usage": {
+              "access": "CC0"
+            }
+          }
+        },
+        "hash": "8bd18740a468a6296df0d439896c12be8489d0ac",
+        "docSignature": "c1591226e9a61684f683114aa84fab12",
+        "timestamp": "1663784056",
+        "lastTimeUpdated": "1794051351",
+        "version": "1794047524"
+      },
+      {
+        "id": "ld1-1643406112513-1643406114094-0",
+        "title": "Common Northern Moon, Moon Shell, Moon Shell",
+        "unitCode": "NMNHEDUCATION",
+        "type": "edanmdm",
+        "url": "edanmdm:nmnheducation_10020198",
+        "content": {
+          "freetext": {
+            "name": [
+              {
+                "label": "Discipline",
+                "content": "Paleobiology"
+              },
+              {
+                "label": "Region",
+                "content": "US Mid Atlantic (PA, NJ, MD, DE, DC, VA, WV)"
+              }
+            ],
+            "notes": [
+              {
+                "label": "Description",
+                "content": "This object is part of the Education and Outreach collection, some of which are in the Q?rius science education center and available to see."
+              },
+              {
+                "label": "Notes",
+                "content": "This is a Common Northern Moon fossil shell. These specimens date to the Miocene Epoch and were found at the St. Mary's formation in Maryland. The fossil shells range in size from 1.5-6.6 cm long x 1-5cm wide."
+              },
+              {
+                "label": "Number of objects in this record",
+                "content": "3"
+              },
+              {
+                "label": "Record Last Modified",
+                "content": "20 Aug 2024"
+              }
+            ],
+            "place": [
+              {
+                "label": "Collecting Locality",
+                "content": "Chesapeake Ranch Club Beach, North America, United States, Maryland, Calvert County"
+              }
+            ],
+            "topic": [
+              {
+                "label": "Topic",
+                "content": "Education & Outreach"
+              }
+            ],
+            "setName": [
+              {
+                "label": "See more items in",
+                "content": "Q?rius, The Coralyn W. Whitney Science Education Center"
+              }
+            ],
+            "publisher": [
+              {
+                "label": "Scientific Name",
+                "content": "Euspira heros"
+              }
+            ],
+            "identifier": [
+              {
+                "label": "USNM Number",
+                "content": "EO50655"
+              }
+            ],
+            "objectType": [
+              {
+                "label": "Object Type",
+                "content": "Education and Outreach collections"
+              }
+            ],
+            "taxonomicName": [
+              {
+                "label": "Taxonomy",
+                "content": "Animalia, Mollusca, Gastropoda, Hypsogastropoda, Littorinimorpha, Naticidae, Polinicinae"
+              }
+            ]
+          },
+          "indexedStructured": {
+            "place": [
+              "United States",
+              "Calvert County",
+              "Maryland"
+            ],
+            "topic": [
+              "Gastropoda"
+            ],
+            "tax_class": [
+              "Gastropoda"
+            ],
+            "tax_order": [
+              "Littorinimorpha"
+            ],
+            "tax_family": [
+              "Naticidae"
+            ],
+            "tax_phylum": [
+              "Mollusca"
+            ],
+            "common_name": [
+              "Moon Shell",
+              "Common Northern Moon"
+            ],
+            "geoLocation": [
+              {
+                "L2": {
+                  "type": "Country",
+                  "content": "United States"
+                },
+                "L3": {
+                  "type": "State",
+                  "content": "Maryland"
+                },
+                "L4": {
+                  "type": "County",
+                  "content": "Calvert County"
+                },
+                "Other": {
+                  "type": "Locality",
+                  "content": "Chesapeake Ranch Club Beach"
+                }
+              }
+            ],
+            "object_type": [
+              "Education and Outreach collections"
+            ],
+            "tax_kingdom": [
+              "Animalia"
+            ],
+            "scientific_name": [
+              "Euspira heros"
+            ],
+            "online_media_type": [
+              "Images"
+            ]
+          },
+          "descriptiveNonRepeating": {
+            "guid": "http://n2t.net/ark:/65665/385930357-468f-4e30-b6b4-a6884ba9b0f5",
+            "title": {
+              "label": "title",
+              "content": "Common Northern Moon, Moon Shell, Moon Shell"
+            },
+            "record_ID": "nmnheducation_10020198",
+            "unit_code": "NMNHEDUCATION",
+            "title_sort": "COMMON NORTHERN MOON MOON SHELL MOON SHELL",
+            "data_source": "NMNH - Education & Outreach",
+            "record_link": "http://n2t.net/ark:/65665/385930357-468f-4e30-b6b4-a6884ba9b0f5",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_001",
+                  "guid": "http://n2t.net/ark:/65665/m3385547e5-4dbd-452e-adac-2e1539602208",
+                  "type": "Images",
+                  "idsId": "ark:/65665/m3385547e54dbd452eadac2e1539602208",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 2240,
+                  "height": 1487,
+                  "content": "https://ids.si.edu/ids/deliveryService/id/ark:/65665/m3385547e54dbd452eadac2e1539602208",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService/id/ark:/65665/m3385547e54dbd452eadac2e1539602208/90",
+                  "altTextAccessibility": "",
+                  "extDescrAccessibility": "",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_001.jpg",
+                      "width": 2500,
+                      "height": 1660,
+                      "dimensions": "2500x1660"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_001_thumb"
+                    }
+                  ]
+                },
+                {
+                  "id": "media:NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_002",
+                  "guid": "http://n2t.net/ark:/65665/m33ba329d1-09e4-4093-9b95-115e80d83230",
+                  "type": "Images",
+                  "idsId": "ark:/65665/m33ba329d109e440939b95115e80d83230",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 2240,
+                  "height": 1487,
+                  "content": "https://ids.si.edu/ids/deliveryService/id/ark:/65665/m33ba329d109e440939b95115e80d83230",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService/id/ark:/65665/m33ba329d109e440939b95115e80d83230/90",
+                  "altTextAccessibility": "",
+                  "extDescrAccessibility": "",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_002.jpg",
+                      "width": 2500,
+                      "height": 1660,
+                      "dimensions": "2500x1660"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_002_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_002_thumb"
+                    }
+                  ]
+                }
+              ],
+              "mediaCount": 2
+            },
+            "metadata_usage": {
+              "access": "CC0"
+            }
+          }
+        },
+        "hash": "30fdb0079c6eb90a5bf45c76f0c455487d4d4805",
+        "docSignature": "0cce2589ffb1e3ac4136f72692fe974a",
+        "timestamp": "1663781097",
+        "lastTimeUpdated": "1793806214",
+        "version": "1793788055"
+      },
+      {
+        "id": "ld1-1643399887910-1643399893884-0",
+        "title": "Full Moon in a Cloudy Sky",
+        "unitCode": "CHNDM",
+        "type": "edanmdm",
+        "url": "edanmdm:chndm_1917-4-1173-a",
+        "content": {
+          "freetext": {
+            "date": [
+              {
+                "label": "Date",
+                "content": "1865–75"
+              }
+            ],
+            "name": [
+              {
+                "label": "Artist",
+                "content": "Frederic Edwin Church, American, 1826–1900"
+              }
+            ],
+            "notes": [
+              {
+                "label": "Catalogue Status",
+                "content": "Research in Progress"
+              },
+              {
+                "label": "Description",
+                "content": "Atmosphere sketch showing a view of the full moon in a cloudy sky. At center left, the moon shines through a thin veil of hazy clouds and illuminates the tops of several billowing and overlapping clouds at center and lower center. At upper center, another group of puffy clouds is loosely rendered."
+              },
+              {
+                "label": "Markings",
+                "content": "Stamped in black ink, verso lower center: L.457d"
+              },
+              {
+                "label": "Inscribed",
+                "content": "Inscribed in graphite, upper left: open sky blackish blue / 5 - similar to above but darker; upper center: 4 / 4; upper right: 2 - cool grey green / 3 - faint reddish / orange glow from west / 4 - clouds warm / glow and moon lit"
+              }
+            ],
+            "place": [
+              {
+                "label": "made in",
+                "content": "USA"
+              }
+            ],
+            "setName": [
+              {
+                "label": "See more items in",
+                "content": "Cooper Hewitt, Smithsonian Design Museum Collection"
+              },
+              {
+                "label": "See more items in",
+                "content": "Drawings, Prints, and Graphic Design Department"
+              }
+            ],
+            "creditLine": [
+              {
+                "label": "Credit Line",
+                "content": "Gift of Louis P. Church"
+              }
+            ],
+            "dataSource": [
+              {
+                "label": "Data Source",
+                "content": "Cooper Hewitt, Smithsonian Design Museum"
+              }
+            ],
+            "identifier": [
+              {
+                "label": "Accession Number",
+                "content": "1917-4-1173-a"
+              }
+            ],
+            "objectType": [
+              {
+                "label": "Object Name",
+                "content": "Drawing"
+              },
+              {
+                "label": "Type",
+                "content": "Drawing"
+              }
+            ],
+            "objectRights": [
+              {
+                "label": "Restrictions & Rights",
+                "content": "CC0"
+              }
+            ],
+            "physicalDescription": [
+              {
+                "label": "Medium",
+                "content": "Graphite on gray-green wove paper"
+              },
+              {
+                "label": "Dimensions",
+                "content": "11.6 × 19.7 cm (4 9/16 × 7 3/4 in.)"
+              }
+            ]
+          },
+          "indexedStructured": {
+            "date": [
+              "1880s",
+              "1860s"
+            ],
+            "name": [
+              "Church, Frederic Edwin"
+            ],
+            "place": [
+              "USA"
+            ],
+            "geoLocation": [
+              {
+                "L2": {
+                  "type": "Country",
+                  "content": "USA"
+                }
+              }
+            ],
+            "object_type": [
+              "Drawings"
+            ],
+            "online_media_type": [
+              "Images"
+            ]
+          },
+          "descriptiveNonRepeating": {
+            "guid": "http://n2t.net/ark:/65665/kq4dce59b04-457b-4349-ac59-abccc93a4868",
+            "title": {
+              "label": "Title",
+              "content": "Full Moon in a Cloudy Sky"
+            },
+            "record_ID": "chndm_1917-4-1173-a",
+            "unit_code": "CHNDM",
+            "title_sort": "FULL MOON IN A CLOUDY SKY",
+            "data_source": "Cooper Hewitt, Smithsonian Design Museum",
+            "record_link": "https://collection.cooperhewitt.org/view/objects/asitem/id/22169",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:CHSDM-22169_02-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc95f2ed09d-ad17-4143-b17b-9a947eebb50a",
+                  "type": "Images",
+                  "idsId": "CHSDM-22169_02-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 5760,
+                  "height": 3412,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-22169_02-000001",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-22169_02-000001",
+                  "altTextAccessibility": "FULL MOON IN A CLOUDY SKY",
+                  "extDescrAccessibility": "Atmosphere sketch showing a view of the full moon in a cloudy sky. At center left, the moon shines through a thin veil of hazy clouds and illuminates the tops of several billowing and overlapping clouds at center and lower center. At upper center, another group of puffy clouds is loosely rendered.",
+                  "resources": [
+                    {
+                      "label": "High-resolution TIFF",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-22169_02-000001.tif",
+                      "width": 5955,
+                      "height": 3527,
+                      "dimensions": "5955x3527"
+                    },
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-22169_02-000001.jpg",
+                      "width": 5955,
+                      "height": 3527,
+                      "dimensions": "5955x3527"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-22169_02-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-22169_02-000001_thumb"
+                    }
+                  ]
+                },
+                {
+                  "id": "media:CHSDM-3283569BBD9B2_001-000001",
+                  "guid": "http://n2t.net/ark:/65665/vc9e2903014-2482-4182-8a5e-fb2b8b6e55d1",
+                  "type": "Images",
+                  "idsId": "CHSDM-3283569BBD9B2_001-000001",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 3200,
+                  "height": 1927,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=CHSDM-3283569BBD9B2_001-000001",
+                  "maxsize": 0,
+                  "thumbnail": "https://ids.si.edu/ids/deliveryService?id=CHSDM-3283569BBD9B2_001-000001",
+                  "altTextAccessibility": "FULL MOON IN A CLOUDY SKY",
+                  "extDescrAccessibility": "Atmosphere sketch showing a view of the full moon in a cloudy sky. At center left, the moon shines through a thin veil of hazy clouds and illuminates the tops of several billowing and overlapping clouds at center and lower center. At upper center, another group of puffy clouds is loosely rendered.",
+                  "resources": [
+                    {
+                      "label": "High-resolution JPEG",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-3283569BBD9B2_001-000001.jpg",
+                      "width": 3447,
+                      "height": 2076,
+                      "dimensions": "3447x2076"
+                    },
+                    {
+                      "label": "Screen Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-3283569BBD9B2_001-000001_screen"
+                    },
+                    {
+                      "label": "Thumbnail Image",
+                      "url": "https://ids.si.edu/ids/download?id=CHSDM-3283569BBD9B2_001-000001_thumb"
+                    }
+                  ]
+                }
+              ],
+              "mediaCount": 2
+            },
+            "metadata_usage": {
+              "access": "CC0"
+            }
+          }
+        },
+        "hash": "69b9b11709156b62491508fa21e7647964ea4c75",
+        "docSignature": "a491f10b952c6029613b60d173227f65",
+        "timestamp": "1663784056",
+        "lastTimeUpdated": "1794311025",
+        "version": "1794306607"
+      }
+    ],
+    "facets": {},
+    "rowCount": 2119,
+    "message": "content found"
+  }
+}

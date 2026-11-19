@@ -1,0 +1,50 @@
+{
+  "nyplAPI": {
+    "request": {
+      "search_text": "moon",
+      "filter_query": "use_rtxt_s:(\"PDCDPP\" OR \"PDNCN\" OR \"PDREN\" OR \"PDEXP\" OR \"PDADD\" OR \"PDUSG\" OR \"PPD\" OR \"PPD100\" OR \"CC_0\")",
+      "filter_type": "fuzzy",
+      "perPage": "2",
+      "page": "1",
+      "totalPages": "268",
+      "startTime": "Beginning of Time",
+      "endTime": "Till Now"
+    },
+    "response": {
+      "headers": {
+        "status": "success",
+        "code": "200",
+        "message": "ok"
+      },
+      "numResults": "535",
+      "result": [
+        {
+          "uuid": "a20567c0-c598-012f-fd27-58d385a7bc34",
+          "apiUri": "https://api.repo.nypl.org/api/v2/items/mods/a20567c0-c598-012f-fd27-58d385a7bc34",
+          "apiItemURL": "https://api.repo.nypl.org/api/v2/items/8e2c1060-c597-012f-bc76-58d385a7bc34",
+          "apiItemDetailURL": "https://api.repo.nypl.org/api/v2/items/item_details/a20567c0-c598-012f-fd27-58d385a7bc34",
+          "title": "Moon, moon",
+          "typeOfResource": "notated music",
+          "imageID": "1992631",
+          "itemLink": "http://digitalcollections.nypl.org/items/a20567c0-c598-012f-fd27-58d385a7bc34",
+          "dateDigitized": null,
+          "rightsStatement": "The New York Public Library believes that this item is in the public domain under the laws of the United States, but did not make a determination as to its copyright status under the copyright laws of other countries. This item may not be in the public domain under the laws of other countries. Though not required, if you want to credit us as the source, please use the following statement, \"From The New York Public Library,\" and provide a link back to the item on our Digital Collections site. Doing so helps us track how our collection is used and helps justify freely releasing even more content in the future.",
+          "rightsStatementURI": "http://rightsstatements.org/vocab/NoC-US/1.0/"
+        },
+        {
+          "uuid": "94a1e74c-6cb6-cfc9-e040-e00a18067933",
+          "apiUri": "https://api.repo.nypl.org/api/v2/items/mods/94a1e74c-6cb6-cfc9-e040-e00a18067933",
+          "apiItemURL": "https://api.repo.nypl.org/api/v2/items/a20567c0-c598-012f-fd27-58d385a7bc34",
+          "apiItemDetailURL": "https://api.repo.nypl.org/api/v2/items/item_details/94a1e74c-6cb6-cfc9-e040-e00a18067933",
+          "title": "Moon, moon",
+          "typeOfResource": "notated music",
+          "imageID": "1992631",
+          "itemLink": "http://digitalcollections.nypl.org/items/94a1e74c-6cb6-cfc9-e040-e00a18067933",
+          "dateDigitized": "2016-03-14T17:45:06Z",
+          "rightsStatement": "The New York Public Library believes that this item is in the public domain under the laws of the United States, but did not make a determination as to its copyright status under the copyright laws of other countries. This item may not be in the public domain under the laws of other countries. Though not required, if you want to credit us as the source, please use the following statement, \"From The New York Public Library,\" and provide a link back to the item on our Digital Collections site. Doing so helps us track how our collection is used and helps justify freely releasing even more content in the future.",
+          "rightsStatementURI": "http://rightsstatements.org/vocab/NoC-US/1.0/"
+        }
+      ]
+    }
+  }
+}

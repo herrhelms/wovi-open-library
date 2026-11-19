@@ -1,0 +1,1086 @@
+{
+  "success": true,
+  "requestNumber": 999,
+  "itemsCount": 2,
+  "totalResults": 5386,
+  "items": [
+    {
+      "completeness": 5,
+      "country": [
+        "Greece"
+      ],
+      "dataProvider": [
+        "Metropolitan Organisation of Museums of Visual Arts of Thessaloniki – MOMus"
+      ],
+      "dcCreator": [
+        "http://semantics.gr/authorities/searchculture-persons/810617100",
+        "Antonakos, Stephen (1926-2013)",
+        "Αντωνάκος, Στήβεν (1926-2013)"
+      ],
+      "dcCreatorLangAware": {
+        "def": [
+          "http://semantics.gr/authorities/searchculture-persons/810617100"
+        ],
+        "el": [
+          "Αντωνάκος, Στήβεν (1926-2013)"
+        ],
+        "en": [
+          "Antonakos, Stephen (1926-2013)"
+        ]
+      },
+      "dcSubjectLangAware": {
+        "def": [
+          "http://semantics.gr/authorities/ekt-unesco/1805955473"
+        ],
+        "el": [
+          "Σχέδια και τυπώματα"
+        ]
+      },
+      "dcTitleLangAware": {
+        "el": [
+          "Purple Moon"
+        ],
+        "en": [
+          "Purple Moon"
+        ]
+      },
+      "dcTypeLangAware": {
+        "def": [
+          "http://data.europeana.eu/concept/35",
+          "http://semantics.gr/authorities/ekt-item-types/sxedioskitso"
+        ]
+      },
+      "edmAgent": [
+        "http://semantics.gr/authorities/searchculture-persons/810617100"
+      ],
+      "edmAgentLabel": [
+        {
+          "def": "Αντωνάκος Στέφανος"
+        },
+        {
+          "def": "Antonakos Stephen"
+        }
+      ],
+      "edmAgentLabelLangAware": {
+        "el": [
+          "Αντωνάκος Στέφανος"
+        ],
+        "en": [
+          "Antonakos Stephen"
+        ]
+      },
+      "edmConcept": [
+        "http://semantics.gr/authorities/ekt-unesco/1805955473",
+        "http://semantics.gr/authorities/ekt-item-types/sxedioskitso",
+        "http://semantics.gr/authorities/ekt-item-types/disdiastata-grafika",
+        "http://semantics.gr/authorities/ekt-unesco/1024662637",
+        "http://data.europeana.eu/concept/35"
+      ],
+      "edmConceptLabel": [
+        {
+          "def": "Drawing"
+        },
+        {
+          "def": "Drawing"
+        },
+        {
+          "def": "2D Graphics"
+        },
+        {
+          "def": "Graphic arts"
+        },
+        {
+          "def": "Drawing"
+        },
+        {
+          "def": "Σχέδιο"
+        },
+        {
+          "def": "Σχέδιο"
+        },
+        {
+          "def": "Δισδιάστατα γραφικά"
+        },
+        {
+          "def": "Γραφικές τέχνες"
+        },
+        {
+          "def": "Σχέδιο"
+        },
+        {
+          "def": "Zeichnung"
+        },
+        {
+          "def": "Piirustus"
+        },
+        {
+          "def": "Рисунок"
+        },
+        {
+          "def": "Desenho"
+        },
+        {
+          "def": "Рисунка"
+        },
+        {
+          "def": "Piešimas"
+        },
+        {
+          "def": "Zīmējums"
+        },
+        {
+          "def": "Crtež"
+        },
+        {
+          "def": "Dessin"
+        },
+        {
+          "def": "Rajz"
+        },
+        {
+          "def": "Kresba"
+        },
+        {
+          "def": "Risba"
+        },
+        {
+          "def": "Líníocht"
+        },
+        {
+          "def": "Dibuix"
+        },
+        {
+          "def": "Teckning"
+        },
+        {
+          "def": "Disegno"
+        },
+        {
+          "def": "Dibujo"
+        },
+        {
+          "def": "Joonistus"
+        },
+        {
+          "def": "Kresba"
+        },
+        {
+          "def": "Marrazki"
+        },
+        {
+          "def": "Rysunek"
+        },
+        {
+          "def": "Desen"
+        },
+        {
+          "def": "Tegning"
+        },
+        {
+          "def": "Tekening"
+        }
+      ],
+      "edmConceptPrefLabelLangAware": {
+        "de": [
+          "Zeichnung"
+        ],
+        "fi": [
+          "Piirustus"
+        ],
+        "ru": [
+          "Рисунок"
+        ],
+        "pt": [
+          "Desenho"
+        ],
+        "bg": [
+          "Рисунка"
+        ],
+        "lt": [
+          "Piešimas"
+        ],
+        "lv": [
+          "Zīmējums"
+        ],
+        "hr": [
+          "Crtež"
+        ],
+        "fr": [
+          "Dessin"
+        ],
+        "hu": [
+          "Rajz"
+        ],
+        "sk": [
+          "Kresba"
+        ],
+        "sl": [
+          "Risba"
+        ],
+        "ga": [
+          "Líníocht"
+        ],
+        "ca": [
+          "Dibuix"
+        ],
+        "sv": [
+          "Teckning"
+        ],
+        "el": [
+          "Σχέδιο",
+          "Δισδιάστατα γραφικά",
+          "Γραφικές τέχνες"
+        ],
+        "en": [
+          "Drawing",
+          "Graphic arts",
+          "2D Graphics"
+        ],
+        "it": [
+          "Disegno"
+        ],
+        "es": [
+          "Dibujo"
+        ],
+        "et": [
+          "Joonistus"
+        ],
+        "cs": [
+          "Kresba"
+        ],
+        "eu": [
+          "Marrazki"
+        ],
+        "pl": [
+          "Rysunek"
+        ],
+        "ro": [
+          "Desen"
+        ],
+        "da": [
+          "Tegning"
+        ],
+        "nl": [
+          "Tekening"
+        ]
+      },
+      "edmDatasetName": [
+        "1316__MOMus"
+      ],
+      "edmIsShownAt": [
+        "https://www.momus.gr/collections/0017673"
+      ],
+      "edmIsShownBy": [
+        "http://dam.momus.gr/files/original/6fa436aa7c74f752f4e1168e16aa6b12fcbf1a5c.jpg"
+      ],
+      "edmPreview": [
+        "https://api.europeana.eu/thumbnail/v2/url.json?uri=https%3A%2F%2Fwww.searchculture.gr%2Faggregator%2Fthumbnails%2Fedm-record%2Fmomus%2F000179-17673&type=IMAGE"
+      ],
+      "edmTimespan": [
+        "http://semantics.gr/authorities/historical-periods/Regime-change",
+        "http://semantics.gr/authorities/historical-periods/neoterh-ellada",
+        "#1987",
+        "http://data.europeana.eu/timespan/20"
+      ],
+      "edmTimespanLabel": [
+        {
+          "def": "Μεταπολίτευση"
+        },
+        {
+          "def": "Νεότερη Ελλάδα"
+        },
+        {
+          "def": "20ός αιώνας"
+        },
+        {
+          "def": "Regime change"
+        },
+        {
+          "def": "Modern Greece"
+        },
+        {
+          "def": "20th century"
+        },
+        {
+          "def": "http://dbpedia.org/page/Metapolitefsi"
+        },
+        {
+          "def": "http://www.wikidata.org/entity/Q6927"
+        },
+        {
+          "def": "http://id.loc.gov/authorities/names/sh85139020"
+        },
+        {
+          "def": "http://id.loc.gov/authorities/names/sh2002012476"
+        },
+        {
+          "def": "http://data.bnf.fr/ark:/12148/cb11975995h"
+        },
+        {
+          "def": "http://www.idref.fr/086305646/id"
+        },
+        {
+          "def": "http://id.nlm.nih.gov/mesh/D049673"
+        },
+        {
+          "def": "https://www.freebase.com/m/089_x"
+        },
+        {
+          "def": "https://g.co/kg/m/089_x"
+        },
+        {
+          "def": "http://id.nlm.nih.gov/mesh/K01.400.504.968"
+        },
+        {
+          "def": "http://vocab.getty.edu/aat/300404514"
+        },
+        {
+          "def": "http://id.worldcat.org/fast/1159810"
+        },
+        {
+          "def": "http://dbpedia.org/resource/20th_century"
+        },
+        {
+          "def": "1987"
+        },
+        {
+          "def": "20. Jahrhundert"
+        },
+        {
+          "def": "XX век"
+        },
+        {
+          "def": "1900-luku"
+        },
+        {
+          "def": "Século XX"
+        },
+        {
+          "def": "20 век"
+        },
+        {
+          "def": "XX amžius"
+        },
+        {
+          "def": "20. gadsimts"
+        },
+        {
+          "def": "20. stoljeće"
+        },
+        {
+          "def": "XXe siècle"
+        },
+        {
+          "def": "20. század"
+        },
+        {
+          "def": "20. storočie"
+        },
+        {
+          "def": "20. stoletje"
+        },
+        {
+          "def": "20ú haois"
+        },
+        {
+          "def": "Segle XX"
+        },
+        {
+          "def": "1900-talet"
+        },
+        {
+          "def": "XX secolo"
+        },
+        {
+          "def": "Siglo XX"
+        },
+        {
+          "def": "20. sajand"
+        },
+        {
+          "def": "XX. mendea"
+        },
+        {
+          "def": "20. století"
+        },
+        {
+          "def": "XX wiek"
+        },
+        {
+          "def": "Secolul al XX-lea"
+        },
+        {
+          "def": "20. århundrede"
+        },
+        {
+          "def": "20e eeuw"
+        }
+      ],
+      "edmTimespanLabelLangAware": {
+        "de": [
+          "20. Jahrhundert"
+        ],
+        "ru": [
+          "XX век"
+        ],
+        "fi": [
+          "1900-luku"
+        ],
+        "pt": [
+          "Século XX"
+        ],
+        "bg": [
+          "20 век"
+        ],
+        "lt": [
+          "XX amžius"
+        ],
+        "lv": [
+          "20. gadsimts"
+        ],
+        "hr": [
+          "20. stoljeće"
+        ],
+        "fr": [
+          "XXe siècle"
+        ],
+        "hu": [
+          "20. század"
+        ],
+        "sk": [
+          "20. storočie"
+        ],
+        "sl": [
+          "20. stoletje"
+        ],
+        "ga": [
+          "20ú haois"
+        ],
+        "ca": [
+          "Segle XX"
+        ],
+        "sv": [
+          "1900-talet"
+        ],
+        "el": [
+          "Μεταπολίτευση",
+          "Νεότερη Ελλάδα",
+          "20ός αιώνας"
+        ],
+        "en": [
+          "Regime change",
+          "Modern Greece",
+          "20th century"
+        ],
+        "it": [
+          "XX secolo"
+        ],
+        "es": [
+          "Siglo XX"
+        ],
+        "et": [
+          "20. sajand"
+        ],
+        "eu": [
+          "XX. mendea"
+        ],
+        "cs": [
+          "20. století"
+        ],
+        "zxx": [
+          "1987"
+        ],
+        "pl": [
+          "XX wiek"
+        ],
+        "ro": [
+          "Secolul al XX-lea"
+        ],
+        "da": [
+          "20. århundrede"
+        ],
+        "nl": [
+          "20e eeuw"
+        ]
+      },
+      "europeanaCollectionName": [
+        "1316__MOMus"
+      ],
+      "europeanaCompleteness": 5,
+      "guid": "https://www.europeana.eu/item/1316/https___www_searchculture_gr_aggregator_edm_momus_000179_17673?utm_source=api&utm_medium=api&utm_campaign=api2demo",
+      "id": "/1316/https___www_searchculture_gr_aggregator_edm_momus_000179_17673",
+      "index": 0,
+      "language": [
+        "mul"
+      ],
+      "link": "https://api.europeana.eu/record/1316/https___www_searchculture_gr_aggregator_edm_momus_000179_17673.json?wskey=api2demo",
+      "organizations": [
+        "http://data.europeana.eu/organization/1371",
+        "http://data.europeana.eu/organization/1331"
+      ],
+      "previewNoDistribute": false,
+      "provider": [
+        "Greek Aggregator SearchCulture.gr"
+      ],
+      "rights": [
+        "http://creativecommons.org/licenses/by-sa/4.0/"
+      ],
+      "score": 34.86485,
+      "timestamp": 1788047089651,
+      "timestamp_created": "2025-03-07T07:19:41.711Z",
+      "timestamp_created_epoch": 1741331981711,
+      "timestamp_update": "2025-03-07T07:19:41.711Z",
+      "timestamp_update_epoch": 1741331981711,
+      "title": [
+        "Purple Moon",
+        "Purple Moon"
+      ],
+      "type": "IMAGE",
+      "ugc": [
+        false
+      ],
+      "year": [
+        "1987"
+      ]
+    },
+    {
+      "completeness": 5,
+      "country": [
+        "Greece"
+      ],
+      "dataProvider": [
+        "Metropolitan Organisation of Museums of Visual Arts of Thessaloniki – MOMus"
+      ],
+      "dcCreator": [
+        "http://semantics.gr/authorities/searchculture-persons/810617100",
+        "Antonakos, Stephen (1926-2013)",
+        "Αντωνάκος, Στήβεν (1926-2013)"
+      ],
+      "dcCreatorLangAware": {
+        "def": [
+          "http://semantics.gr/authorities/searchculture-persons/810617100"
+        ],
+        "el": [
+          "Αντωνάκος, Στήβεν (1926-2013)"
+        ],
+        "en": [
+          "Antonakos, Stephen (1926-2013)"
+        ]
+      },
+      "dcSubjectLangAware": {
+        "def": [
+          "http://semantics.gr/authorities/ekt-unesco/1805955473"
+        ],
+        "el": [
+          "Σχέδια και τυπώματα"
+        ]
+      },
+      "dcTitleLangAware": {
+        "el": [
+          "Blue Moon"
+        ],
+        "en": [
+          "Blue Moon"
+        ]
+      },
+      "dcTypeLangAware": {
+        "def": [
+          "http://semantics.gr/authorities/ekt-item-types/sxedioskitso",
+          "http://data.europeana.eu/concept/35"
+        ]
+      },
+      "edmAgent": [
+        "http://semantics.gr/authorities/searchculture-persons/810617100"
+      ],
+      "edmAgentLabel": [
+        {
+          "def": "Αντωνάκος Στέφανος"
+        },
+        {
+          "def": "Antonakos Stephen"
+        }
+      ],
+      "edmAgentLabelLangAware": {
+        "el": [
+          "Αντωνάκος Στέφανος"
+        ],
+        "en": [
+          "Antonakos Stephen"
+        ]
+      },
+      "edmConcept": [
+        "http://semantics.gr/authorities/ekt-unesco/1805955473",
+        "http://semantics.gr/authorities/ekt-item-types/sxedioskitso",
+        "http://semantics.gr/authorities/ekt-item-types/disdiastata-grafika",
+        "http://semantics.gr/authorities/ekt-unesco/1024662637",
+        "http://data.europeana.eu/concept/35"
+      ],
+      "edmConceptLabel": [
+        {
+          "def": "Drawing"
+        },
+        {
+          "def": "Drawing"
+        },
+        {
+          "def": "2D Graphics"
+        },
+        {
+          "def": "Graphic arts"
+        },
+        {
+          "def": "Drawing"
+        },
+        {
+          "def": "Σχέδιο"
+        },
+        {
+          "def": "Σχέδιο"
+        },
+        {
+          "def": "Δισδιάστατα γραφικά"
+        },
+        {
+          "def": "Γραφικές τέχνες"
+        },
+        {
+          "def": "Σχέδιο"
+        },
+        {
+          "def": "Zeichnung"
+        },
+        {
+          "def": "Piirustus"
+        },
+        {
+          "def": "Рисунок"
+        },
+        {
+          "def": "Desenho"
+        },
+        {
+          "def": "Рисунка"
+        },
+        {
+          "def": "Piešimas"
+        },
+        {
+          "def": "Zīmējums"
+        },
+        {
+          "def": "Crtež"
+        },
+        {
+          "def": "Dessin"
+        },
+        {
+          "def": "Rajz"
+        },
+        {
+          "def": "Kresba"
+        },
+        {
+          "def": "Risba"
+        },
+        {
+          "def": "Líníocht"
+        },
+        {
+          "def": "Dibuix"
+        },
+        {
+          "def": "Teckning"
+        },
+        {
+          "def": "Disegno"
+        },
+        {
+          "def": "Dibujo"
+        },
+        {
+          "def": "Joonistus"
+        },
+        {
+          "def": "Kresba"
+        },
+        {
+          "def": "Marrazki"
+        },
+        {
+          "def": "Rysunek"
+        },
+        {
+          "def": "Desen"
+        },
+        {
+          "def": "Tegning"
+        },
+        {
+          "def": "Tekening"
+        }
+      ],
+      "edmConceptPrefLabelLangAware": {
+        "de": [
+          "Zeichnung"
+        ],
+        "fi": [
+          "Piirustus"
+        ],
+        "ru": [
+          "Рисунок"
+        ],
+        "pt": [
+          "Desenho"
+        ],
+        "bg": [
+          "Рисунка"
+        ],
+        "lt": [
+          "Piešimas"
+        ],
+        "lv": [
+          "Zīmējums"
+        ],
+        "hr": [
+          "Crtež"
+        ],
+        "fr": [
+          "Dessin"
+        ],
+        "hu": [
+          "Rajz"
+        ],
+        "sk": [
+          "Kresba"
+        ],
+        "sl": [
+          "Risba"
+        ],
+        "ga": [
+          "Líníocht"
+        ],
+        "ca": [
+          "Dibuix"
+        ],
+        "sv": [
+          "Teckning"
+        ],
+        "el": [
+          "Σχέδιο",
+          "Δισδιάστατα γραφικά",
+          "Γραφικές τέχνες"
+        ],
+        "en": [
+          "Drawing",
+          "Graphic arts",
+          "2D Graphics"
+        ],
+        "it": [
+          "Disegno"
+        ],
+        "es": [
+          "Dibujo"
+        ],
+        "et": [
+          "Joonistus"
+        ],
+        "cs": [
+          "Kresba"
+        ],
+        "eu": [
+          "Marrazki"
+        ],
+        "pl": [
+          "Rysunek"
+        ],
+        "ro": [
+          "Desen"
+        ],
+        "da": [
+          "Tegning"
+        ],
+        "nl": [
+          "Tekening"
+        ]
+      },
+      "edmDatasetName": [
+        "1316__MOMus"
+      ],
+      "edmIsShownAt": [
+        "https://www.momus.gr/collections/0017670"
+      ],
+      "edmIsShownBy": [
+        "http://dam.momus.gr/files/original/f0ae554cc210667d737baf225440afdcbec63e06.jpg"
+      ],
+      "edmPreview": [
+        "https://api.europeana.eu/thumbnail/v2/url.json?uri=https%3A%2F%2Fwww.searchculture.gr%2Faggregator%2Fthumbnails%2Fedm-record%2Fmomus%2F000179-17670&type=IMAGE"
+      ],
+      "edmTimespan": [
+        "http://semantics.gr/authorities/historical-periods/Regime-change",
+        "http://semantics.gr/authorities/historical-periods/neoterh-ellada",
+        "#1987",
+        "http://data.europeana.eu/timespan/20"
+      ],
+      "edmTimespanLabel": [
+        {
+          "def": "Μεταπολίτευση"
+        },
+        {
+          "def": "Νεότερη Ελλάδα"
+        },
+        {
+          "def": "20ός αιώνας"
+        },
+        {
+          "def": "Regime change"
+        },
+        {
+          "def": "Modern Greece"
+        },
+        {
+          "def": "20th century"
+        },
+        {
+          "def": "http://dbpedia.org/page/Metapolitefsi"
+        },
+        {
+          "def": "http://www.wikidata.org/entity/Q6927"
+        },
+        {
+          "def": "http://id.loc.gov/authorities/names/sh85139020"
+        },
+        {
+          "def": "http://id.loc.gov/authorities/names/sh2002012476"
+        },
+        {
+          "def": "http://data.bnf.fr/ark:/12148/cb11975995h"
+        },
+        {
+          "def": "http://www.idref.fr/086305646/id"
+        },
+        {
+          "def": "http://id.nlm.nih.gov/mesh/D049673"
+        },
+        {
+          "def": "https://www.freebase.com/m/089_x"
+        },
+        {
+          "def": "https://g.co/kg/m/089_x"
+        },
+        {
+          "def": "http://id.nlm.nih.gov/mesh/K01.400.504.968"
+        },
+        {
+          "def": "http://vocab.getty.edu/aat/300404514"
+        },
+        {
+          "def": "http://id.worldcat.org/fast/1159810"
+        },
+        {
+          "def": "http://dbpedia.org/resource/20th_century"
+        },
+        {
+          "def": "1987"
+        },
+        {
+          "def": "20. Jahrhundert"
+        },
+        {
+          "def": "XX век"
+        },
+        {
+          "def": "1900-luku"
+        },
+        {
+          "def": "Século XX"
+        },
+        {
+          "def": "20 век"
+        },
+        {
+          "def": "XX amžius"
+        },
+        {
+          "def": "20. gadsimts"
+        },
+        {
+          "def": "20. stoljeće"
+        },
+        {
+          "def": "XXe siècle"
+        },
+        {
+          "def": "20. század"
+        },
+        {
+          "def": "20. storočie"
+        },
+        {
+          "def": "20. stoletje"
+        },
+        {
+          "def": "20ú haois"
+        },
+        {
+          "def": "Segle XX"
+        },
+        {
+          "def": "1900-talet"
+        },
+        {
+          "def": "XX secolo"
+        },
+        {
+          "def": "Siglo XX"
+        },
+        {
+          "def": "20. sajand"
+        },
+        {
+          "def": "XX. mendea"
+        },
+        {
+          "def": "20. století"
+        },
+        {
+          "def": "XX wiek"
+        },
+        {
+          "def": "Secolul al XX-lea"
+        },
+        {
+          "def": "20. århundrede"
+        },
+        {
+          "def": "20e eeuw"
+        }
+      ],
+      "edmTimespanLabelLangAware": {
+        "de": [
+          "20. Jahrhundert"
+        ],
+        "ru": [
+          "XX век"
+        ],
+        "fi": [
+          "1900-luku"
+        ],
+        "pt": [
+          "Século XX"
+        ],
+        "bg": [
+          "20 век"
+        ],
+        "lt": [
+          "XX amžius"
+        ],
+        "lv": [
+          "20. gadsimts"
+        ],
+        "hr": [
+          "20. stoljeće"
+        ],
+        "fr": [
+          "XXe siècle"
+        ],
+        "hu": [
+          "20. század"
+        ],
+        "sk": [
+          "20. storočie"
+        ],
+        "sl": [
+          "20. stoletje"
+        ],
+        "ga": [
+          "20ú haois"
+        ],
+        "ca": [
+          "Segle XX"
+        ],
+        "sv": [
+          "1900-talet"
+        ],
+        "el": [
+          "Μεταπολίτευση",
+          "Νεότερη Ελλάδα",
+          "20ός αιώνας"
+        ],
+        "en": [
+          "Regime change",
+          "Modern Greece",
+          "20th century"
+        ],
+        "it": [
+          "XX secolo"
+        ],
+        "es": [
+          "Siglo XX"
+        ],
+        "et": [
+          "20. sajand"
+        ],
+        "eu": [
+          "XX. mendea"
+        ],
+        "cs": [
+          "20. století"
+        ],
+        "zxx": [
+          "1987"
+        ],
+        "pl": [
+          "XX wiek"
+        ],
+        "ro": [
+          "Secolul al XX-lea"
+        ],
+        "da": [
+          "20. århundrede"
+        ],
+        "nl": [
+          "20e eeuw"
+        ]
+      },
+      "europeanaCollectionName": [
+        "1316__MOMus"
+      ],
+      "europeanaCompleteness": 5,
+      "guid": "https://www.europeana.eu/item/1316/https___www_searchculture_gr_aggregator_edm_momus_000179_17670?utm_source=api&utm_medium=api&utm_campaign=api2demo",
+      "id": "/1316/https___www_searchculture_gr_aggregator_edm_momus_000179_17670",
+      "index": 0,
+      "language": [
+        "mul"
+      ],
+      "link": "https://api.europeana.eu/record/1316/https___www_searchculture_gr_aggregator_edm_momus_000179_17670.json?wskey=api2demo",
+      "organizations": [
+        "http://data.europeana.eu/organization/1371",
+        "http://data.europeana.eu/organization/1331"
+      ],
+      "previewNoDistribute": false,
+      "provider": [
+        "Greek Aggregator SearchCulture.gr"
+      ],
+      "rights": [
+        "http://creativecommons.org/licenses/by-sa/4.0/"
+      ],
+      "score": 34.82821,
+      "timestamp": 1788047089342,
+      "timestamp_created": "2025-03-07T07:19:41.711Z",
+      "timestamp_created_epoch": 1741331981711,
+      "timestamp_update": "2025-03-07T07:19:41.711Z",
+      "timestamp_update_epoch": 1741331981711,
+      "title": [
+        "Blue Moon",
+        "Blue Moon"
+      ],
+      "type": "IMAGE",
+      "ugc": [
+        false
+      ],
+      "year": [
+        "1987"
+      ]
+    }
+  ]
+}
