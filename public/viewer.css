@@ -1,1 +1,357 @@
-/* Stub viewer styles. The full viewer arrives in a later package. */
+/* Full-screen image viewer dialog for Open Library Fetch. */
+
+.viewer {
+  width: 100vw;
+  max-width: 100vw;
+  height: 100vh;
+  max-height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+.viewer::backdrop {
+  background-color: rgba(12, 11, 10, 0.72);
+}
+
+.viewer-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Stage ---------- */
+
+.viewer-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background-color: color-mix(in srgb, var(--ink) 8%, var(--bg));
+  border-right: 1px solid var(--rule);
+}
+
+.viewer-canvas {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: var(--space-5);
+}
+
+.viewer-canvas.is-fit {
+  overflow: hidden;
+}
+
+.viewer-canvas.is-actual {
+  display: block;
+  overflow: auto;
+}
+
+.viewer-image {
+  display: block;
+  cursor: zoom-in;
+}
+
+.viewer-canvas.is-fit .viewer-image {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+.viewer-canvas.is-actual .viewer-image {
+  max-width: none;
+  max-height: none;
+  width: auto;
+  height: auto;
+  margin: 0;
+  cursor: zoom-out;
+}
+
+.viewer-image[hidden] {
+  display: none;
+}
+
+.viewer-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: -0.75rem 0 0 -0.75rem;
+  border-width: 2px;
+  border-color: var(--rule-strong);
+  border-top-color: var(--accent);
+}
+
+.viewer-spinner[hidden] {
+  display: none;
+}
+
+.viewer-error {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+.viewer-error[hidden] {
+  display: none;
+}
+
+/* ---------- Navigation ---------- */
+
+.viewer-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-top: -1.375rem;
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background-color: var(--bg-raised);
+  color: var(--ink);
+  transition: border-color 120ms ease, opacity 120ms ease;
+}
+
+.viewer-prev {
+  left: var(--space-4);
+}
+
+.viewer-next {
+  right: var(--space-4);
+}
+
+.viewer-nav:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.viewer-nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+.viewer-nav-glyph {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  line-height: 1;
+  padding-bottom: 0.15em;
+}
+
+/* ---------- Panel ---------- */
+
+.viewer-panel {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  background-color: var(--bg);
+}
+
+.viewer-panel-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6) var(--space-5) var(--space-6);
+}
+
+.viewer-close {
+  position: fixed;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--rule-strong);
+  border-radius: 50%;
+  background-color: var(--bg-raised);
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.viewer-close:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.viewer-source {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.12em;
+  color: var(--ink-muted);
+}
+
+.viewer-title {
+  margin: 0;
+  padding-right: var(--space-6);
+  font-size: 1.5rem;
+  line-height: 1.2;
+}
+
+.viewer-byline {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--ink-muted);
+}
+
+.viewer-block {
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+}
+
+.viewer-description {
+  margin: 0;
+  max-height: 14rem;
+  overflow-y: auto;
+  padding-right: var(--space-2);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+/* ---------- Facts ---------- */
+
+.viewer-facts {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+  font-size: 0.88rem;
+}
+
+.viewer-facts dt {
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  color: var(--ink-muted);
+}
+
+.viewer-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.viewer-page-link {
+  font-size: 0.9rem;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--rule-strong);
+}
+
+.viewer-page-link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ---------- Actions ---------- */
+
+.viewer-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.viewer-download {
+  width: 100%;
+  text-align: center;
+}
+
+.viewer-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.viewer-button {
+  flex: 1 1 auto;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background-color: transparent;
+  color: var(--ink);
+  font-size: 0.85rem;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+.viewer-button:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.viewer-position {
+  margin: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--rule);
+  font-size: 0.78rem;
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.1em;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 800px) {
+  .viewer {
+    overflow-y: auto;
+  }
+
+  .viewer-layout {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+    height: auto;
+    min-height: 100%;
+  }
+
+  .viewer-stage {
+    height: 60vh;
+    border-right: 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .viewer-panel {
+    overflow-y: visible;
+  }
+
+  .viewer-panel-inner {
+    padding: var(--space-5) var(--space-4) var(--space-7);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .viewer-stage {
+    background-color: #0b0a09;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .viewer,
+  .viewer * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .viewer-spinner {
+    animation: none;
+  }
+}
