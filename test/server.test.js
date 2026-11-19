@@ -82,9 +82,14 @@ function makeSources(upstreamBase) {
   nasa.resolveDownload = async () => ({ url: `${upstreamBase}/x.jpg` });
 
   const europeana = makeStub('europeana', 'EUROPEANA_KEY');
+  europeana.trustResolvedUrl = true;
   europeana.resolveDownload = async (id) => ({ url: `${upstreamBase}/image/${id}` });
 
-  return [ok, bad, keyed, met, nasa, europeana];
+  const openverse = makeStub('openverse');
+  openverse.trustResolvedUrl = true;
+  openverse.resolveDownload = async (id) => ({ url: `${upstreamBase}/x.jpg` });
+
+  return [ok, bad, keyed, met, nasa, europeana, openverse];
 }
 
 async function createFixture() {
@@ -113,6 +118,11 @@ async function createFixture() {
     if (req.url === '/html') {
       res.writeHead(200, { 'Content-Type': 'text/html' });
       res.end('<html>not an image</html>');
+      return;
+    }
+    if (req.url === '/noct.jpg' || req.url === '/noct') {
+      res.writeHead(200, { 'Content-Length': IMAGE_BYTES.length });
+      res.end(IMAGE_BYTES);
       return;
     }
     res.writeHead(404, { 'Content-Type': 'text/plain' });
@@ -201,7 +211,7 @@ test('GET /api/sources', async () => {
     assert.ok(!text.includes('secret-value'));
     const data = JSON.parse(text);
     assert.ok(Array.isArray(data));
-    assert.equal(data.length, 6);
+    assert.equal(data.length, 7);
     const keyed = data.find((entry) => entry.id === 'keyed');
     assert.equal(keyed.needsKey, true);
     assert.equal(keyed.keyConfigured, true);
@@ -364,4 +374,79 @@ test('path traversal is blocked', async () => {
 test('POST is not allowed', async () => {
   const res = await fetch(`${fixture.base}/api/sources`, { method: 'POST' });
   assert.equal(res.status, 405);
+});
+
+async function withServer(sources, fn) {
+  const server = createServer({ publicDir: fixture.publicDir, sourcesOverride: sources });
+  const port = await listen(server);
+  try {
+    await fn(`http://127.0.0.1:${port}`, port);
+  } finally {
+    await close(server);
+  }
+}
+
+test('GET /api/download openverse needs an id', async () => {
+  const res = await fetch(
+    `${fixture.base}/api/download?source=openverse&url=${encodeURIComponent('https://evil.example.com/x.jpg')}`,
+  );
+  assert.equal(res.status, 400);
+  assert.equal((await res.json()).error, 'Missing id');
+});
+
+test('GET /api/download openverse ignores url and streams', async () => {
+  const res = await fetch(
+    `${fixture.base}/api/download?source=openverse&id=abc&url=${encodeURIComponent('https://evil.example.com/x.jpg')}`,
+  );
+  assert.equal(res.status, 200);
+  assert.equal(res.headers.get('content-type'), 'image/jpeg');
+  assert.deepEqual(Buffer.from(await res.arrayBuffer()), IMAGE_BYTES);
+});
+
+test('GET /api/download does not hard-code the europeana id', async () => {
+  const sources = makeSources(fixture.upstreamBase).map((source) =>
+    source.id === 'europeana'
+      ? { ...source, trustResolvedUrl: undefined }
+      : source,
+  );
+  await withServer(sources, async (base) => {
+    const res = await fetch(
+      `${base}/api/download?source=europeana&id=1&url=${encodeURIComponent('https://evil.example.com/x.jpg')}`,
+    );
+    assert.equal(res.status, 400);
+  });
+});
+
+test('GET /api/download accepts a missing Content-Type with an image extension', async () => {
+  const sources = makeSources(fixture.upstreamBase).map((source) =>
+    source.id === 'openverse'
+      ? {
+          ...source,
+          resolveDownload: async () => ({ url: `${fixture.upstreamBase}/noct.jpg` }),
+        }
+      : source,
+  );
+  await withServer(sources, async (base) => {
+    const res = await fetch(`${base}/api/download?source=openverse&id=abc`);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('content-type'), 'image/jpeg');
+    assert.match(res.headers.get('content-disposition'), /\.jpg"$/);
+    assert.deepEqual(Buffer.from(await res.arrayBuffer()), IMAGE_BYTES);
+  });
+});
+
+test('GET /api/download rejects a missing Content-Type without a known extension', async () => {
+  const sources = makeSources(fixture.upstreamBase).map((source) =>
+    source.id === 'openverse'
+      ? {
+          ...source,
+          resolveDownload: async () => ({ url: `${fixture.upstreamBase}/noct` }),
+        }
+      : source,
+  );
+  await withServer(sources, async (base) => {
+    const res = await fetch(`${base}/api/download?source=openverse&id=abc`);
+    assert.equal(res.status, 502);
+    assert.match((await res.json()).error, /not an image/);
+  });
 });
