@@ -10,10 +10,15 @@ import {
   buildSearchUrl,
   licenseLabel,
   resolveDownload,
+  trustResolvedUrl,
 } from '../lib/sources/europeana.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(readFileSync(join(here, 'fixtures/europeana.json'), 'utf8'));
+
+test('europeana trusts its resolved download URL', () => {
+  assert.equal(trustResolvedUrl, true);
+});
 
 test('europeana parseSearch reads items and total', () => {
   const result = parseSearch(fixture, 1);

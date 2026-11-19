@@ -108,6 +108,28 @@ function errorStatus(err) {
   return err?.status === 400 ? 400 : 502;
 }
 
+const IMAGE_TYPES_BY_EXTENSION = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  jp2: 'image/jp2',
+  gif: 'image/gif',
+  webp: 'image/webp',
+};
+
+function imageExtensionFromUrl(url) {
+  let path = '';
+  try {
+    path = new URL(url).pathname;
+  } catch {
+    path = String(url ?? '').split(/[?#]/, 1)[0];
+  }
+  const match = /\.([A-Za-z0-9]{2,5})$/.exec(path);
+  return match ? match[1].toLowerCase() : null;
+}
+
 async function handleDownload(url, req, res, sourceList) {
   const sourceId = url.searchParams.get('source');
   const source = sourceId ? sourceList.find((entry) => entry.id === sourceId) : null;
@@ -119,14 +141,15 @@ async function handleDownload(url, req, res, sourceList) {
   const itemId = url.searchParams.get('id');
   const explicitUrl = url.searchParams.get('url');
   const title = url.searchParams.get('title');
-  const isEuropeana = source.id === 'europeana';
+  const trustResolvedUrl = source.trustResolvedUrl === true;
 
-  if (!itemId && !explicitUrl) {
+  if (trustResolvedUrl) {
+    if (!itemId) {
+      sendJson(res, 400, { error: 'Missing id' });
+      return;
+    }
+  } else if (!itemId && !explicitUrl) {
     sendJson(res, 400, { error: 'Missing id or url' });
-    return;
-  }
-  if (isEuropeana && !itemId) {
-    sendJson(res, 400, { error: 'Missing id' });
     return;
   }
 
@@ -135,7 +158,7 @@ async function handleDownload(url, req, res, sourceList) {
   let resolvedFilename = null;
 
   try {
-    if (isEuropeana) {
+    if (trustResolvedUrl) {
       if (typeof source.resolveDownload !== 'function') {
         sendJson(res, 400, { error: 'No download URL' });
         return;
@@ -182,8 +205,19 @@ async function handleDownload(url, req, res, sourceList) {
     return;
   }
 
-  const contentType = remote.headers.get('content-type') ?? '';
-  const normalizedType = contentType.split(';', 1)[0].trim().toLowerCase();
+  const finalUrl = remote.url || remoteUrl;
+
+  let contentType = remote.headers.get('content-type') ?? '';
+  let normalizedType = contentType.split(';', 1)[0].trim().toLowerCase();
+  if (normalizedType === '') {
+    const extension = imageExtensionFromUrl(finalUrl);
+    const derived = extension ? IMAGE_TYPES_BY_EXTENSION[extension] : null;
+    if (derived) {
+      normalizedType = derived;
+      contentType = derived;
+    }
+  }
+
   if (!normalizedType.startsWith('image/') && normalizedType !== 'application/octet-stream') {
     try {
       await remote.body?.cancel();
@@ -199,9 +233,9 @@ async function handleDownload(url, req, res, sourceList) {
 
   let urlPath = '';
   try {
-    urlPath = new URL(remoteUrl).pathname;
+    urlPath = new URL(finalUrl).pathname;
   } catch {
-    urlPath = remoteUrl;
+    urlPath = finalUrl;
   }
   const ext = extFromContentType(normalizedType, urlPath);
   const filename = safeFilename(

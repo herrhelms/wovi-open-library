@@ -1,0 +1,159 @@
+{
+  "type": "ResultList",
+  "pageSize": 2,
+  "totalPages": 238,
+  "totalResults": 476,
+  "results": [
+    {
+      "locations": [
+        {
+          "url": "https://iiif.wellcomecollection.org/image/V0024724/info.json",
+          "credit": "Wellcome Collection",
+          "license": {
+            "id": "pdm",
+            "type": "License",
+            "label": "Public Domain Mark",
+            "url": "https://creativecommons.org/share-your-work/public-domain/pdm/"
+          },
+          "accessConditions": [
+            {
+              "method": {
+                "id": "view-online",
+                "type": "AccessMethod",
+                "label": "View online"
+              },
+              "status": {
+                "id": "open",
+                "type": "AccessStatus",
+                "label": "Open"
+              },
+              "type": "AccessCondition"
+            }
+          ],
+          "locationType": {
+            "id": "iiif-image",
+            "type": "LocationType",
+            "label": "IIIF Image API"
+          },
+          "type": "DigitalLocation"
+        }
+      ],
+      "source": {
+        "id": "eaf5rrag",
+        "title": "Astronomy: the surface of the moon. Engraving.",
+        "type": "Work"
+      },
+      "aspectRatio": 0.8125,
+      "thumbnail": {
+        "url": "https://iiif.wellcomecollection.org/image/V0024724/info.json",
+        "credit": "Wellcome Collection",
+        "license": {
+          "id": "pdm",
+          "type": "License",
+          "label": "Public Domain Mark",
+          "url": "https://creativecommons.org/share-your-work/public-domain/pdm/"
+        },
+        "accessConditions": [
+          {
+            "method": {
+              "id": "view-online",
+              "type": "AccessMethod",
+              "label": "View online"
+            },
+            "status": {
+              "id": "open",
+              "type": "AccessStatus",
+              "label": "Open"
+            },
+            "type": "AccessCondition"
+          }
+        ],
+        "locationType": {
+          "id": "iiif-image",
+          "type": "LocationType",
+          "label": "IIIF Image API"
+        },
+        "type": "DigitalLocation"
+      },
+      "averageColor": "#656259",
+      "id": "a7wfv9vu",
+      "type": "Image"
+    },
+    {
+      "locations": [
+        {
+          "url": "https://iiif.wellcomecollection.org/image/V0024780/info.json",
+          "credit": "Wellcome Collection",
+          "license": {
+            "id": "pdm",
+            "type": "License",
+            "label": "Public Domain Mark",
+            "url": "https://creativecommons.org/share-your-work/public-domain/pdm/"
+          },
+          "accessConditions": [
+            {
+              "method": {
+                "id": "view-online",
+                "type": "AccessMethod",
+                "label": "View online"
+              },
+              "status": {
+                "id": "open",
+                "type": "AccessStatus",
+                "label": "Open"
+              },
+              "type": "AccessCondition"
+            }
+          ],
+          "locationType": {
+            "id": "iiif-image",
+            "type": "LocationType",
+            "label": "IIIF Image API"
+          },
+          "type": "DigitalLocation"
+        }
+      ],
+      "source": {
+        "id": "vgd42upc",
+        "title": "Astronomy: the surface of the moon. Engraving.",
+        "type": "Work"
+      },
+      "aspectRatio": 1.0723860589812333,
+      "thumbnail": {
+        "url": "https://iiif.wellcomecollection.org/image/V0024780/info.json",
+        "credit": "Wellcome Collection",
+        "license": {
+          "id": "pdm",
+          "type": "License",
+          "label": "Public Domain Mark",
+          "url": "https://creativecommons.org/share-your-work/public-domain/pdm/"
+        },
+        "accessConditions": [
+          {
+            "method": {
+              "id": "view-online",
+              "type": "AccessMethod",
+              "label": "View online"
+            },
+            "status": {
+              "id": "open",
+              "type": "AccessStatus",
+              "label": "Open"
+            },
+            "type": "AccessCondition"
+          }
+        ],
+        "locationType": {
+          "id": "iiif-image",
+          "type": "LocationType",
+          "label": "IIIF Image API"
+        },
+        "type": "DigitalLocation"
+      },
+      "averageColor": "#998c7d",
+      "id": "cr4wxy9v",
+      "type": "Image"
+    }
+  ],
+  "nextPage": "https://api.wellcomecollection.org/catalogue/v2/images?locations.license=pdm,cc-0,cc-by&page=2&pageSize=2&query=moon"
+}
