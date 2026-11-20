@@ -1,0 +1,70 @@
+{
+  "help": "https://data.nhm.ac.uk/api/3/action/help_show?name=datastore_search",
+  "success": true,
+  "result": {
+    "total": 1628,
+    "records": [
+      {
+        "_id": "2828514",
+        "catalogNumber": "1918.8.1.590",
+        "occurrenceID": "dce83f3f-e8ea-46e4-a72c-db872e72b107",
+        "scientificName": "Astromma",
+        "collectionCode": "ZOO",
+        "collectionName": "G.C. Wallich Collection",
+        "genus": "Astromma",
+        "basisOfRecord": "PreservedSpecimen",
+        "associatedMedia": [
+          {
+            "_id": "9867",
+            "assetID": "e6afe3bb-6273-45bb-a2a6-b27853fcd5c7",
+            "identifier": "https://data.nhm.ac.uk/media/e6afe3bb-6273-45bb-a2a6-b27853fcd5c7",
+            "title": "Zoology Accessions Register: Spongiida: 1918 - 1928: page 8",
+            "category": "Register",
+            "type": "StillImage",
+            "license": "http://creativecommons.org/licenses/by/4.0/",
+            "rightsHolder": "The Trustees of the Natural History Museum, London",
+            "PixelXDimension": "2828",
+            "PixelYDimension": "2268",
+            "format": "image/jpeg"
+          }
+        ],
+        "associatedMediaCount": 1
+      },
+      {
+        "_id": "2828512",
+        "catalogNumber": "1918.8.1.589",
+        "occurrenceID": "8b151485-b437-4760-b635-d7b4be05bef7",
+        "scientificName": "Radiolaria",
+        "collectionCode": "ZOO",
+        "collectionName": "G.C. Wallich Collection",
+        "basisOfRecord": "PreservedSpecimen",
+        "associatedMedia": [
+          {
+            "_id": "9867",
+            "assetID": "e6afe3bb-6273-45bb-a2a6-b27853fcd5c7",
+            "identifier": "https://data.nhm.ac.uk/media/e6afe3bb-6273-45bb-a2a6-b27853fcd5c7",
+            "title": "Zoology Accessions Register: Spongiida: 1918 - 1928: page 8",
+            "category": "Register",
+            "type": "StillImage",
+            "license": "http://creativecommons.org/licenses/by/4.0/",
+            "rightsHolder": "The Trustees of the Natural History Museum, London",
+            "PixelXDimension": "2828",
+            "PixelYDimension": "2268",
+            "format": "image/jpeg"
+          }
+        ],
+        "associatedMediaCount": 1
+      },
+      {
+        "_id": "3000000",
+        "catalogNumber": "NHMUK-no-image",
+        "occurrenceID": "00000000-0000-0000-0000-000000000000",
+        "scientificName": "No image specimen",
+        "collectionCode": "ZOO",
+        "basisOfRecord": "PreservedSpecimen",
+        "associatedMedia": [],
+        "associatedMediaCount": 0
+      }
+    ]
+  }
+}
