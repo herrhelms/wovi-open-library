@@ -171,6 +171,39 @@ test('search rejects on a non-200 status', async () => {
   await assert.rejects(eso.search('moon', 1, { fetch: fake }), /ESO answered HTTP 503/);
 });
 
+test('search cancels the body on a non-200 status', async () => {
+  let cancelled = false;
+  const fake = async () => ({
+    status: 503,
+    body: {
+      cancel() {
+        cancelled = true;
+      },
+    },
+    text: async () => '',
+  });
+  await assert.rejects(eso.search('moon', 1, { fetch: fake }), /ESO answered HTTP 503/);
+  assert.equal(cancelled, true);
+});
+
+test('resolveDownload cancels the body on a non-200 status', async () => {
+  let cancelled = false;
+  const fake = async () => ({
+    status: 503,
+    body: {
+      cancel() {
+        cancelled = true;
+      },
+    },
+    text: async () => '',
+  });
+  await assert.rejects(
+    webb.resolveDownload('potm2504a', { fetch: fake }),
+    /ESA\/Webb answered HTTP 503/,
+  );
+  assert.equal(cancelled, true);
+});
+
 test('resolveDownload returns the picked URL', async () => {
   let requested = '';
   const fake = async (url) => {
