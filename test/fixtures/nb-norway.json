@@ -1,0 +1,190 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://api.nb.no/catalog/v1/items?q=moon&filter=mediatype:bilder&filter=contentClasses:public&page=0&size=3"
+    },
+    "next": {
+      "href": "https://api.nb.no/catalog/v1/items?q=moon&filter=mediatype:bilder&filter=contentClasses:public&page=1&size=3"
+    },
+    "last": {
+      "href": "https://api.nb.no/catalog/v1/items?q=moon&filter=mediatype:bilder&filter=contentClasses:public&page=1&size=3"
+    }
+  },
+  "page": {
+    "number": 0,
+    "size": 3,
+    "totalElements": 5,
+    "totalPages": 2
+  },
+  "_embedded": {
+    "items": [
+      {
+        "id": "e608aabae1c78f0c0184c009e7e0350f",
+        "_links": {
+          "self": {
+            "href": "https://api.nb.no:443/catalog/v1/items/e608aabae1c78f0c0184c009e7e0350f"
+          },
+          "presentation": {
+            "href": "https://api.nb.no:443/catalog/v1/iiif/e608aabae1c78f0c0184c009e7e0350f/manifest"
+          },
+          "thumbnail_custom": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20171122_00016_NB_HS_F_00305/full/{width},{height}/0/native.jpg",
+            "templated": true
+          },
+          "thumbnail_large": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20171122_00016_NB_HS_F_00305/full/0,200/0/native.jpg"
+          }
+        },
+        "accessInfo": {
+          "accessAllowedFrom": "EVERYWHERE",
+          "accessInfoLastModified": "2025-08-26T13:53:23.443Z",
+          "isDigital": true,
+          "isPublicDomain": true,
+          "license": "publicdomain",
+          "viewability": "ALL"
+        },
+        "metadata": {
+          "identifiers": {
+            "sesamId": "e608aabae1c78f0c0184c009e7e0350f",
+            "oaiId": "oai:axiellav.nb.no:av:756512",
+            "urn": "URN:NBN:no-nb_digifoto_20171122_00016_NB_HS_F_00305"
+          },
+          "title": "Holmenkolldagen 5/3 1933, Ola Moon",
+          "mediaTypes": [
+            "bilder"
+          ],
+          "creators": [
+            "Henriksen & Steen"
+          ],
+          "dateCreated": "19330305"
+        }
+      },
+      {
+        "id": "6e71917b5c6cd9cc3f6ccd4d1e9430e3",
+        "_links": {
+          "self": {
+            "href": "https://api.nb.no:443/catalog/v1/items/6e71917b5c6cd9cc3f6ccd4d1e9430e3"
+          },
+          "presentation": {
+            "href": "https://api.nb.no:443/catalog/v1/iiif/6e71917b5c6cd9cc3f6ccd4d1e9430e3/manifest"
+          },
+          "thumbnail_custom": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20261109_00017_blds_17282/full/{width},{height}/0/native.jpg",
+            "templated": true
+          },
+          "thumbnail_large": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20261109_00017_blds_17282/full/0,200/0/native.jpg"
+          }
+        },
+        "accessInfo": {
+          "accessAllowedFrom": "EVERYWHERE",
+          "accessInfoLastModified": "2026-11-10T03:00:03.149Z",
+          "isDigital": true,
+          "isPublicDomain": true,
+          "license": "publicdomain",
+          "viewability": "ALL"
+        },
+        "metadata": {
+          "identifiers": {
+            "sesamId": "6e71917b5c6cd9cc3f6ccd4d1e9430e3",
+            "oaiId": "oai:axiellav.nb.no:av:222491991",
+            "urn": "URN:NBN:no-nb_digifoto_20261109_00017_blds_17282"
+          },
+          "title": "Full Moon [stereofotografi]",
+          "mediaTypes": [
+            "bilder"
+          ],
+          "creators": [
+            "Rutherfurd, Lewis Morris"
+          ],
+          "dateCreated": "1871"
+        }
+      },
+      {
+        "id": "ae8c393ae0f08c18655a09cd23bd1ebc",
+        "_links": {
+          "self": {
+            "href": "https://api.nb.no:443/catalog/v1/items/ae8c393ae0f08c18655a09cd23bd1ebc"
+          },
+          "presentation": {
+            "href": "https://api.nb.no:443/catalog/v1/iiif/ae8c393ae0f08c18655a09cd23bd1ebc/manifest"
+          },
+          "thumbnail_custom": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20200511_00060_NB_HS_O_00843/full/{width},{height}/0/native.jpg",
+            "templated": true
+          },
+          "thumbnail_large": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20200511_00060_NB_HS_O_00843/full/0,200/0/native.jpg"
+          }
+        },
+        "accessInfo": {
+          "accessAllowedFrom": "EVERYWHERE",
+          "accessInfoLastModified": "2025-08-26T13:57:04.218Z",
+          "isDigital": true,
+          "isPublicDomain": true,
+          "license": "publicdomain",
+          "viewability": "ALL"
+        },
+        "metadata": {
+          "identifiers": {
+            "sesamId": "ae8c393ae0f08c18655a09cd23bd1ebc",
+            "oaiId": "oai:axiellav.nb.no:av:762542",
+            "urn": "URN:NBN:no-nb_digifoto_20200511_00060_NB_HS_O_00843"
+          },
+          "title": "Nydalsrennet, div. portretter, Oskar Kristiansen (34), Nydalen - Hilmar Myhra (17), Kongsberg - Ola Moon (189), BUL - Alf Andersen (179), Skeid",
+          "mediaTypes": [
+            "bilder"
+          ],
+          "creators": [
+            "Henriksen & Steen"
+          ],
+          "dateCreated": "1940"
+        }
+      },
+      {
+        "id": "00000000000000000000000000000001",
+        "_links": {
+          "thumbnail_custom": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20200101_00001_TEST/full/{width},{height}/0/native.jpg",
+            "templated": true
+          }
+        },
+        "accessInfo": {
+          "accessAllowedFrom": "EVERYWHERE",
+          "isDigital": true,
+          "isPublicDomain": false,
+          "license": "copyright",
+          "viewability": "ALL"
+        },
+        "metadata": {
+          "identifiers": {
+            "urn": "URN:NBN:no-nb_digifoto_20200101_00001_TEST"
+          },
+          "title": "Hand-made restricted item"
+        }
+      },
+      {
+        "id": "00000000000000000000000000000002",
+        "_links": {
+          "thumbnail_custom": {
+            "href": "https://www.nb.no/services/image/resolver/URN:NBN:no-nb_digifoto_20200101_00002_TEST/full/{width},{height}/0/native.jpg",
+            "templated": true
+          }
+        },
+        "accessInfo": {
+          "accessAllowedFrom": "NORWAY",
+          "isDigital": true,
+          "isPublicDomain": true,
+          "license": "publicdomain",
+          "viewability": "ALL"
+        },
+        "metadata": {
+          "identifiers": {
+            "urn": "URN:NBN:no-nb_digifoto_20200101_00002_TEST"
+          },
+          "title": "Hand-made Norway-only item"
+        }
+      }
+    ]
+  }
+}
