@@ -1,0 +1,71 @@
+{
+  "total_results": 83,
+  "page": 1,
+  "per_page": 24,
+  "photos": [
+    {
+      "id": 3145678,
+      "width": 4000,
+      "height": 6000,
+      "url": "https://www.pexels.com/photo/full-moon-in-the-night-sky-3145678/",
+      "photographer": "Jane Doe",
+      "photographer_url": "https://www.pexels.com/@jane-doe-12345",
+      "photographer_id": 12345,
+      "avg_color": "#1B1B2F",
+      "src": {
+        "original": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg",
+        "large2x": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "large": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+        "medium": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&h=350",
+        "small": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&h=130",
+        "portrait": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+        "landscape": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        "tiny": "https://images.pexels.com/photos/3145678/pexels-photo-3145678.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280"
+      },
+      "alt": "Full moon in the night sky"
+    },
+    {
+      "id": 2087654,
+      "width": 3000,
+      "height": 2000,
+      "url": "https://www.pexels.com/photo/moon-over-mountains-2087654/",
+      "photographer": "John Smith",
+      "photographer_url": "https://www.pexels.com/@john-smith-67890",
+      "photographer_id": 67890,
+      "avg_color": "#2C2F45",
+      "src": {
+        "original": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg",
+        "large2x": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+        "large": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
+        "medium": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&h=350",
+        "small": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&h=130",
+        "portrait": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=800",
+        "landscape": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=627&w=1200",
+        "tiny": "https://images.pexels.com/photos/2087654/pexels-photo-2087654.jpeg?auto=compress&cs=tinysrgb&dpr=1&fit=crop&h=200&w=280"
+      },
+      "alt": "Moon over the mountains"
+    },
+    {
+      "id": 1111111,
+      "width": 2000,
+      "height": 2000,
+      "url": "https://www.pexels.com/photo/no-original-1111111/",
+      "photographer": "No Original",
+      "photographer_url": "https://www.pexels.com/@no-original-111",
+      "photographer_id": 111,
+      "avg_color": "#000000",
+      "src": {
+        "original": "",
+        "large2x": "",
+        "large": "",
+        "medium": "https://images.pexels.com/photos/1111111/pexels-photo-1111111.jpeg?auto=compress&cs=tinysrgb&h=350",
+        "small": "",
+        "portrait": "",
+        "landscape": "",
+        "tiny": ""
+      },
+      "alt": "Record without an original image"
+    }
+  ],
+  "next_page": "https://api.pexels.com/v1/search?query=moon&per_page=24&page=2"
+}
