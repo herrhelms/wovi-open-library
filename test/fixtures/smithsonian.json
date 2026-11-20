@@ -780,6 +780,69 @@
         "timestamp": "1663784056",
         "lastTimeUpdated": "1794311025",
         "version": "1794306607"
+      },
+      {
+        "id": "test-no-resources",
+        "title": "No Resources",
+        "type": "edanmdm",
+        "url": "edanmdm:test_test-no-resources",
+        "content": {
+          "freetext": {},
+          "descriptiveNonRepeating": {
+            "record_link": "https://example.org/test-no-resources",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:TEST-000001",
+                  "type": "Images",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 1200,
+                  "height": 800,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=TEST-000001",
+                  "maxsize": 0
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "id": "test-tiff-only",
+        "title": "TIFF Only",
+        "type": "edanmdm",
+        "url": "edanmdm:test_test-tiff-only",
+        "content": {
+          "freetext": {},
+          "descriptiveNonRepeating": {
+            "record_link": "https://example.org/test-tiff-only",
+            "online_media": {
+              "media": [
+                {
+                  "id": "media:TEST-000001",
+                  "type": "Images",
+                  "usage": {
+                    "access": "CC0"
+                  },
+                  "width": 1200,
+                  "height": 800,
+                  "content": "https://ids.si.edu/ids/deliveryService?id=TEST-000001",
+                  "maxsize": 0,
+                  "resources": [
+                    {
+                      "label": "High-resolution TIFF",
+                      "url": "https://ids.si.edu/ids/download?id=TEST-000002.tif",
+                      "width": 1300,
+                      "height": 900,
+                      "dimensions": "1300x900"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        }
       }
     ],
     "facets": {},

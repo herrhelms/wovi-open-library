@@ -27,7 +27,8 @@ test('mia parseSearch removes non-public-domain records', () => {
   assert.equal(item.id, String(record.id));
   assert.equal(item.source, 'mia');
   assert.equal(item.thumb, `https://1.api.artsmia.org/400/${record.id}.jpg`);
-  assert.equal(item.preview, `https://1.api.artsmia.org/800/${record.id}.jpg`);
+  assert.equal(item.preview, `https://1.api.artsmia.org/full/${record.id}.jpg`);
+  assert.equal(item.previewFallback, `https://1.api.artsmia.org/800/${record.id}.jpg`);
   assert.equal(item.full, `https://1.api.artsmia.org/full/${record.id}.jpg`);
   assert.equal(item.pageUrl, `https://collections.artsmia.org/art/${record.id}`);
   assert.equal(item.license, 'Public domain');
@@ -36,6 +37,13 @@ test('mia parseSearch removes non-public-domain records', () => {
   assert.equal(item.height, record.image_height);
   assert.equal(item.creator, record.artist);
   assert.equal(item.date, record.dated);
+});
+
+test('mia normalize id 1218 uses the full image as preview', () => {
+  const item = normalize({ id: 1218, rights_type: 'Public Domain', title: 'Test' });
+  assert.equal(item.preview, 'https://1.api.artsmia.org/full/1218.jpg');
+  assert.equal(item.previewFallback, 'https://1.api.artsmia.org/800/1218.jpg');
+  assert.equal(item.full, 'https://1.api.artsmia.org/full/1218.jpg');
 });
 
 test('mia normalize rejects unknown rights', () => {
