@@ -244,6 +244,33 @@ export function el(tag, attrs = {}, children = []) {
 }
 
 /**
+ * Decide whether the sentinel may trigger another automatic page load.
+ * When the last automatic load produced no new visible cards and the allowed
+ * retries are used up, the caller should wait for a manual "Load more".
+ * @param {object} options
+ * @param {number} options.visibleNow
+ * @param {number|null} options.visibleAtLastAutoLoad
+ * @param {number} options.autoLoadsWithoutGain
+ * @param {number} [options.maxWithoutGain]
+ * @returns {boolean}
+ */
+export function shouldAutoLoad({
+  visibleNow,
+  visibleAtLastAutoLoad,
+  autoLoadsWithoutGain,
+  maxWithoutGain = 1,
+}) {
+  if (
+    typeof visibleAtLastAutoLoad === 'number' &&
+    visibleNow <= visibleAtLastAutoLoad &&
+    autoLoadsWithoutGain >= maxWithoutGain
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/**
  * Wait for a number of milliseconds.
  * @param {number} ms
  * @returns {Promise<void>}
