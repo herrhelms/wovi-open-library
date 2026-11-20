@@ -181,8 +181,92 @@ test('getty normalize makes an Item', () => {
   assert.equal(item.height, null);
   assert.ok(item.pageUrl.startsWith('https://www.getty.edu/art/collection/object/'));
   assert.equal(item.pageUrl, 'https://www.getty.edu/art/collection/object/109JB8');
-  assert.equal(item.license, 'Getty Open Content (free to use)');
-  assert.equal(item.licenseUrl, 'https://www.getty.edu/projects/open-content-program/');
+  assert.equal(item.license, 'CC0');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/zero/1.0/');
+});
+
+test('getty normalize reads the InC rights statement from the fixture', () => {
+  const raw = fixture.objects['9f4c8a11-2b6d-4e5a-8c17-7d3f0a2e6b91'];
+  const item = normalize(raw);
+  assert.equal(item.license, 'In copyright');
+  assert.equal(item.licenseUrl, 'https://rightsstatements.org/vocab/InC/1.0/');
+});
+
+const BASE_OBJECT = fixture.objects['6187b505-b256-4d00-9ad2-68806e1e59e6'];
+
+function licenceItem(id) {
+  return normalize({
+    ...BASE_OBJECT,
+    subject_to: id === null ? undefined : [{ classified_as: [{ id }] }],
+  });
+}
+
+test('getty normalize reads the CC0 licence', () => {
+  const item = licenceItem('https://creativecommons.org/publicdomain/zero/1.0/');
+  assert.equal(item.license, 'CC0');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/zero/1.0/');
+});
+
+test('getty normalize reads InC and InC-RUU as In copyright', () => {
+  for (const id of [
+    'https://rightsstatements.org/vocab/InC/1.0/',
+    'https://rightsstatements.org/vocab/InC-RUU/1.0/',
+  ]) {
+    const item = licenceItem(id);
+    assert.equal(item.license, 'In copyright');
+    assert.equal(item.licenseUrl, id);
+  }
+});
+
+test('getty normalize reads UND as Copyright undetermined', () => {
+  const id = 'https://rightsstatements.org/vocab/UND/1.0/';
+  const item = licenceItem(id);
+  assert.equal(item.license, 'Copyright undetermined');
+  assert.equal(item.licenseUrl, id);
+});
+
+test('getty normalize reads CNE as Copyright not evaluated', () => {
+  const id = 'https://rightsstatements.org/vocab/CNE/1.0/';
+  const item = licenceItem(id);
+  assert.equal(item.license, 'Copyright not evaluated');
+  assert.equal(item.licenseUrl, id);
+});
+
+test('getty normalize uses See item page without a licence', () => {
+  for (const id of [null, 'http://vocab.getty.edu/aat/300417696']) {
+    const item = licenceItem(id);
+    assert.equal(item.license, 'See item page');
+    assert.equal(item.licenseUrl, null);
+  }
+});
+
+test('getty normalize compares licence ids without http and trailing slash', () => {
+  const item = licenceItem('http://creativecommons.org/publicdomain/zero/1.0');
+  assert.equal(item.license, 'CC0');
+});
+
+test('getty buildQuery adds the open filter only when openOnly is true', () => {
+  const open = buildQuery('moon', 1, true);
+  assert.ok(open.includes('?o crm:P104_is_subject_to ?lic .'));
+  assert.ok(
+    open.includes(
+      '?lic crm:P2_has_type <http://creativecommons.org/publicdomain/zero/1.0/> .',
+    ),
+  );
+  assert.ok(!buildQuery('moon', 1).includes('P104'));
+  assert.ok(!buildQuery('moon', 1, false).includes('P104'));
+});
+
+test('getty search passes openOnly to the SPARQL URL', async () => {
+  clearCache();
+  const openFake = makeFake();
+  await search('moon', 1, { fetchJson: openFake.fetchJson, openOnly: true });
+  assert.ok(decodeURIComponent(openFake.calls[0]).includes('P104_is_subject_to'));
+
+  clearCache();
+  const normalFake = makeFake();
+  await search('moon', 1, { fetchJson: normalFake.fetchJson });
+  assert.ok(!decodeURIComponent(normalFake.calls[0]).includes('P104_is_subject_to'));
 });
 
 test('getty normalize returns null without a representation', () => {
