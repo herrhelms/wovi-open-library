@@ -1,0 +1,884 @@
+{
+  "sparql": {
+    "head": {
+      "vars": [
+        "o",
+        "title"
+      ]
+    },
+    "results": {
+      "bindings": [
+        {
+          "o": {
+            "type": "uri",
+            "value": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6"
+          },
+          "title": {
+            "type": "literal",
+            "value": "A Swan Among the Reeds, by Moonlight"
+          }
+        },
+        {
+          "o": {
+            "type": "uri",
+            "value": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975"
+          },
+          "title": {
+            "type": "literal",
+            "value": "American Fall from Ice Bridge - Moonlight. [Niagara Falls, New York]"
+          }
+        }
+      ]
+    }
+  },
+  "objects": {
+    "6187b505-b256-4d00-9ad2-68806e1e59e6": {
+      "@context": "https://static.getty.edu/contexts/linked.art/ns/v1.1.0/linked-art.json",
+      "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6",
+      "type": "HumanMadeObject",
+      "_label": "A Swan Among the Reeds, by Moonlight (2013.41)",
+      "identified_by": [
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/identifier/f26d2c34-8b5d-5643-a0b7-4cae4be35ece",
+          "type": "Identifier",
+          "_label": "Accession Number",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300404626",
+              "type": "Type",
+              "_label": "Identification Number"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300312355",
+              "type": "Type",
+              "_label": "Accession Number"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300404670",
+              "type": "Type",
+              "_label": "Preferred Term"
+            }
+          ],
+          "content": "2013.41"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/name/de98fe08-2741-5b24-a4ed-2bc43e62036d",
+          "type": "Name",
+          "_label": "Alternate Title",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300417193",
+              "type": "Type",
+              "_label": "Titles (General, Names)"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300417227",
+              "type": "Type",
+              "_label": "Alternate Title"
+            },
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/tms/object/titles/primary",
+              "type": "Type",
+              "_label": "Primary Title",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on the `https://data.getty.edu/local/thesaurus/object-title-*` terms instead.",
+                "since": "2020-11-11"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/object-title-primary",
+              "type": "Type",
+              "_label": "Primary Title"
+            }
+          ],
+          "content": "A Swan Among the Reeds, by Moonlight",
+          "language": [
+            {
+              "id": "http://vocab.getty.edu/aat/300388277",
+              "type": "Language",
+              "_label": "English (language)"
+            }
+          ]
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/identifier/dor-id",
+          "type": "Identifier",
+          "_label": "Getty DOR ID",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/dor-id",
+              "type": "Type",
+              "_label": "Getty DOR ID",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on `Getty DOR ID` (https://data.getty.edu/local/thesaurus/dor-id) instead.",
+                "since": "2021-01-05"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/dor-id",
+              "type": "Type",
+              "_label": "Getty DOR ID"
+            }
+          ],
+          "content": "263073"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/identifier/slug-id",
+          "type": "Identifier",
+          "_label": "Slug Identifier",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/local/thesaurus/slug-identifier",
+              "type": "Type",
+              "_label": "Slug Identifier"
+            }
+          ],
+          "content": "urn:getty-local:idm:object:slug/109JB8"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/name/de98fe08-2741-5b24-a4ed-2bc43e62036d",
+          "type": "Name",
+          "_label": "Preferred Title",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300417193",
+              "type": "Type",
+              "_label": "Titles (General, Names)"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300404670",
+              "type": "Type",
+              "_label": "Preferred Term"
+            }
+          ],
+          "content": "A Swan Among the Reeds, by Moonlight",
+          "language": [
+            {
+              "id": "http://vocab.getty.edu/aat/300388277",
+              "type": "Language",
+              "_label": "English (language)"
+            }
+          ]
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/identifier/tms-id",
+          "type": "Identifier",
+          "_label": "Gallery Systems' TMS ID",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/tms-id",
+              "type": "Type",
+              "_label": "Gallery Systems' TMS ID",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on `Gallery Systems' TMS ID` (https://data.getty.edu/local/thesaurus/tms-id) instead.",
+                "since": "2021-01-05"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/tms-id",
+              "type": "Type",
+              "_label": "Gallery Systems' TMS ID"
+            }
+          ],
+          "content": "344267"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/identifier/dor-uuid",
+          "type": "Identifier",
+          "_label": "Getty DOR UUID",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/dor-uuid",
+              "type": "Type",
+              "_label": "Getty DOR UUID",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on `Getty DOR UUID` (https://data.getty.edu/local/thesaurus/dor-uuid) instead.",
+                "since": "2021-01-05"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/dor-uuid",
+              "type": "Type",
+              "_label": "Getty DOR UUID"
+            }
+          ],
+          "content": "6187b505-b256-4d00-9ad2-68806e1e59e6"
+        }
+      ],
+      "produced_by": {
+        "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production",
+        "type": "Production",
+        "_label": "Production of Artwork by Carl Gustav Carus",
+        "referred_to_by": [
+          {
+            "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production/e78e0e34-a9f8-54b2-9ffc-696906d0a058/producer-description",
+            "type": "LinguisticObject",
+            "_label": "Artist/Maker (Producer) Description",
+            "classified_as": [
+              {
+                "id": "https://data.getty.edu/museum/ontology/linked-data/tms/object/producer-description",
+                "type": "Type",
+                "_label": "Producer Description",
+                "deprecated": {
+                  "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                  "replacement": "Filter on `Producer Description` (https://data.getty.edu/local/thesaurus/producer-description) instead.",
+                  "since": "2020-11-10"
+                }
+              },
+              {
+                "id": "https://data.getty.edu/local/thesaurus/producer-description",
+                "type": "Type",
+                "_label": "Producer Description"
+              },
+              {
+                "id": "http://vocab.getty.edu/aat/300418049",
+                "type": "Type",
+                "_label": "Brief Text"
+              }
+            ],
+            "content": "Carl Gustav Carus (German, 1789 - 1869)"
+          },
+          {
+            "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production/e78e0e34-a9f8-54b2-9ffc-696906d0a058/producer-name",
+            "type": "LinguisticObject",
+            "_label": "Artist/Maker (Producer) Name",
+            "classified_as": [
+              {
+                "id": "https://data.getty.edu/local/thesaurus/producer-name",
+                "type": "Type",
+                "_label": "Producer Name"
+              },
+              {
+                "id": "http://vocab.getty.edu/aat/300418049",
+                "type": "Type",
+                "_label": "Brief Text"
+              }
+            ],
+            "content": "Carl Gustav Carus"
+          },
+          {
+            "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production/e78e0e34-a9f8-54b2-9ffc-696906d0a058/producer-nationality-and-dates",
+            "type": "LinguisticObject",
+            "_label": "Artist/Maker (Producer) Nationality & Dates",
+            "classified_as": [
+              {
+                "id": "https://data.getty.edu/local/thesaurus/nationality-and-dates",
+                "type": "Type",
+                "_label": "Producer Nationality & Dates"
+              },
+              {
+                "id": "http://vocab.getty.edu/aat/300418049",
+                "type": "Type",
+                "_label": "Brief Text"
+              }
+            ],
+            "content": "German, 1789 - 1869"
+          }
+        ],
+        "timespan": {
+          "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production/timespan",
+          "type": "TimeSpan",
+          "identified_by": [
+            {
+              "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production/timespan/display",
+              "type": "Name",
+              "_label": "Dates",
+              "classified_as": [
+                {
+                  "id": "http://vocab.getty.edu/aat/300458798",
+                  "type": "Type",
+                  "_label": "Display Names"
+                }
+              ],
+              "content": "September 18, 1852"
+            }
+          ],
+          "begin_of_the_begin": "1852-01-01T00:00:00",
+          "end_of_the_end": "1852-12-31T23:59:59"
+        },
+        "carried_out_by": [
+          {
+            "id": "https://data.getty.edu/museum/collection/person/11dcc610-e4c9-45eb-b65c-fecdfe10124f",
+            "type": "Person",
+            "_label": "Carl Gustav Carus",
+            "referred_to_by": [
+              {
+                "id": "https://data.getty.edu/museum/collection/object/6187b505-b256-4d00-9ad2-68806e1e59e6/production/e78e0e34-a9f8-54b2-9ffc-696906d0a058/role-statement",
+                "type": "LinguisticObject",
+                "_label": "Artist/Maker (Producer) Role Statement",
+                "classified_as": [
+                  {
+                    "id": "https://data.getty.edu/museum/ontology/linked-data/object/artist-maker-role-statement",
+                    "type": "Type",
+                    "_label": "Artist/Maker (Producer) Role Statement",
+                    "deprecated": {
+                      "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                      "replacement": "Filter on `Artist/Maker Role Statement` (https://data.getty.edu/local/thesaurus/artist-maker-role-statement) instead.",
+                      "since": "2020-11-10"
+                    }
+                  },
+                  {
+                    "id": "https://data.getty.edu/local/thesaurus/producer-role-statement",
+                    "type": "Type",
+                    "_label": "Artist/Maker (Producer) Role Statement"
+                  },
+                  {
+                    "id": "http://vocab.getty.edu/aat/300418049",
+                    "type": "Type",
+                    "_label": "Brief Text"
+                  }
+                ],
+                "content": "Artist",
+                "close_match": [
+                  {
+                    "id": "http://vocab.getty.edu/aat/300025103",
+                    "type": "Type",
+                    "_label": "Artist"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "subject_of": [
+        {
+          "id": "https://www.getty.edu/art/collection/object/109JB8",
+          "type": "LinguisticObject",
+          "_label": "Homepage for A Swan Among the Reeds, by Moonlight (2013.41) (HumanMadeObject)",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300264578",
+              "type": "Type",
+              "_label": "Web Page"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300404670",
+              "type": "Type",
+              "_label": "Primary"
+            }
+          ],
+          "format": "text/html"
+        },
+        {
+          "has_format": "https://media.getty.edu/iiif/manifest/3/3c5c2950-774b-4d14-837d-96d0295c42a8",
+          "id": "https://media.getty.edu/iiif/manifest/2/3c5c2950-774b-4d14-837d-96d0295c42a8",
+          "type": "InformationObject",
+          "_label": "IIIF Manifest URL",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/local/thesaurus/iiif-manifest",
+              "type": "Type",
+              "_label": "IIIF Manifest"
+            }
+          ],
+          "conforms_to": [
+            {
+              "id": "http://iiif.io/api/presentation",
+              "type": "InformationObject",
+              "_label": "IIIF Presentation API"
+            }
+          ],
+          "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/2/context.json\""
+        },
+        {
+          "has_format": "https://media.getty.edu/iiif/manifest/2/3c5c2950-774b-4d14-837d-96d0295c42a8",
+          "id": "https://media.getty.edu/iiif/manifest/3/3c5c2950-774b-4d14-837d-96d0295c42a8",
+          "type": "InformationObject",
+          "_label": "IIIF Manifest URL",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/local/thesaurus/iiif-manifest",
+              "type": "Type",
+              "_label": "IIIF Manifest"
+            }
+          ],
+          "conforms_to": [
+            {
+              "id": "http://iiif.io/api/presentation",
+              "type": "InformationObject",
+              "_label": "IIIF Presentation API"
+            }
+          ],
+          "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/3/context.json\""
+        }
+      ],
+      "representation": [
+        {
+          "id": "https://media.getty.edu/iiif/image/63e9cac4-9fe3-42f8-8355-fd9663c3b5d7/full/full/0/default.jpg",
+          "type": "VisualItem",
+          "_label": "Object Overall Image (34426701)",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300215302",
+              "type": "Type",
+              "_label": "Digital Image"
+            }
+          ],
+          "identified_by": [
+            {
+              "id": "https://media.getty.edu/iiif/image/63e9cac4-9fe3-42f8-8355-fd9663c3b5d7/full/full/0/default.jpg/id/asset",
+              "type": "Identifier",
+              "_label": "Asset ID",
+              "classified_as": [
+                {
+                  "id": "https://data.getty.edu/local/thesaurus/asset-identifier",
+                  "type": "Type",
+                  "_label": "Asset ID"
+                }
+              ],
+              "content": "7154427ae93e4b07a26e1117a2fa811f54dbc2a7"
+            },
+            {
+              "id": "https://media.getty.edu/iiif/image/63e9cac4-9fe3-42f8-8355-fd9663c3b5d7/full/full/0/default.jpg/id/name",
+              "type": "Identifier",
+              "_label": "Asset Name",
+              "classified_as": [
+                {
+                  "id": "https://data.getty.edu/local/thesaurus/asset-name",
+                  "type": "Type",
+                  "_label": "Asset Name"
+                }
+              ],
+              "content": "34426701"
+            }
+          ],
+          "deprecated": {
+            "reason": "Please note that in the future, the `representation` property's image, referenced by the `id` property, will be smaller than that currently offered.",
+            "replacement": "Larger images, if needed, will be available via the IIIF Image API endpoints referenced within this document's `shows` property instead.",
+            "since": "2021-03-08"
+          },
+          "format": "image/jpeg"
+        }
+      ]
+    },
+    "2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975": {
+      "@context": "https://static.getty.edu/contexts/linked.art/ns/v1.1.0/linked-art.json",
+      "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975",
+      "type": "HumanMadeObject",
+      "_label": "American Fall from Ice Bridge - Moonlight. [Niagara Falls, New York] (84.XC.873.7344)",
+      "identified_by": [
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/identifier/701de5f6-c2df-5003-b863-8cf9fedad3b6",
+          "type": "Identifier",
+          "_label": "Accession Number",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300404626",
+              "type": "Type",
+              "_label": "Identification Number"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300312355",
+              "type": "Type",
+              "_label": "Accession Number"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300404670",
+              "type": "Type",
+              "_label": "Preferred Term"
+            }
+          ],
+          "content": "84.XC.873.7344"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/name/8af27c6d-f068-5b18-92a1-3590ed6311fb",
+          "type": "Name",
+          "_label": "Alternate Title",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300417193",
+              "type": "Type",
+              "_label": "Titles (General, Names)"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300417227",
+              "type": "Type",
+              "_label": "Alternate Title"
+            },
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/tms/object/titles/primary",
+              "type": "Type",
+              "_label": "Primary Title",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on the `https://data.getty.edu/local/thesaurus/object-title-*` terms instead.",
+                "since": "2020-11-11"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/object-title-primary",
+              "type": "Type",
+              "_label": "Primary Title"
+            }
+          ],
+          "content": "American Fall from Ice Bridge - Moonlight. [Niagara Falls, New York]",
+          "language": [
+            {
+              "id": "http://vocab.getty.edu/aat/300388277",
+              "type": "Language",
+              "_label": "English (language)"
+            }
+          ]
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/identifier/dor-id",
+          "type": "Identifier",
+          "_label": "Getty DOR ID",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/dor-id",
+              "type": "Type",
+              "_label": "Getty DOR ID",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on `Getty DOR ID` (https://data.getty.edu/local/thesaurus/dor-id) instead.",
+                "since": "2021-01-05"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/dor-id",
+              "type": "Type",
+              "_label": "Getty DOR ID"
+            }
+          ],
+          "content": "71299"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/identifier/slug-id",
+          "type": "Identifier",
+          "_label": "Slug Identifier",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/local/thesaurus/slug-identifier",
+              "type": "Type",
+              "_label": "Slug Identifier"
+            }
+          ],
+          "content": "urn:getty-local:idm:object:slug/106Z8B"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/name/8af27c6d-f068-5b18-92a1-3590ed6311fb",
+          "type": "Name",
+          "_label": "Preferred Title",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300417193",
+              "type": "Type",
+              "_label": "Titles (General, Names)"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300404670",
+              "type": "Type",
+              "_label": "Preferred Term"
+            }
+          ],
+          "content": "American Fall from Ice Bridge - Moonlight. [Niagara Falls, New York]",
+          "language": [
+            {
+              "id": "http://vocab.getty.edu/aat/300388277",
+              "type": "Language",
+              "_label": "English (language)"
+            }
+          ]
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/identifier/tms-id",
+          "type": "Identifier",
+          "_label": "Gallery Systems' TMS ID",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/tms-id",
+              "type": "Type",
+              "_label": "Gallery Systems' TMS ID",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on `Gallery Systems' TMS ID` (https://data.getty.edu/local/thesaurus/tms-id) instead.",
+                "since": "2021-01-05"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/tms-id",
+              "type": "Type",
+              "_label": "Gallery Systems' TMS ID"
+            }
+          ],
+          "content": "77825"
+        },
+        {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/identifier/dor-uuid",
+          "type": "Identifier",
+          "_label": "Getty DOR UUID",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/museum/ontology/linked-data/dor-uuid",
+              "type": "Type",
+              "_label": "Getty DOR UUID",
+              "deprecated": {
+                "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                "replacement": "Filter on `Getty DOR UUID` (https://data.getty.edu/local/thesaurus/dor-uuid) instead.",
+                "since": "2021-01-05"
+              }
+            },
+            {
+              "id": "https://data.getty.edu/local/thesaurus/dor-uuid",
+              "type": "Type",
+              "_label": "Getty DOR UUID"
+            }
+          ],
+          "content": "2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975"
+        }
+      ],
+      "produced_by": {
+        "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production",
+        "type": "Production",
+        "_label": "Production of Artwork by George E. Curtis",
+        "referred_to_by": [
+          {
+            "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production/b652668c-f375-502f-af50-329266fbeab8/producer-description",
+            "type": "LinguisticObject",
+            "_label": "Artist/Maker (Producer) Description",
+            "classified_as": [
+              {
+                "id": "https://data.getty.edu/museum/ontology/linked-data/tms/object/producer-description",
+                "type": "Type",
+                "_label": "Producer Description",
+                "deprecated": {
+                  "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                  "replacement": "Filter on `Producer Description` (https://data.getty.edu/local/thesaurus/producer-description) instead.",
+                  "since": "2020-11-10"
+                }
+              },
+              {
+                "id": "https://data.getty.edu/local/thesaurus/producer-description",
+                "type": "Type",
+                "_label": "Producer Description"
+              },
+              {
+                "id": "http://vocab.getty.edu/aat/300418049",
+                "type": "Type",
+                "_label": "Brief Text"
+              }
+            ],
+            "content": "George E. Curtis (American, 1830 - 1910)"
+          },
+          {
+            "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production/b652668c-f375-502f-af50-329266fbeab8/producer-name",
+            "type": "LinguisticObject",
+            "_label": "Artist/Maker (Producer) Name",
+            "classified_as": [
+              {
+                "id": "https://data.getty.edu/local/thesaurus/producer-name",
+                "type": "Type",
+                "_label": "Producer Name"
+              },
+              {
+                "id": "http://vocab.getty.edu/aat/300418049",
+                "type": "Type",
+                "_label": "Brief Text"
+              }
+            ],
+            "content": "George E. Curtis"
+          },
+          {
+            "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production/b652668c-f375-502f-af50-329266fbeab8/producer-nationality-and-dates",
+            "type": "LinguisticObject",
+            "_label": "Artist/Maker (Producer) Nationality & Dates",
+            "classified_as": [
+              {
+                "id": "https://data.getty.edu/local/thesaurus/nationality-and-dates",
+                "type": "Type",
+                "_label": "Producer Nationality & Dates"
+              },
+              {
+                "id": "http://vocab.getty.edu/aat/300418049",
+                "type": "Type",
+                "_label": "Brief Text"
+              }
+            ],
+            "content": "American, 1830 - 1910"
+          }
+        ],
+        "timespan": {
+          "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production/timespan",
+          "type": "TimeSpan",
+          "identified_by": [
+            {
+              "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production/timespan/display",
+              "type": "Name",
+              "_label": "Dates",
+              "classified_as": [
+                {
+                  "id": "http://vocab.getty.edu/aat/300458798",
+                  "type": "Type",
+                  "_label": "Display Names"
+                }
+              ],
+              "content": "about 1869"
+            }
+          ],
+          "begin_of_the_begin": "1869-01-01T00:00:00",
+          "end_of_the_end": "1869-12-31T23:59:59"
+        },
+        "carried_out_by": [
+          {
+            "id": "https://data.getty.edu/museum/collection/person/c5e05708-7eff-4356-b75d-e42279e098af",
+            "type": "Person",
+            "_label": "George E. Curtis",
+            "referred_to_by": [
+              {
+                "id": "https://data.getty.edu/museum/collection/object/2e57a0d5-d3b6-4f7d-b8b1-ec2dd0e7c975/production/b652668c-f375-502f-af50-329266fbeab8/role-statement",
+                "type": "LinguisticObject",
+                "_label": "Artist/Maker (Producer) Role Statement",
+                "classified_as": [
+                  {
+                    "id": "https://data.getty.edu/museum/ontology/linked-data/object/artist-maker-role-statement",
+                    "type": "Type",
+                    "_label": "Artist/Maker (Producer) Role Statement",
+                    "deprecated": {
+                      "reason": "Migration to unified `data.getty.edu/local/thesaurus` URLs for custom terms.",
+                      "replacement": "Filter on `Artist/Maker Role Statement` (https://data.getty.edu/local/thesaurus/artist-maker-role-statement) instead.",
+                      "since": "2020-11-10"
+                    }
+                  },
+                  {
+                    "id": "https://data.getty.edu/local/thesaurus/producer-role-statement",
+                    "type": "Type",
+                    "_label": "Artist/Maker (Producer) Role Statement"
+                  },
+                  {
+                    "id": "http://vocab.getty.edu/aat/300418049",
+                    "type": "Type",
+                    "_label": "Brief Text"
+                  }
+                ],
+                "content": "Photographer",
+                "close_match": [
+                  {
+                    "id": "http://vocab.getty.edu/aat/300025687",
+                    "type": "Type",
+                    "_label": "Photographer"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "subject_of": [
+        {
+          "id": "https://www.getty.edu/art/collection/object/106Z8B",
+          "type": "LinguisticObject",
+          "_label": "Homepage for American Fall from Ice Bridge - Moonlight. [Niagara Falls, New York] (84.XC.873.7344) (HumanMadeObject)",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300264578",
+              "type": "Type",
+              "_label": "Web Page"
+            },
+            {
+              "id": "http://vocab.getty.edu/aat/300404670",
+              "type": "Type",
+              "_label": "Primary"
+            }
+          ],
+          "format": "text/html"
+        },
+        {
+          "has_format": "https://media.getty.edu/iiif/manifest/3/68161e60-ead2-4347-84c1-c42a13220690",
+          "id": "https://media.getty.edu/iiif/manifest/2/68161e60-ead2-4347-84c1-c42a13220690",
+          "type": "InformationObject",
+          "_label": "IIIF Manifest URL",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/local/thesaurus/iiif-manifest",
+              "type": "Type",
+              "_label": "IIIF Manifest"
+            }
+          ],
+          "conforms_to": [
+            {
+              "id": "http://iiif.io/api/presentation",
+              "type": "InformationObject",
+              "_label": "IIIF Presentation API"
+            }
+          ],
+          "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/2/context.json\""
+        },
+        {
+          "has_format": "https://media.getty.edu/iiif/manifest/2/68161e60-ead2-4347-84c1-c42a13220690",
+          "id": "https://media.getty.edu/iiif/manifest/3/68161e60-ead2-4347-84c1-c42a13220690",
+          "type": "InformationObject",
+          "_label": "IIIF Manifest URL",
+          "classified_as": [
+            {
+              "id": "https://data.getty.edu/local/thesaurus/iiif-manifest",
+              "type": "Type",
+              "_label": "IIIF Manifest"
+            }
+          ],
+          "conforms_to": [
+            {
+              "id": "http://iiif.io/api/presentation",
+              "type": "InformationObject",
+              "_label": "IIIF Presentation API"
+            }
+          ],
+          "format": "application/ld+json;profile=\"http://iiif.io/api/presentation/3/context.json\""
+        }
+      ],
+      "representation": [
+        {
+          "id": "https://media.getty.edu/iiif/image/88c440bb-456f-44da-96a4-8cccec25012d/full/full/0/default.jpg",
+          "type": "VisualItem",
+          "_label": "Object Overall Image (07782501)",
+          "classified_as": [
+            {
+              "id": "http://vocab.getty.edu/aat/300215302",
+              "type": "Type",
+              "_label": "Digital Image"
+            }
+          ],
+          "identified_by": [
+            {
+              "id": "https://media.getty.edu/iiif/image/88c440bb-456f-44da-96a4-8cccec25012d/full/full/0/default.jpg/id/asset",
+              "type": "Identifier",
+              "_label": "Asset ID",
+              "classified_as": [
+                {
+                  "id": "https://data.getty.edu/local/thesaurus/asset-identifier",
+                  "type": "Type",
+                  "_label": "Asset ID"
+                }
+              ],
+              "content": "16b04de373d978b8d84c4dfadadebb9262ad738c"
+            },
+            {
+              "id": "https://media.getty.edu/iiif/image/88c440bb-456f-44da-96a4-8cccec25012d/full/full/0/default.jpg/id/name",
+              "type": "Identifier",
+              "_label": "Asset Name",
+              "classified_as": [
+                {
+                  "id": "https://data.getty.edu/local/thesaurus/asset-name",
+                  "type": "Type",
+                  "_label": "Asset Name"
+                }
+              ],
+              "content": "07782501"
+            }
+          ],
+          "deprecated": {
+            "reason": "Please note that in the future, the `representation` property's image, referenced by the `id` property, will be smaller than that currently offered.",
+            "replacement": "Larger images, if needed, will be available via the IIIF Image API endpoints referenced within this document's `shows` property instead.",
+            "since": "2021-03-08"
+          },
+          "format": "image/jpeg"
+        }
+      ]
+    }
+  }
+}
