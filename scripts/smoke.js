@@ -1,5 +1,6 @@
 import { loadEnv } from '../lib/env.js';
 import { sources } from '../lib/sources/index.js';
+import { mapLimit } from '../lib/util.js';
 
 loadEnv();
 
@@ -8,6 +9,8 @@ const PAGE = 1;
 const ID_WIDTH = 12;
 const MAX_WAIT_MS = 5 * 60_000;
 const POLL_MS = 10_000;
+const COMMONS_LIMIT = 4;
+const WIKIMEDIA_NOTE = '  (0 results; check by hand)';
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -40,13 +43,33 @@ function itemCount(result) {
 
 function okOrNoItems(source, result, elapsed) {
   const count = itemCount(result);
-  if (count === 0) {
-    return { status: 'FAIL', message: 'no items', elapsed };
-  }
-  return { status: 'OK', count, total: result?.total ?? null, elapsed };
+  return {
+    status: 'OK',
+    count,
+    total: result?.total ?? null,
+    elapsed,
+    empty: count === 0,
+  };
+}
+
+function sourceNeedsKey(source) {
+  return source.keyEnv != null && source.keyOptional !== true;
+}
+
+function hasMissingKey(source) {
+  if (!sourceNeedsKey(source)) return false;
+  const value = process.env[source.keyEnv];
+  return !(typeof value === 'string' && value !== '');
+}
+
+function isCommonsBased(source) {
+  return source.id === 'commons' || typeof source.filter === 'string';
 }
 
 async function runSource(source) {
+  if (hasMissingKey(source)) {
+    return { status: 'SKIP', message: `needs ${source.keyEnv}`, elapsed: 0 };
+  }
   const started = performance.now();
   try {
     const result = await source.search(QUERY, PAGE);
@@ -61,6 +84,9 @@ async function runSource(source) {
 }
 
 async function runPrepared(source) {
+  if (hasMissingKey(source)) {
+    return { status: 'SKIP', message: `needs ${source.keyEnv}`, elapsed: 0 };
+  }
   const started = performance.now();
   const deadline = started + MAX_WAIT_MS;
   let announced = false;
@@ -110,7 +136,11 @@ function formatResult(result) {
   const id = pad(result.id);
 
   if (result.status === 'OK') {
-    return `OK    ${id}  ${result.count} items  total ${formatTotal(result.total)}  ${seconds(result.elapsed)}`;
+    const line = `OK    ${id}  ${result.count} items  total ${formatTotal(result.total)}  ${seconds(result.elapsed)}`;
+    return result.empty ? `${line}${WIKIMEDIA_NOTE}` : line;
+  }
+  if (result.status === 'SKIP') {
+    return `SKIP  ${id}  ${result.message}`;
   }
   if (result.status === 'WARN') {
     return `WARN  ${id}  ${result.message}`;
@@ -125,10 +155,19 @@ const parallelSources = sources.filter((source) => !preparedIds.has(source.id));
 const locSource = sources.find((source) => source.id === 'loc');
 const ngaSource = sources.find((source) => source.id === 'nga');
 
-const parallelResults = await Promise.all(
-  parallelSources.map(async (source) => ({ source, result: await runSource(source) })),
-);
-for (const { source, result } of parallelResults) {
+const commonsSources = parallelSources.filter(isCommonsBased);
+const otherSources = parallelSources.filter((source) => !isCommonsBased(source));
+
+const [otherResults, commonsResults] = await Promise.all([
+  Promise.all(
+    otherSources.map(async (source) => ({ source, result: await runSource(source) })),
+  ),
+  mapLimit(commonsSources, COMMONS_LIMIT, async (source) => ({
+    source,
+    result: await runSource(source),
+  })),
+]);
+for (const { source, result } of [...otherResults, ...commonsResults]) {
   results.set(source.id, result);
 }
 
@@ -140,7 +179,7 @@ if (ngaSource) {
   results.set(ngaSource.id, await runPrepared(ngaSource));
 }
 
-const summary = { OK: 0, WARN: 0, FAIL: 0 };
+const summary = { OK: 0, WARN: 0, SKIP: 0, FAIL: 0 };
 for (const source of sources) {
   const result = results.get(source.id);
   if (!result) continue;
@@ -149,7 +188,7 @@ for (const source of sources) {
 }
 
 console.log(
-  `Summary: ${summary.OK} OK, ${summary.WARN} WARN, ${summary.FAIL} FAIL`,
+  `Summary: ${summary.OK} OK, ${summary.WARN} WARN, ${summary.SKIP} SKIP, ${summary.FAIL} FAIL`,
 );
 
 process.exitCode = summary.FAIL > 0 ? 1 : 0;

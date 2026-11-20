@@ -7,7 +7,7 @@ import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { PROJECT_ROOT, loadEnv } from './lib/env.js';
-import { sources as registrySources } from './lib/sources/index.js';
+import { GROUPS, sources as registrySources } from './lib/sources/index.js';
 import { extFromContentType, openRemote, safeFilename } from './lib/download.js';
 
 const JSON_TYPE = 'application/json; charset=utf-8';
@@ -52,17 +52,38 @@ function parsePage(value) {
   return Math.min(parsed, 500);
 }
 
+function sourceNeedsKey(source) {
+  return source.keyEnv != null && source.keyOptional !== true;
+}
+
+function isKeyConfigured(keyEnv) {
+  return typeof process.env[keyEnv] === 'string' && process.env[keyEnv] !== '';
+}
+
+function missingKeyError(source) {
+  return {
+    error: `${source.name} needs ${source.keyEnv} in .env`,
+    code: 'NEEDS_KEY',
+  };
+}
+
+function hasMissingKey(source) {
+  return sourceNeedsKey(source) && !isKeyConfigured(source.keyEnv);
+}
+
 async function handleSources(res, sourceList) {
   const data = sourceList.map((source) => {
-    const keyEnv = source.keyEnv ?? null;
-    const keyConfigured =
-      keyEnv === null || (typeof process.env[keyEnv] === 'string' && process.env[keyEnv] !== '');
+    const needsKey = sourceNeedsKey(source);
+    const keyEnv = needsKey ? source.keyEnv : null;
+    const keyConfigured = keyEnv === null || isKeyConfigured(keyEnv);
     return {
       id: source.id,
       name: source.name,
       homepage: source.homepage,
-      needsKey: keyEnv !== null,
+      group: source.group ?? null,
+      needsKey,
       keyConfigured,
+      keyEnv,
     };
   });
   sendJson(res, 200, data);
@@ -83,6 +104,11 @@ async function handleSearch(url, res, sourceList) {
   }
   if (q.length > 200) {
     sendJson(res, 400, { error: 'Query is too long' });
+    return;
+  }
+
+  if (hasMissingKey(source)) {
+    sendJson(res, 400, missingKeyError(source));
     return;
   }
 
@@ -135,6 +161,11 @@ async function handleDownload(url, req, res, sourceList) {
   const source = sourceId ? sourceList.find((entry) => entry.id === sourceId) : null;
   if (!source) {
     sendJson(res, 400, { error: 'Unknown source' });
+    return;
+  }
+
+  if (hasMissingKey(source)) {
+    sendJson(res, 400, missingKeyError(source));
     return;
   }
 
@@ -337,8 +368,13 @@ async function handleStatic(req, res, publicDir) {
   }
 }
 
-export function createServer({ publicDir = join(PROJECT_ROOT, 'public'), sourcesOverride } = {}) {
+export function createServer({
+  publicDir = join(PROJECT_ROOT, 'public'),
+  sourcesOverride,
+  groupsOverride,
+} = {}) {
   const sourceList = Array.isArray(sourcesOverride) ? sourcesOverride : registrySources;
+  const groupList = Array.isArray(groupsOverride) ? groupsOverride : GROUPS;
 
   return createHttpServer(async (req, res) => {
     try {
@@ -351,6 +387,10 @@ export function createServer({ publicDir = join(PROJECT_ROOT, 'public'), sources
 
       if (url.pathname === '/api/sources') {
         await handleSources(res, sourceList);
+        return;
+      }
+      if (url.pathname === '/api/groups') {
+        sendJson(res, 200, groupList);
         return;
       }
       if (url.pathname === '/api/search') {
