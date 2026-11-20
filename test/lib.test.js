@@ -178,6 +178,12 @@ test('sources registry', () => {
     'archive',
     'europeana',
     'dpla',
+    'japan-search',
+    'ksamsok',
+    'digitalnz',
+    'pixabay',
+    'pexels',
+    'unsplash',
     'met',
     'smithsonian',
     'rijksmuseum',
@@ -191,6 +197,8 @@ test('sources registry', () => {
     'walters',
     'brooklyn',
     'auckland',
+    'princeton',
+    'harvard',
     'loc',
     'nypl',
     'british-library',
@@ -201,6 +209,9 @@ test('sources registry', () => {
     'bundesarchiv',
     'eth-library',
     'slq',
+    'nb-norway',
+    'digital-commonwealth',
+    'rumsey',
     'nasa',
     'esa-hubble',
     'esa-webb',
@@ -209,8 +220,10 @@ test('sources registry', () => {
     'bhl',
     'noaa',
     'inaturalist',
+    'gbif',
+    'nhm',
   ];
-  assert.equal(sources.length, 38);
+  assert.equal(sources.length, 51);
   assert.deepEqual(
     sources.map((source) => source.id),
     ids,
@@ -240,4 +253,27 @@ test('sources registry', () => {
 
   assert.equal(getSource('europeana').keyOptional, true);
   assert.equal(getSource('smithsonian').keyOptional, true);
+  assert.equal(getSource('digitalnz').keyEnv, 'DIGITALNZ_KEY');
+  assert.equal(getSource('digitalnz').keyOptional, true);
+
+  const needsKey = sources
+    .filter((source) => source.keyEnv !== null && source.keyOptional !== true)
+    .map((source) => source.id);
+  assert.deepEqual(needsKey, [
+    'flickr-commons',
+    'flickr-cc',
+    'dpla',
+    'pixabay',
+    'pexels',
+    'unsplash',
+    'harvard',
+    'nypl',
+    'trove',
+  ]);
+
+  for (const source of sources) {
+    if (source.trustResolvedUrl === true) {
+      assert.equal(typeof source.resolveDownload, 'function', source.id);
+    }
+  }
 });
