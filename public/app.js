@@ -11,6 +11,7 @@ import {
   itemKey,
   parseSavedSelection,
   serializeSelection,
+  shouldAutoLoad,
   sleep,
   subtitleText,
 } from './lib.js';
@@ -51,6 +52,9 @@ let generation = 0;
 let activeLoads = 0;
 let hasAnswered = false;
 let downloading = false;
+let visibleAtLastAutoLoad = null;
+let autoLoadsWithoutGain = 0;
+let autoLoadStopped = false;
 
 const states = new Map();
 const controllers = new Map();
@@ -503,9 +507,16 @@ function scheduleRetry(id, batch, page, gen) {
   retryTimers.set(id, timer);
 }
 
+function resetAutoLoad() {
+  visibleAtLastAutoLoad = null;
+  autoLoadsWithoutGain = 0;
+  autoLoadStopped = false;
+}
+
 function resetSearchState() {
   abortAll();
   cancelAllRetries();
+  resetAutoLoad();
   generation += 1;
   states.clear();
   errors.clear();
@@ -547,12 +558,12 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
 }
 
 function loadMore() {
-  if (!canLoadMore()) return;
+  if (!canLoadMore()) return false;
   const targets = registry
     .filter((source) => selected.has(source.id))
     .map((source) => ({ source, state: sourceState(source.id) }))
     .filter(({ state }) => state.hasMore && state.status !== 'error' && state.status !== 'loading');
-  if (targets.length === 0) return;
+  if (targets.length === 0) return false;
 
   const batch = createBatch();
   const gen = generation;
@@ -560,6 +571,36 @@ function loadMore() {
     loadSource(source.id, state.page + 1, batch, gen);
   }
   updateUi();
+  return true;
+}
+
+/**
+ * Sentinel-triggered loading. Stops when pages no longer add visible cards,
+ * so sources with broken thumbnails cannot cause endless requests.
+ */
+function autoLoad() {
+  const visibleNow = visibleRecords().length;
+  const mayLoad = shouldAutoLoad({
+    visibleNow,
+    visibleAtLastAutoLoad,
+    autoLoadsWithoutGain,
+  });
+
+  if (!mayLoad) {
+    autoLoadStopped = true;
+    updateUi();
+    return;
+  }
+
+  const noGain =
+    typeof visibleAtLastAutoLoad === 'number' &&
+    visibleNow <= visibleAtLastAutoLoad;
+
+  if (!loadMore()) return;
+
+  autoLoadStopped = false;
+  autoLoadsWithoutGain = noGain ? autoLoadsWithoutGain + 1 : 0;
+  visibleAtLastAutoLoad = visibleNow;
 }
 
 function canLoadMore() {
@@ -584,10 +625,12 @@ function toggleSource(id) {
     removeSourceCards(id);
     errors.delete(id);
     states.delete(id);
+    resetAutoLoad();
     renderErrors();
     updateChip(id);
   } else {
     selected.add(id);
+    resetAutoLoad();
     if (query) {
       const batch = createBatch();
       loadSource(id, 1, batch, generation);
@@ -607,6 +650,7 @@ function abortSource(id) {
 }
 
 function setAll(isOn) {
+  resetAutoLoad();
   if (isOn) {
     const added = registry.filter(
       (source) => isUsable(source) && !selected.has(source.id),
@@ -638,6 +682,7 @@ function setAll(isOn) {
 function setGroupAll(groupId, isOn) {
   const row = groupSources(registry, groups).find((entry) => entry.id === groupId);
   if (!row) return;
+  resetAutoLoad();
   const targets = row.sources.filter(isUsable);
   if (isOn) {
     const added = targets.filter((source) => !selected.has(source.id));
@@ -700,6 +745,12 @@ function updateStatus() {
   if (loading > 0) {
     const count = selected.size;
     statusLineEl.textContent = `Searching ${count} source${count === 1 ? '' : 's'}…`;
+    return;
+  }
+
+  if (autoLoadStopped && canLoadMore()) {
+    statusLineEl.textContent =
+      'Some results have no loadable preview images. Press "Load more" to continue.';
     return;
   }
 
@@ -893,7 +944,11 @@ searchForm.addEventListener('submit', (event) => {
 
 allButton.addEventListener('click', () => setAll(true));
 noneButton.addEventListener('click', () => setAll(false));
-loadMoreButton.addEventListener('click', loadMore);
+loadMoreButton.addEventListener('click', () => {
+  resetAutoLoad();
+  loadMore();
+  updateUi();
+});
 downloadSelectedButton.addEventListener('click', downloadSelected);
 clearSelectionButton.addEventListener('click', () => {
   selection.clear();
@@ -912,7 +967,7 @@ examplesEl.addEventListener('click', (event) => {
 if (typeof IntersectionObserver === 'function') {
   const observer = new IntersectionObserver(
     (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) loadMore();
+      if (entries.some((entry) => entry.isIntersecting)) autoLoad();
     },
     { rootMargin: '800px' },
   );

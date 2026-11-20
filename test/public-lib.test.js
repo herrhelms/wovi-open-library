@@ -8,6 +8,7 @@ import {
   isUsable,
   parseSavedSelection,
   serializeSelection,
+  shouldAutoLoad,
   subtitleText,
 } from '../public/lib.js';
 
@@ -125,6 +126,82 @@ test('serializeSelection round-trips through parseSavedSelection', () => {
   const json = serializeSelection(['a'], registry);
   assert.deepEqual(JSON.parse(json), { selected: ['a'], known: ['a', 'b'] });
   assert.deepEqual(parseSavedSelection(json, registry), ['a']);
+});
+
+test('shouldAutoLoad allows the first automatic load', () => {
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 10,
+      visibleAtLastAutoLoad: null,
+      autoLoadsWithoutGain: 0,
+    }),
+    true,
+  );
+});
+
+test('shouldAutoLoad allows automatic loading after a gain', () => {
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 30,
+      visibleAtLastAutoLoad: 10,
+      autoLoadsWithoutGain: 0,
+    }),
+    true,
+  );
+});
+
+test('shouldAutoLoad allows one retry without a gain', () => {
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 10,
+      visibleAtLastAutoLoad: 10,
+      autoLoadsWithoutGain: 0,
+    }),
+    true,
+  );
+});
+
+test('shouldAutoLoad stops after a retry without a gain', () => {
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 10,
+      visibleAtLastAutoLoad: 10,
+      autoLoadsWithoutGain: 1,
+    }),
+    false,
+  );
+});
+
+test('shouldAutoLoad stops when no visible cards remain', () => {
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 0,
+      visibleAtLastAutoLoad: 0,
+      autoLoadsWithoutGain: 3,
+    }),
+    false,
+  );
+});
+
+test('shouldAutoLoad honours maxWithoutGain', () => {
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 5,
+      visibleAtLastAutoLoad: 5,
+      autoLoadsWithoutGain: 1,
+      maxWithoutGain: 3,
+    }),
+    true,
+  );
+  assert.equal(
+    shouldAutoLoad({
+      visibleNow: 5,
+      visibleAtLastAutoLoad: 5,
+      autoLoadsWithoutGain: 3,
+      maxWithoutGain: 3,
+    }),
+    false,
+  );
 });
 
 test('downloadUrl keeps the existing behaviour', () => {
