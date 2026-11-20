@@ -555,3 +555,190 @@ test('the cache ignores bad entries', async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+test('a probe time-out caches null in memory only', async () => {
+  const dir = await makeTempDir();
+  try {
+    const fake = makeFetchJson({ otherSetError: () => httpError(500) });
+    const bases = [];
+    async function probe(base) {
+      bases.push(base);
+      if (base.includes('mrg:10300:10350')) {
+        if (base.endsWith('v')) return null;
+        throw new HttpError('tile.loc.gov did not answer in 8 s', {
+          status: null,
+          code: 'TIMEOUT',
+        });
+      }
+      return null;
+    }
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: probe,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('lighthouse', 1));
+    await waitFor(() => source.status() === 'ready');
+
+    const first = await source.search('lighthouse', 1);
+    const mrg = first.items.find((entry) => entry.id === 'mrg.10350');
+    assert.ok(mrg);
+    assert.equal(mrg.full, mrg.thumb);
+
+    const mrgProbes = bases.filter((base) => base.includes('mrg:10300:10350'));
+    assert.equal(mrgProbes.length, 2);
+
+    bases.length = 0;
+    await source.search('lighthouse', 1);
+    assert.equal(
+      bases.filter((base) => base.includes('mrg:10300:10350')).length,
+      0,
+    );
+
+    await source.flushCache();
+    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+    assert.equal(Object.hasOwn(cache, 'mrg.10350'), false);
+
+    const again = [];
+    const second = createLocSource({
+      dataDir: dir,
+      fetchJson: async () => {
+        throw new Error('must not fetch');
+      },
+      probeIiif: async (base) => {
+        again.push(base);
+        return null;
+      },
+    });
+    await expectPreparing(second.search('lighthouse', 1));
+    await waitFor(() => second.status() === 'ready');
+    await second.search('lighthouse', 1);
+    assert.ok(again.some((base) => base.includes('mrg:10300:10350')));
+    await second.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('a time-out followed by a size is cached and written', async () => {
+  const dir = await makeTempDir();
+  try {
+    const fake = makeFetchJson({ otherSetError: () => httpError(500) });
+    const bases = [];
+    async function probe(base) {
+      bases.push(base);
+      if (base === HIGHSM_BASE) {
+        throw new HttpError('tile.loc.gov did not answer in 8 s', {
+          status: null,
+          code: 'TIMEOUT',
+        });
+      }
+      if (base === `${HIGHSM_BASE}v`) return { width: 848, height: 1024 };
+      return null;
+    }
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: probe,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+
+    const result = await source.search('heceta', 1);
+    const item = result.items.find((entry) => entry.id === 'highsm.12127');
+    assert.ok(item);
+    assert.equal(item.full, `${HIGHSM_BASE}v/full/full/0/default.jpg`);
+    assert.equal(item.width, 848);
+    assert.deepEqual(bases, [HIGHSM_BASE, `${HIGHSM_BASE}v`]);
+
+    await source.flushCache();
+    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+    assert.deepEqual(cache['highsm.12127'], {
+      base: `${HIGHSM_BASE}v`,
+      width: 848,
+      height: 1024,
+    });
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('a network error during a probe is not cached', async () => {
+  const dir = await makeTempDir();
+  try {
+    const fake = makeFetchJson({ otherSetError: () => httpError(500) });
+    const bases = [];
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async (base) => {
+        bases.push(base);
+        throw new HttpError('tile.loc.gov network down', {
+          status: null,
+          code: 'NETWORK',
+        });
+      },
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+
+    const first = await source.search('heceta', 1);
+    assert.equal(first.items[0].full, first.items[0].thumb);
+    assert.ok(bases.length > 0);
+
+    bases.length = 0;
+    await source.search('heceta', 1);
+    assert.deepEqual(bases, [HIGHSM_BASE]);
+
+    await source.flushCache();
+    let cache = null;
+    try {
+      cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+    } catch {
+      cache = null;
+    }
+    assert.equal(cache === null || !Object.hasOwn(cache, 'highsm.12127'), true);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('a failed set writes the reason to stderr', async () => {
+  const dir = await makeTempDir();
+  const chunks = [];
+  const original = process.stderr.write;
+  process.stderr.write = (chunk, ...args) => {
+    chunks.push(String(chunk));
+    return true;
+  };
+  try {
+    const fake = makeFetchJson({
+      otherSetError: () => httpError(500),
+      override: (url) => {
+        if (url === `${LIGHTHOUSES_SET_URL}?fo=json`) throw httpError(403);
+        return undefined;
+      },
+    });
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('lighthouse', 1));
+    await waitFor(() => source.status() === 'idle');
+
+    const output = chunks.join('');
+    assert.match(output, /\[loc\] set failed: Lighthouses: test answered HTTP 403/);
+  } finally {
+    process.stderr.write = original;
+    await rm(dir, { recursive: true, force: true });
+  }
+});

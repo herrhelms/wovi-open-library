@@ -6,7 +6,6 @@ loadEnv();
 const QUERY = 'moon';
 const PAGE = 1;
 const ID_WIDTH = 12;
-const NGA_POLL_MS = 10_000;
 const MAX_WAIT_MS = 5 * 60_000;
 const POLL_MS = 10_000;
 
