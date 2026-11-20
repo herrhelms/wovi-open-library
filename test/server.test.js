@@ -215,6 +215,11 @@ test('isAllowedHost', () => {
   assert.equal(isAllowedHost('images.pexels.com'), true);
   assert.equal(isAllowedHost('images.unsplash.com'), true);
   assert.equal(isAllowedHost('nrs.harvard.edu'), true);
+  assert.equal(isAllowedHost('smithsonian-open-access.s3-us-west-2.amazonaws.com'), true);
+  assert.equal(isAllowedHost('SMITHSONIAN-OPEN-ACCESS.S3-US-WEST-2.AMAZONAWS.COM'), true);
+  assert.equal(isAllowedHost('other-bucket.s3-us-west-2.amazonaws.com'), false);
+  assert.equal(isAllowedHost('s3-us-west-2.amazonaws.com'), false);
+  assert.equal(isAllowedHost('smithsonian-open-access.s3-us-west-2.amazonaws.com.evil.com'), false);
   assert.equal(isAllowedHost('princeton.edu'), false);
   assert.equal(isAllowedHost('evil-nb.no'), false);
   assert.equal(isAllowedHost('nb.no.evil.com'), false);
