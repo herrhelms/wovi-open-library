@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 import {
+  cacheUrl,
   group,
   keyEnv,
   normalize,
@@ -59,6 +61,22 @@ test('gbif photoLicense rejects closed and unknown licenses', () => {
   assert.equal(photoLicense(''), null);
 });
 
+const md5 = (value) => createHash('md5').update(String(value), 'utf8').digest('hex');
+
+const imageResponse = (type = 'image/jpeg', status = 200) => ({
+  status,
+  headers: { get: () => type },
+  body: { cancel: async () => {} },
+});
+
+test('gbif cacheUrl builds the cache URL for a size', () => {
+  const identifier = 'https://example.org/a.jpg';
+  assert.equal(
+    cacheUrl(123, identifier, '400x'),
+    `https://api.gbif.org/v1/image/cache/400x/occurrence/123/media/${md5(identifier)}`,
+  );
+});
+
 test('gbif thumbUrl uses the md5 of the identifier', () => {
   assert.equal(
     thumbUrl(
@@ -84,11 +102,15 @@ test('gbif parseSearch removes non-open records', () => {
     const raw = fixture.results.find((entry) => String(entry.key) === item.id);
     assert.ok(raw);
     assert.equal(item.pageUrl, `https://www.gbif.org/occurrence/${raw.key}`);
-    assert.equal(item.full, raw.media[0].identifier);
-    assert.equal(item.preview, raw.media[0].identifier);
-    assert.ok(
-      item.thumb.startsWith('https://api.gbif.org/v1/image/cache/200x/occurrence/'),
-    );
+    const identifier = raw.media[0].identifier;
+    const suffix = `/occurrence/${raw.key}/media/${md5(identifier)}`;
+    assert.equal(item.full, identifier);
+    assert.ok(item.thumb.includes('/cache/400x/'));
+    assert.ok(item.thumbFallback.includes('/cache/200x/'));
+    assert.ok(item.preview.includes('/cache/1600x/'));
+    assert.ok(item.thumb.endsWith(suffix));
+    assert.ok(item.thumbFallback.endsWith(suffix));
+    assert.ok(item.preview.endsWith(suffix));
     assert.equal(item.source, 'gbif');
     assert.equal(item.width, null);
     assert.equal(item.height, null);
@@ -106,6 +128,36 @@ test('gbif normalize makes an Item', () => {
   assert.equal(item.description, 'France');
   assert.equal(item.license, 'CC BY-SA 4.0');
   assert.equal(item.licenseUrl, 'https://creativecommons.org/licenses/by-sa/4.0/');
+});
+
+test('gbif normalize sets previewFallback only for https identifiers', () => {
+  const httpsRaw = {
+    key: 42,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier: 'https://example.org/heron.jpg',
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  };
+  const httpsItem = normalize(httpsRaw);
+  assert.equal(httpsItem.previewFallback, 'https://example.org/heron.jpg');
+
+  const httpRaw = {
+    key: 42,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier: 'http://example.org/heron.jpg',
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  };
+  const httpItem = normalize(httpRaw);
+  assert.equal('previewFallback' in httpItem, false);
 });
 
 test('gbif normalize puts the scientific name in brackets', () => {
@@ -172,11 +224,131 @@ test('gbif resolveDownload gets the occurrence record', async () => {
     requested = url;
     return raw;
   };
-  const resolved = await resolveDownload(String(raw.key), { fetchJson: fake });
+  const requestedHeaders = [];
+  const fakeHeaders = async (url) => {
+    requestedHeaders.push(url);
+    return imageResponse('image/jpeg');
+  };
+  const resolved = await resolveDownload(String(raw.key), {
+    fetchJson: fake,
+    fetch: fakeHeaders,
+  });
 
   assert.equal(requested, 'https://api.gbif.org/v1/occurrence/5109511068');
   assert.equal(resolved.url, raw.media[0].identifier);
   assert.equal(resolved.filename, 'Aphyllanthes monspeliensis L.');
+  assert.deepEqual(requestedHeaders, [raw.media[0].identifier]);
+});
+
+test('gbif resolveDownload keeps an https identifier that answers an image', async () => {
+  const identifier = 'https://example.org/photo.jpg';
+  const fakeJson = async () => ({
+    key: 11,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier,
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  });
+  const requests = [];
+  const fakeFetch = async (url) => {
+    requests.push(url);
+    return imageResponse('image/jpeg');
+  };
+  const resolved = await resolveDownload('11', { fetchJson: fakeJson, fetch: fakeFetch });
+
+  assert.equal(resolved.url, identifier);
+  assert.deepEqual(requests, [identifier]);
+});
+
+test('gbif resolveDownload tries the https form of an http identifier first', async () => {
+  const identifier = 'http://example.org/photo.jpg';
+  const fakeJson = async () => ({
+    key: 12,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier,
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  });
+  const requests = [];
+  const fakeFetch = async (url) => {
+    requests.push(url);
+    return imageResponse('image/jpeg');
+  };
+  const resolved = await resolveDownload('12', { fetchJson: fakeJson, fetch: fakeFetch });
+
+  assert.equal(resolved.url, 'https://example.org/photo.jpg');
+  assert.deepEqual(requests, ['https://example.org/photo.jpg']);
+});
+
+test('gbif resolveDownload falls back to the http identifier when https fails', async () => {
+  const identifier = 'http://example.org/photo.png';
+  const fakeJson = async () => ({
+    key: 13,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier,
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  });
+  const requests = [];
+  const fakeFetch = async (url) => {
+    requests.push(url);
+    if (url === 'https://example.org/photo.png') throw new Error('no https');
+    return imageResponse('image/png');
+  };
+  const resolved = await resolveDownload('13', { fetchJson: fakeJson, fetch: fakeFetch });
+
+  assert.equal(resolved.url, identifier);
+  assert.deepEqual(requests, ['https://example.org/photo.png', 'http://example.org/photo.png']);
+});
+
+test('gbif resolveDownload uses the 1600x cache when the host blocks the download', async () => {
+  const identifier = 'https://mediaphoto.mnhn.fr/media/1234';
+  const fakeJson = async () => ({
+    key: 14,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier,
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  });
+  const fakeFetch = async () => imageResponse('text/html', 403);
+  const resolved = await resolveDownload('14', { fetchJson: fakeJson, fetch: fakeFetch });
+
+  assert.equal(resolved.url, cacheUrl(14, identifier, '1600x'));
+});
+
+test('gbif resolveDownload uses the 1600x cache when the answer is not an image', async () => {
+  const identifier = 'https://example.org/page';
+  const fakeJson = async () => ({
+    key: 15,
+    scientificName: 'Ardea cinerea',
+    media: [
+      {
+        type: 'StillImage',
+        identifier,
+        license: 'http://creativecommons.org/publicdomain/zero/1.0/',
+      },
+    ],
+  });
+  const fakeFetch = async () => imageResponse('text/html', 200);
+  const resolved = await resolveDownload('15', { fetchJson: fakeJson, fetch: fakeFetch });
+
+  assert.equal(resolved.url, cacheUrl(15, identifier, '1600x'));
 });
 
 test('gbif resolveDownload rejects a bad id without a request', async () => {
