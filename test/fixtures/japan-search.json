@@ -1,0 +1,194 @@
+{
+  "image": {
+    "from": 0,
+    "hit": 1241,
+    "list": [
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "contentsType": "image",
+          "contributor": [
+            "川瀬巴水　KAWASE Hasui",
+            "Moon at Umagome",
+            "woodcut on paper"
+          ],
+          "database": "apmoa_mapps",
+          "dclass": "733",
+          "id": "apmoa_mapps-18647",
+          "lastUpdatedDate": 1594611057041,
+          "linkUrl": "https://jmapps.ne.jp/apmoa/det.html?data_id=18647",
+          "location": [
+            "版画（日本）"
+          ],
+          "ownerOrg": "ZENBI",
+          "provider": "apmoa",
+          "temporal": [
+            "1930年",
+            "1930"
+          ],
+          "thumbnailUrl": [
+            "https://ibmuseum.mapps.ne.jp/files/5899/media_files/large/3862.jpg"
+          ],
+          "title": "馬込の月",
+          "titleEn": "Moon at Umagome"
+        },
+        "id": "apmoa_mapps-18647",
+        "rdfindex": {
+          "temporal": [
+            "昭和"
+          ],
+          "type": [
+            "版画"
+          ]
+        },
+        "apmoa_mapps-0-s": "馬込の月",
+        "apmoa_mapps-1-s": "川瀬巴水　KAWASE Hasui",
+        "apmoa_mapps-2-s": "1930年",
+        "apmoa_mapps-3-s": "木版、紙",
+        "apmoa_mapps-4-s": "36.5×24.0",
+        "apmoa_mapps-5-s": "版画（日本）",
+        "apmoa_mapps-6-s": "JP200700018000",
+        "apmoa_mapps-10-s": "Moon at Umagome",
+        "apmoa_mapps-11-s": "1930",
+        "apmoa_mapps-12-s": "woodcut on paper",
+        "apmoa_mapps-13-s": "36.5×24.0",
+        "apmoa_mapps-15-s": "18647",
+        "apmoa_mapps-16-s": "3862.0",
+        "apmoa_mapps-17-s": "JP200700018000_080225_001, 2008/02/25撮影, Public Domain",
+        "apmoa_mapps-18-s": "pdm",
+        "apmoa_mapps-imageURL-u": "https://ibmuseum.mapps.ne.jp/files/5899/media_files/large/3862.jpg",
+        "apmoa_mapps-landingURL-u": "https://jmapps.ne.jp/apmoa/det.html?data_id=18647"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "contentsType": "image",
+          "contributor": [
+            "川瀬巴水　KAWASE Hasui",
+            "Moon Over Izura",
+            "woodcut on paper"
+          ],
+          "database": "apmoa_mapps",
+          "dclass": "733",
+          "id": "apmoa_mapps-18690",
+          "lastUpdatedDate": 1594611057041,
+          "linkUrl": "https://jmapps.ne.jp/apmoa/det.html?data_id=18690",
+          "location": [
+            "版画（日本）"
+          ],
+          "ownerOrg": "ZENBI",
+          "provider": "apmoa",
+          "temporal": [
+            "1952年",
+            "1952"
+          ],
+          "thumbnailUrl": [
+            "https://ibmuseum.mapps.ne.jp/files/5899/media_files/large/3905.jpg"
+          ],
+          "title": "五浦之月",
+          "titleEn": "Moon Over Izura"
+        },
+        "id": "apmoa_mapps-18690",
+        "rdfindex": {
+          "temporal": [
+            "昭和"
+          ],
+          "type": [
+            "版画"
+          ]
+        },
+        "apmoa_mapps-0-s": "五浦之月",
+        "apmoa_mapps-1-s": "川瀬巴水　KAWASE Hasui",
+        "apmoa_mapps-2-s": "1952年",
+        "apmoa_mapps-3-s": "木版、紙",
+        "apmoa_mapps-4-s": "24.0×36.5",
+        "apmoa_mapps-5-s": "版画（日本）",
+        "apmoa_mapps-6-s": "JP200700061000",
+        "apmoa_mapps-10-s": "Moon Over Izura",
+        "apmoa_mapps-11-s": "1952",
+        "apmoa_mapps-12-s": "woodcut on paper",
+        "apmoa_mapps-13-s": "24.0×36.5",
+        "apmoa_mapps-15-s": "18690",
+        "apmoa_mapps-16-s": "3905.0",
+        "apmoa_mapps-17-s": "JP200700061000_080225_001, 2008/02/25撮影, Public Domain",
+        "apmoa_mapps-18-s": "pdm",
+        "apmoa_mapps-imageURL-u": "https://ibmuseum.mapps.ne.jp/files/5899/media_files/large/3905.jpg",
+        "apmoa_mapps-landingURL-u": "https://jmapps.ne.jp/apmoa/det.html?data_id=18690"
+      }
+    ]
+  },
+  "ndl": {
+    "from": 0,
+    "hit": 6012,
+    "list": [
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-13437516",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/13437516/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/13437516",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1944.5",
+            "1944"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/13437516/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Sunrise, Sunset, Moonrise and Moonset Tables"
+        },
+        "id": "dignl-13437516"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-14945844",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/14945844/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/14945844",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1947.06-1947.06",
+            "1947"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/14945844/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Hommon Kyoo Sect"
+        },
+        "id": "dignl-14945844"
+      }
+    ]
+  }
+}
