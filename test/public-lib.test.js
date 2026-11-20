@@ -16,6 +16,8 @@ import {
   itemKey,
   parseSavedSelection,
   pickColumn,
+  rememberLimited,
+  searchKey,
   serializeSelection,
   shouldAutoLoad,
   subtitleText,
@@ -443,4 +445,38 @@ test('viewerPlan uses the thumb candidates and drops thumb URLs', () => {
     small: ['t'],
     large: ['p'],
   });
+});
+
+test('searchKey includes the open filter and the exact query', () => {
+  assert.equal(searchKey(true, 'moon'), '1|moon');
+  assert.equal(searchKey(false, 'Moon Base'), '0|Moon Base');
+});
+
+test('rememberLimited drops the oldest keys', () => {
+  const map = new Map();
+  rememberLimited(map, 'a', 1, 2);
+  rememberLimited(map, 'b', 2, 2);
+  rememberLimited(map, 'c', 3, 2);
+  assert.deepEqual([...map.keys()], ['b', 'c']);
+});
+
+test('rememberLimited makes an existing key the newest', () => {
+  const map = new Map();
+  rememberLimited(map, 'a', 1, 2);
+  rememberLimited(map, 'b', 2, 2);
+  rememberLimited(map, 'a', 3, 2);
+  rememberLimited(map, 'c', 4, 2);
+  assert.deepEqual([...map.keys()], ['a', 'c']);
+  assert.equal(map.get('a'), 3);
+});
+
+test('rememberLimited returns nothing and uses the default max', () => {
+  const map = new Map();
+  const before = new Map([['x', 0]]);
+  assert.equal(rememberLimited(map, 'a', 1), undefined);
+  for (let index = 0; index < 20; index += 1) {
+    rememberLimited(map, `k${index}`, index);
+  }
+  assert.equal(map.size, 10);
+  assert.deepEqual([...before.keys()], ['x']);
 });

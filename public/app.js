@@ -15,6 +15,8 @@ import {
   itemKey,
   parseSavedSelection,
   pickColumn,
+  rememberLimited,
+  searchKey,
   serializeSelection,
   shouldAutoLoad,
   sleep,
@@ -85,6 +87,10 @@ let tokenCounter = 0;
 let masonryEl = null;
 let masonryCols = [];
 let resizeTimer = 0;
+/** Search key → Map(source id → { records, state }) */
+const cardCache = new Map();
+/** Key of the search that is on screen, or null when there is no query. */
+let currentSearchKey = null;
 /** @type {Map<string, object>} itemKey -> item */
 const selection = new Map();
 
@@ -369,7 +375,7 @@ function createCard(item, key, sourceId, mediaId) {
   img.addEventListener('load', () => {
     if (item.thumbCached === true) return;
     if (typeof mediaId !== 'string' || mediaId === '') return;
-    if (img.src !== item.thumbSource) return;
+    if (candidates[candidateIndex] !== item.thumbSource) return;
     if (warmSent.has(mediaId)) return;
     warmSent.add(mediaId);
     try {
@@ -455,10 +461,21 @@ function addItems(sourceId, items) {
     if (mediaId !== null && displayedMedia.has(mediaId)) continue;
     displayedKeys.add(key);
     if (mediaId !== null) displayedMedia.add(mediaId);
-    prepared.push({ item, key, mediaId });
+    prepared.push({ item, key, mediaId, sourceId });
   }
 
-  if (prepared.length === 0) return;
+  placeEntries(prepared);
+}
+
+/**
+ * Put cards into the columns, shortest column first. Reads the column heights
+ * one time. New cards use the estimated height. Restored cards also use their
+ * real height when the browser can give one.
+ * @param {Array<{item:object,key:string,mediaId:string|null,sourceId?:string,record?:object}>} entries
+ * @param {{realHeights?:boolean}} [options]
+ */
+function placeEntries(entries, { realHeights = false } = {}) {
+  if (!Array.isArray(entries) || entries.length === 0) return;
   if (!masonryEl || masonryCols.length === 0) createMasonry();
 
   const heights = masonryCols.map((column) => column.offsetHeight);
@@ -466,13 +483,19 @@ function addItems(sourceId, items) {
   const columnWidth = firstWidth > 0 ? firstWidth : resultsEl.clientWidth;
   const gap = masonryGap();
 
-  for (const entry of prepared) {
+  for (const entry of entries) {
     const columnIndex = pickColumn(heights);
-    const record = createCard(entry.item, entry.key, sourceId, entry.mediaId);
+    const record =
+      entry.record ??
+      createCard(entry.item, entry.key, entry.sourceId, entry.mediaId);
     masonryCols[columnIndex].append(record.el);
     records.push(record);
     cardsByKey.set(record.key, record);
-    heights[columnIndex] += estimateCardHeight(entry.item, columnWidth) + gap;
+
+    let height = 0;
+    if (realHeights) height = record.el.offsetHeight;
+    if (!(height > 0)) height = estimateCardHeight(entry.item, columnWidth);
+    heights[columnIndex] += height + gap;
   }
 }
 
@@ -507,8 +530,86 @@ function removeSourceCards(id) {
     if (record.mediaId !== null) displayedMedia.delete(record.mediaId);
     cardsByKey.delete(record.key);
     selection.delete(record.key);
+    // The record is no longer in cardsByKey, so updateSelectionUi cannot reset it.
+    // Clear the visual selection state here, so a later restore starts unselected.
+    record.el.classList.remove('selected');
+    record.checkbox.checked = selection.has(record.key);
   }
   updateSelectionUi();
+}
+
+// ---------- Card cache ----------
+/**
+ * Save the records and a state copy of one source under the current search key.
+ * A source without records and with status `idle` is not saved.
+ * @param {string} id
+ */
+function saveSourceToCache(id) {
+  if (currentSearchKey === null) return;
+  const state = sourceState(id);
+  const sourceRecords = records.filter((record) => record.sourceId === id);
+  if (sourceRecords.length === 0 && state.status === 'idle') return;
+
+  let map = cardCache.get(currentSearchKey);
+  if (!map) map = new Map();
+  rememberLimited(cardCache, currentSearchKey, map);
+  map.set(id, { records: sourceRecords.slice(), state: { ...state } });
+}
+
+/** Save every source that has records or a state that is not idle. */
+function saveAllToCache() {
+  if (currentSearchKey === null) return;
+  const ids = new Set(states.keys());
+  for (const record of records) ids.add(record.sourceId);
+  for (const id of ids) saveSourceToCache(id);
+}
+
+/**
+ * Put the cached records of one source back into the grid.
+ * Duplicate keys and media IDs are skipped. The cached state is copied again.
+ * @param {string} id
+ * @returns {boolean} true when an entry was restored
+ */
+function restoreSourceFromCache(id) {
+  const entry = cardCache.get(currentSearchKey)?.get(id);
+  if (!entry) return false;
+
+  Object.assign(sourceState(id), { ...entry.state });
+
+  const prepared = [];
+  for (const record of entry.records) {
+    if (displayedKeys.has(record.key)) continue;
+    if (record.mediaId !== null && displayedMedia.has(record.mediaId)) continue;
+    displayedKeys.add(record.key);
+    if (record.mediaId !== null) displayedMedia.add(record.mediaId);
+    prepared.push({
+      item: record.item,
+      key: record.key,
+      mediaId: record.mediaId,
+      sourceId: id,
+      record,
+    });
+  }
+
+  placeEntries(prepared, { realHeights: true });
+  // Restored cards are not selected again unless their key is in the selection.
+  updateSelectionUi();
+  newToken(id);
+  hasAnswered = true;
+  updateChip(id);
+  updateUi();
+  return true;
+}
+
+/**
+ * Restore a source from the cache only when its cached state is `done`.
+ * @param {string} id
+ * @returns {boolean}
+ */
+function restoreIfCached(id) {
+  const entry = cardCache.get(currentSearchKey)?.get(id);
+  if (!entry || entry.state.status !== 'done') return false;
+  return restoreSourceFromCache(id);
 }
 
 // ---------- Search ----------
@@ -647,6 +748,12 @@ function resetSearchState() {
   generation += 1;
   states.clear();
   errors.clear();
+  // Cached elements keep their nodes; clear the visual selection before the
+  // selection map is cleared, so a later restore starts unselected.
+  for (const record of records) {
+    record.el.classList.remove('selected');
+    record.checkbox.checked = false;
+  }
   records.length = 0;
   displayedKeys.clear();
   displayedMedia.clear();
@@ -668,9 +775,11 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
   const nextQuery = rawQuery.trim();
   if (!nextQuery) return;
 
+  saveAllToCache();
   query = nextQuery;
   searchInput.value = nextQuery;
   resetSearchState();
+  currentSearchKey = searchKey(openOnly, nextQuery);
 
   if (urlMode !== 'none') updateUrl(urlMode);
 
@@ -681,6 +790,7 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
 
   const gen = generation;
   for (const source of searchableSelected()) {
+    if (restoreIfCached(source.id)) continue;
     startLoad(source.id, 1, gen);
   }
   updateUi();
@@ -750,6 +860,7 @@ function toggleSource(id) {
   if (!source || !isSearchable(source, openOnly)) return;
   if (selected.has(id)) {
     selected.delete(id);
+    saveSourceToCache(id);
     abortSource(id);
     cancelRetry(id);
     removeSourceCards(id);
@@ -761,7 +872,7 @@ function toggleSource(id) {
   } else {
     selected.add(id);
     resetAutoLoad();
-    if (query) {
+    if (query && !restoreIfCached(id)) {
       startLoad(id, 1, generation);
     }
   }
@@ -788,10 +899,14 @@ function setAll(isOn) {
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
       const gen = generation;
-      for (const source of added) startLoad(source.id, 1, gen);
+      for (const source of added) {
+        if (restoreIfCached(source.id)) continue;
+        startLoad(source.id, 1, gen);
+      }
     }
   } else {
     for (const id of [...selected]) {
+      saveSourceToCache(id);
       abortSource(id);
       cancelRetry(id);
       removeSourceCards(id);
@@ -818,12 +933,16 @@ function setGroupAll(groupId, isOn) {
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
       const gen = generation;
-      for (const source of added) startLoad(source.id, 1, gen);
+      for (const source of added) {
+        if (restoreIfCached(source.id)) continue;
+        startLoad(source.id, 1, gen);
+      }
     }
   } else {
     for (const source of targets) {
       if (!selected.has(source.id)) continue;
       selected.delete(source.id);
+      saveSourceToCache(source.id);
       abortSource(source.id);
       cancelRetry(source.id);
       removeSourceCards(source.id);
@@ -958,7 +1077,9 @@ function applyUrlState() {
   if (nextQuery) {
     runSearch(nextQuery, { urlMode: 'none' });
   } else {
+    saveAllToCache();
     query = '';
+    currentSearchKey = null;
     searchInput.value = '';
     resetSearchState();
     states.clear();
