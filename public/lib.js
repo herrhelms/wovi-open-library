@@ -89,11 +89,31 @@ export function viewerPlan(item) {
   const large = [];
   for (const value of [item?.preview, item?.previewFallback]) {
     if (typeof value !== 'string' || value === '') continue;
-    if (small.includes(value) || large.includes(value)) continue;
+    if (value === item?.thumb || large.includes(value)) continue;
     large.push(value);
   }
 
   return { small, large };
+}
+
+/**
+ * Decide whether a candidate image is wider than the shown image.
+ * A shown width that is not a finite number greater than 0 counts as 0, so any
+ * candidate with a positive width is an upgrade.
+ * @param {number} shownWidth
+ * @param {number} candidateWidth
+ * @returns {boolean}
+ */
+export function isUpgrade(shownWidth, candidateWidth) {
+  if (typeof candidateWidth !== 'number' || !Number.isFinite(candidateWidth)) {
+    return false;
+  }
+  if (candidateWidth <= 0) return false;
+  const shown =
+    typeof shownWidth === 'number' && Number.isFinite(shownWidth) && shownWidth > 0
+      ? shownWidth
+      : 0;
+  return shown === 0 || candidateWidth > shown;
 }
 
 /**
