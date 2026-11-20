@@ -1,0 +1,377 @@
+{
+  "search": {
+    "totalResults": "2467",
+    "iiifCollection": "https://www.davidrumsey.com/luna/servlet/iiif/collection/s/5t6yqv",
+    "institutionName": "David Rumsey",
+    "results": [
+      {
+        "id": "RUMSEY~8~1~384464~90150261",
+        "displayName": "The new worlds which the telescope sees : The pits of the moon ...",
+        "description": "",
+        "mediaType": "Image",
+        "urlSize0": "https://www.davidrumsey.com/rumsey/Size0/RUMSEY~8~1/229/14730007.jpg",
+        "urlSize1": "https://www.davidrumsey.com/rumsey/Size1/RUMSEY~8~1/229/14730007.jpg",
+        "urlSize2": "https://www.davidrumsey.com/rumsey/Size2/RUMSEY~8~1/229/14730007.jpg",
+        "urlSize3": "https://media.davidrumsey.com/MediaManager/srvr?mediafile=/Size3/RUMSEY~8~1/229/14730007.jpg",
+        "urlSize4": "https://media.davidrumsey.com/MediaManager/srvr?mediafile=/Size4/RUMSEY~8~1/229/14730007.jpg",
+        "iiifManifest": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~384464~90150261/manifest",
+        "fieldValues": [
+          {
+            "Author": [
+              "Neurath, Marie"
+            ]
+          },
+          {
+            "Date": [
+              "1953"
+            ]
+          },
+          {
+            "Short Title": [
+              "The new worlds which the telescope sees : The pits of the moon ..."
+            ]
+          },
+          {
+            "Publisher": [
+              "Lothrop, Lee & Shepard Company, Inc."
+            ]
+          },
+          {
+            "Type": [
+              "Celestial Map"
+            ]
+          },
+          {
+            "Obj Height cm": [
+              "22"
+            ]
+          },
+          {
+            "Obj Width cm": [
+              "37"
+            ]
+          },
+          {
+            "Note": [
+              "Celestial illustration depicting concepts from astronomy, within a sequence of explanatory images and text. Printed in color."
+            ]
+          },
+          {
+            "Region": [
+              "Solar System",
+              "Moon",
+              "Jupiter",
+              "Mars",
+              "Venus"
+            ]
+          },
+          {
+            "Subject": [
+              "Celestial",
+              "Astronomy",
+              "Data Visualization"
+            ]
+          },
+          {
+            "Full Title": [
+              "The new worlds which the telescope sees : The pits of the moon -- The clouds of Jupiter -- Mars with its caps of ice -- The crescent of Venus."
+            ]
+          },
+          {
+            "List No": [
+              "14730.007"
+            ]
+          },
+          {
+            "Series No": [
+              "7"
+            ]
+          },
+          {
+            "Page No": [
+              "6-7"
+            ]
+          },
+          {
+            "Engraver or Printer": [
+              "Graphic Reproductions Ltd."
+            ]
+          },
+          {
+            "Publication Author": [
+              "Neurath, Marie"
+            ]
+          },
+          {
+            "Pub Date": [
+              "1953"
+            ]
+          },
+          {
+            "Pub Title": [
+              "Let's look at the sky. Marie Neurath. Lothrop, Lee & Shepard. 419 Fourth Avenue, New York, New York. A Chanticleer Edition. First publ. 1952. 2nd imp. 1953. Gt. Britain by Graphic Reproductions Ltd. London."
+            ]
+          },
+          {
+            "Pub Note": [
+              "Let's look at the sky by Marie Neurath. Published by Lothrop, Lee & Shepard Company, Inc. in New York, 1953. Printed in Great Britain by Graphic Reproductions Ltd. Belongs to a series of children’s books by Marie Neurath entitled The how and why series. Bound in blue board with a colorful dust jacket including a celestial illustration. Jacket flap includes a synopsis of the work, as well as other titles within the same series. With inscriptions by children in pencil and red marker on the verso to the front cover: Lerry R. -- Steven R. Volume includes a half title page, title page, table of contents and numerous celestial illustrations depicting concepts from astronomy, within a sequence of explanatory texts. The title page includes an \"Isotype\" logo representing the visual communication method developed with the author's partner, Otto Neurath. Isotype is a visual system for presenting complex information - especially social, economic, and scientific data - using simple, standardized pictograms. The intention behind Isotype was to create a “universal language” for education, enabling people to understand data without relying heavily on text. Data visualization in this simplified format is particularly well suited to this children’s book series by Marie Neurath, in which she presented scientific ideas to a young audience."
+            ]
+          },
+          {
+            "Pub List No": [
+              "14730.000"
+            ]
+          },
+          {
+            "Pub Type": [
+              "Exploration Book"
+            ]
+          },
+          {
+            "Pub Maps": [
+              "20"
+            ]
+          },
+          {
+            "Pub Height cm": [
+              "23"
+            ]
+          },
+          {
+            "Pub Width cm": [
+              "20"
+            ]
+          },
+          {
+            "Image No": [
+              "14730007.jp2"
+            ]
+          },
+          {
+            "Download 1": [
+              "<a href=https://www.davidrumsey.com/rumsey/download.pl?image=/229/14730007.jp2 target=_blank>Full Image Download in JP2 Format</a>"
+            ]
+          },
+          {
+            "Download 2": [
+              "<a href=https://www.extensis.com/support/geoviewer-9 target=_blank >GeoViewer for JP2 and SID files</a>"
+            ]
+          },
+          {
+            "Authors": [
+              "Neurath, Marie"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "RUMSEY~8~1~384468~90150263",
+        "displayName": "The changing face of the moon -- New moon ...",
+        "description": "",
+        "mediaType": "Image",
+        "urlSize0": "https://www.davidrumsey.com/rumsey/Size0/RUMSEY~8~1/229/14730011.jpg",
+        "urlSize1": "https://www.davidrumsey.com/rumsey/Size1/RUMSEY~8~1/229/14730011.jpg",
+        "urlSize2": "https://www.davidrumsey.com/rumsey/Size2/RUMSEY~8~1/229/14730011.jpg",
+        "urlSize3": "https://media.davidrumsey.com/MediaManager/srvr?mediafile=/Size3/RUMSEY~8~1/229/14730011.jpg",
+        "urlSize4": "https://media.davidrumsey.com/MediaManager/srvr?mediafile=/Size4/RUMSEY~8~1/229/14730011.jpg",
+        "iiifManifest": "https://www.davidrumsey.com/luna/servlet/iiif/m/RUMSEY~8~1~384468~90150263/manifest",
+        "fieldValues": [
+          {
+            "Author": [
+              "Neurath, Marie"
+            ]
+          },
+          {
+            "Date": [
+              "1953"
+            ]
+          },
+          {
+            "Short Title": [
+              "The changing face of the moon -- New moon ..."
+            ]
+          },
+          {
+            "Publisher": [
+              "Lothrop, Lee & Shepard Company, Inc."
+            ]
+          },
+          {
+            "Type": [
+              "Celestial Map"
+            ]
+          },
+          {
+            "Obj Height cm": [
+              "22"
+            ]
+          },
+          {
+            "Obj Width cm": [
+              "37"
+            ]
+          },
+          {
+            "Note": [
+              "Celestial illustration depicting concepts from astronomy, within a sequence of explanatory images and text. Printed in color."
+            ]
+          },
+          {
+            "World Area": [
+              "World"
+            ]
+          },
+          {
+            "Region": [
+              "Solar System",
+              "Moon"
+            ]
+          },
+          {
+            "Subject": [
+              "Celestial",
+              "Astronomy",
+              "Data Visualization"
+            ]
+          },
+          {
+            "Full Title": [
+              "The changing face of the moon -- New moon -- First quarter -- Full moon -- Last quarter."
+            ]
+          },
+          {
+            "List No": [
+              "14730.011"
+            ]
+          },
+          {
+            "Series No": [
+              "11"
+            ]
+          },
+          {
+            "Page No": [
+              "14-15"
+            ]
+          },
+          {
+            "Engraver or Printer": [
+              "Graphic Reproductions Ltd."
+            ]
+          },
+          {
+            "Publication Author": [
+              "Neurath, Marie"
+            ]
+          },
+          {
+            "Pub Date": [
+              "1953"
+            ]
+          },
+          {
+            "Pub Title": [
+              "Let's look at the sky. Marie Neurath. Lothrop, Lee & Shepard. 419 Fourth Avenue, New York, New York. A Chanticleer Edition. First publ. 1952. 2nd imp. 1953. Gt. Britain by Graphic Reproductions Ltd. London."
+            ]
+          },
+          {
+            "Pub Note": [
+              "Let's look at the sky by Marie Neurath. Published by Lothrop, Lee & Shepard Company, Inc. in New York, 1953. Printed in Great Britain by Graphic Reproductions Ltd. Belongs to a series of children’s books by Marie Neurath entitled The how and why series. Bound in blue board with a colorful dust jacket including a celestial illustration. Jacket flap includes a synopsis of the work, as well as other titles within the same series. With inscriptions by children in pencil and red marker on the verso to the front cover: Lerry R. -- Steven R. Volume includes a half title page, title page, table of contents and numerous celestial illustrations depicting concepts from astronomy, within a sequence of explanatory texts. The title page includes an \"Isotype\" logo representing the visual communication method developed with the author's partner, Otto Neurath. Isotype is a visual system for presenting complex information - especially social, economic, and scientific data - using simple, standardized pictograms. The intention behind Isotype was to create a “universal language” for education, enabling people to understand data without relying heavily on text. Data visualization in this simplified format is particularly well suited to this children’s book series by Marie Neurath, in which she presented scientific ideas to a young audience."
+            ]
+          },
+          {
+            "Pub List No": [
+              "14730.000"
+            ]
+          },
+          {
+            "Pub Type": [
+              "Exploration Book"
+            ]
+          },
+          {
+            "Pub Maps": [
+              "20"
+            ]
+          },
+          {
+            "Pub Height cm": [
+              "23"
+            ]
+          },
+          {
+            "Pub Width cm": [
+              "20"
+            ]
+          },
+          {
+            "Image No": [
+              "14730011.jp2"
+            ]
+          },
+          {
+            "Download 1": [
+              "<a href=https://www.davidrumsey.com/rumsey/download.pl?image=/229/14730011.jp2 target=_blank>Full Image Download in JP2 Format</a>"
+            ]
+          },
+          {
+            "Download 2": [
+              "<a href=https://www.extensis.com/support/geoviewer-9 target=_blank >GeoViewer for JP2 and SID files</a>"
+            ]
+          },
+          {
+            "Authors": [
+              "Neurath, Marie"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "info": {
+    "@context": "http://iiif.io/api/image/2/context.json",
+    "@id": "https://www.davidrumsey.com/luna/servlet/iiif/RUMSEY~8~1~384464~90150261",
+    "width": 8007,
+    "height": 4808,
+    "tiles": [
+      {
+        "width": 1536,
+        "height": 1536,
+        "scaleFactors": [
+          1,
+          2,
+          4,
+          8,
+          16
+        ]
+      }
+    ],
+    "profile": [
+      "http://iiif.io/api/image/2/level2.json",
+      {
+        "formats": [
+          "jpg",
+          "png"
+        ],
+        "qualities": [
+          "default",
+          "color",
+          "bitonal",
+          "gray"
+        ],
+        "supports": [
+          "regionByPx",
+          "sizeByW",
+          "sizeByH",
+          "sizeByWh",
+          "rotationBy90s",
+          "sizeByConfinedWh",
+          "sizeByDistortedWh",
+          "sizeByPct",
+          "regionByPct"
+        ]
+      }
+    ],
+    "protocol": "http://iiif.io/api/image"
+  }
+}
