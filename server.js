@@ -10,8 +10,11 @@ import { PROJECT_ROOT, loadEnv } from './lib/env.js';
 import { isOpenLicense } from './lib/license.js';
 import { GROUPS, sources as registrySources } from './lib/sources/index.js';
 import { extFromContentType, openRemote, safeFilename } from './lib/download.js';
+import { mediaIdFor } from './lib/media-id.js';
+import { createSearchCache, searchCacheKey } from './lib/search-cache.js';
 
 const JSON_TYPE = 'application/json; charset=utf-8';
+const DEFAULT_SEARCH_CACHE_TTL_MS = 1_800_000;
 
 const STATIC_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -26,12 +29,13 @@ const STATIC_TYPES = {
   '.woff2': 'font/woff2',
 };
 
-function sendJson(res, status, data) {
+function sendJson(res, status, data, headers = {}) {
   const body = JSON.stringify(data);
   res.writeHead(status, {
     'Content-Type': JSON_TYPE,
     'Cache-Control': 'no-store',
     'Content-Length': Buffer.byteLength(body),
+    ...headers,
   });
   res.end(body);
 }
@@ -91,7 +95,7 @@ async function handleSources(res, sourceList) {
   sendJson(res, 200, data);
 }
 
-async function handleSearch(url, res, sourceList) {
+async function handleSearch(url, res, sourceList, searchCache) {
   const sourceId = url.searchParams.get('source');
   const source = sourceId ? sourceList.find((entry) => entry.id === sourceId) : null;
   if (!source) {
@@ -130,32 +134,58 @@ async function handleSearch(url, res, sourceList) {
   }
 
   try {
-    const result = openOnly
-      ? await source.search(q, page, { openOnly: true })
-      : await source.search(q, page);
+    const key = searchCacheKey({ sourceId: source.id, openOnly, page, q });
+    const { value: result, hit } = await searchCache.get(key, () =>
+      openOnly
+        ? source.search(q, page, { openOnly: true })
+        : source.search(q, page),
+    );
 
-    let items = Array.isArray(result?.items) ? result.items : [];
-    for (const item of items) {
-      if (!item || typeof item !== 'object') continue;
+    const rawItems = Array.isArray(result?.items) ? result.items : [];
+    let items = [];
+    for (const raw of rawItems) {
+      if (!raw || typeof raw !== 'object') continue;
+      const item = { ...raw };
       if (typeof item.open !== 'boolean') {
         item.open = isOpenLicense(item.license, item.licenseUrl);
       }
+      item.uid = `${source.id}:${item.id}`;
+      item.thumbSource = raw.thumb ?? null;
+      item.mediaId = mediaIdFor(raw.thumb);
+      items.push(item);
     }
 
     let total = result?.total ?? null;
     if (openOnly) {
-      const kept = items.filter((item) => item?.open === true);
+      const kept = items.filter((item) => item.open === true);
       if (kept.length !== items.length) total = null;
       items = kept;
     }
 
-    sendJson(res, 200, {
-      source: source.id,
-      page,
-      total,
-      hasMore: Boolean(result?.hasMore),
-      items,
-    });
+    const seenUids = new Set();
+    const seenMedia = new Set();
+    const unique = [];
+    for (const item of items) {
+      if (seenUids.has(item.uid)) continue;
+      if (item.mediaId !== null && seenMedia.has(item.mediaId)) continue;
+      seenUids.add(item.uid);
+      if (item.mediaId !== null) seenMedia.add(item.mediaId);
+      unique.push(item);
+    }
+    items = unique;
+
+    sendJson(
+      res,
+      200,
+      {
+        source: source.id,
+        page,
+        total,
+        hasMore: Boolean(result?.hasMore),
+        items,
+      },
+      { 'X-Search-Cache': hit ? 'hit' : 'miss' },
+    );
   } catch (err) {
     const message = err?.message ?? 'Search failed';
     process.stderr.write(`[search ${source.id}] ${message}\n`);
@@ -405,9 +435,18 @@ export function createServer({
   publicDir = join(PROJECT_ROOT, 'public'),
   sourcesOverride,
   groupsOverride,
+  searchCacheTtlMs,
+  now,
 } = {}) {
   const sourceList = Array.isArray(sourcesOverride) ? sourcesOverride : registrySources;
   const groupList = Array.isArray(groupsOverride) ? groupsOverride : GROUPS;
+
+  const ttlMs =
+    typeof searchCacheTtlMs === 'number' && searchCacheTtlMs > 0
+      ? searchCacheTtlMs
+      : DEFAULT_SEARCH_CACHE_TTL_MS;
+  const clock = typeof now === 'function' ? now : Date.now;
+  const searchCache = createSearchCache({ ttlMs, now: clock });
 
   return createHttpServer(async (req, res) => {
     try {
@@ -427,7 +466,7 @@ export function createServer({
         return;
       }
       if (url.pathname === '/api/search') {
-        await handleSearch(url, res, sourceList);
+        await handleSearch(url, res, sourceList, searchCache);
         return;
       }
       if (url.pathname === '/api/download') {

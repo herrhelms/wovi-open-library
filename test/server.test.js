@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 import { createServer } from '../server.js';
+import { mediaIdFor } from '../lib/media-id.js';
 import {
   ALLOWED_HOST_SUFFIXES,
   extFromContentType,
@@ -701,5 +702,174 @@ test('GET /api/search treats open=0 like no filter', async () => {
     assert.equal(fake.calls[0].deps, undefined);
     assert.deepEqual(data.items.map((item) => item.open), [true, false]);
     assert.equal(data.total, 2);
+  });
+});
+
+test('GET /api/search caches identical requests and sends the header', async () => {
+  let calls = 0;
+  const fake = fakeSource('cached', {
+    searchResult: () => {
+      calls += 1;
+      return { total: 1, hasMore: false, items: [{ id: '1' }] };
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const first = await fetch(`${base}/api/search?source=cached&q=moon`);
+    assert.equal(first.headers.get('x-search-cache'), 'miss');
+    const second = await fetch(`${base}/api/search?source=cached&q=moon`);
+    assert.equal(second.headers.get('x-search-cache'), 'hit');
+    assert.equal(calls, 1);
+  });
+});
+
+test('GET /api/search caches page, open and q separately', async () => {
+  let calls = 0;
+  const fake = fakeSource('cached', {
+    searchResult: () => {
+      calls += 1;
+      return { total: 1, hasMore: false, items: [{ id: '1', license: 'CC0' }] };
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    await fetch(`${base}/api/search?source=cached&q=moon`);
+    await fetch(`${base}/api/search?source=cached&q=moon&page=2`);
+    await fetch(`${base}/api/search?source=cached&q=moon&open=1`);
+    await fetch(`${base}/api/search?source=cached&q=sun`);
+    assert.equal(calls, 4);
+  });
+});
+
+test('GET /api/search expires the cache after the TTL', async () => {
+  let clock = 0;
+  let calls = 0;
+  const fake = fakeSource('cached', {
+    searchResult: () => {
+      calls += 1;
+      return { total: 1, hasMore: false, items: [{ id: '1' }] };
+    },
+  });
+  const server = createServer({
+    publicDir: fixture.publicDir,
+    sourcesOverride: [fake.source],
+    searchCacheTtlMs: 1000,
+    now: () => clock,
+  });
+  const port = await listen(server);
+  const base = `http://127.0.0.1:${port}`;
+  try {
+    await fetch(`${base}/api/search?source=cached&q=moon`);
+    const hit = await fetch(`${base}/api/search?source=cached&q=moon`);
+    assert.equal(hit.headers.get('x-search-cache'), 'hit');
+    assert.equal(calls, 1);
+
+    clock = 1000;
+    const expired = await fetch(`${base}/api/search?source=cached&q=moon`);
+    assert.equal(expired.headers.get('x-search-cache'), 'miss');
+    assert.equal(calls, 2);
+  } finally {
+    await close(server);
+  }
+});
+
+test('GET /api/search does not cache an error', async () => {
+  let calls = 0;
+  const fake = fakeSource('thrower', {
+    searchResult: () => {
+      calls += 1;
+      throw new Error('Nope');
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const first = await fetch(`${base}/api/search?source=thrower&q=moon`);
+    assert.equal(first.status, 502);
+    const second = await fetch(`${base}/api/search?source=thrower&q=moon`);
+    assert.equal(second.status, 502);
+    assert.equal(calls, 2);
+  });
+});
+
+test('GET /api/search does not change the cached raw items', async () => {
+  const raw = { id: '1', thumb: 'https://img.example/a.jpg', license: 'CC0' };
+  const result = { total: 1, hasMore: false, items: [raw] };
+  const fake = fakeSource('cached', { searchResult: () => result });
+  await withServer([fake.source], async (base) => {
+    await fetch(`${base}/api/search?source=cached&q=moon`);
+    await fetch(`${base}/api/search?source=cached&q=moon`);
+    assert.equal(raw.uid, undefined);
+    assert.equal(raw.mediaId, undefined);
+    assert.equal(raw.thumbSource, undefined);
+    assert.equal(raw.open, undefined);
+    assert.deepEqual(raw, {
+      id: '1',
+      thumb: 'https://img.example/a.jpg',
+      license: 'CC0',
+    });
+  });
+});
+
+test('GET /api/search adds uid, thumbSource and mediaId', async () => {
+  const fake = fakeSource('ok', {
+    searchResult: {
+      total: 1,
+      hasMore: false,
+      items: [{ id: '1', thumb: 'http://img.example/a.jpg' }],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=ok&q=moon`)).json();
+    const item = data.items[0];
+    assert.equal(item.uid, 'ok:1');
+    assert.equal(item.thumbSource, 'http://img.example/a.jpg');
+    assert.equal(item.mediaId, mediaIdFor('https://img.example/a.jpg'));
+    assert.equal(item.thumb, 'http://img.example/a.jpg');
+  });
+});
+
+test('GET /api/search drops duplicate uid and mediaId items', async () => {
+  const fake = fakeSource('dup', {
+    searchResult: {
+      total: 4,
+      hasMore: false,
+      items: [
+        { id: '1', thumb: 'https://x.example/a.jpg' },
+        { id: '1', thumb: 'https://x.example/b.jpg' },
+        { id: '2', thumb: 'http://x.example/a.jpg' },
+        { id: '3', thumb: 'https://x.example/c.jpg' },
+      ],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=dup&q=moon`)).json();
+    assert.deepEqual(data.items.map((item) => item.id), ['1', '3']);
+    assert.equal(data.total, 4);
+  });
+});
+
+test('GET /api/search keeps items without a thumb', async () => {
+  const fake = fakeSource('nothumb', {
+    searchResult: {
+      total: 2,
+      hasMore: false,
+      items: [{ id: '1' }, { id: '2' }],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=nothumb&q=moon`)).json();
+    assert.deepEqual(data.items.map((item) => item.id), ['1', '2']);
+    assert.equal(data.items[0].mediaId, null);
+    assert.equal(data.items[0].thumbSource, null);
+  });
+});
+
+test('GET /api/search excluded answer has no cache header', async () => {
+  const fake = fakeSource('limited', {
+    openLicenses: false,
+    searchResult: { total: 5, hasMore: true, items: [{ id: '1', license: 'CC0' }] },
+  });
+  await withServer([fake.source], async (base) => {
+    const res = await fetch(`${base}/api/search?source=limited&q=moon&open=1`);
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get('x-search-cache'), null);
+    assert.equal(fake.calls.length, 0);
   });
 });
