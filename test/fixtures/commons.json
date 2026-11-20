@@ -244,5 +244,42 @@
         ]
       }
     }
+  },
+  "tiff": {
+    "pageid": 55555555,
+    "ns": 6,
+    "title": "File:Verklaar-steen over de inwijding der Hebreeuse republyk, objectnr A 19751.tif",
+    "index": 1,
+    "imagerepository": "local",
+    "imageinfo": [
+      {
+        "size": 1234567,
+        "width": 1410,
+        "height": 2000,
+        "thumburl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/Verklaar-steen_over_de_inwijding_der_Hebreeuse_republyk%2C_objectnr_A_19751.tif/lossy-page1-500px-Verklaar-steen_over_de_inwijding_der_Hebreeuse_republyk%2C_objectnr_A_19751.tif.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+        "thumbwidth": 500,
+        "thumbheight": 709,
+        "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Verklaar-steen_over_de_inwijding_der_Hebreeuse_republyk%2C_objectnr_A_19751.tif?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "descriptionurl": "https://commons.wikimedia.org/wiki/File:Verklaar-steen_over_de_inwijding_der_Hebreeuse_republyk%2C_objectnr_A_19751.tif",
+        "mime": "image/tiff",
+        "extmetadata": {
+          "ObjectName": {
+            "value": "Verklaar-steen over de inwijding der Hebreeuse republyk, objectnr A 19751"
+          },
+          "Artist": {
+            "value": "Unknown"
+          },
+          "DateTimeOriginal": {
+            "value": "1900"
+          },
+          "LicenseShortName": {
+            "value": "Public domain"
+          },
+          "LicenseUrl": {
+            "value": "https://creativecommons.org/publicdomain/mark/1.0/"
+          }
+        }
+      }
+    ]
   }
 }
