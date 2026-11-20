@@ -1,0 +1,82 @@
+{
+  "offset": 0,
+  "limit": 3,
+  "endOfRecords": false,
+  "count": 31760,
+  "results": [
+    {
+      "key": 5109511068,
+      "scientificName": "Aphyllanthes monspeliensis L.",
+      "species": "Aphyllanthes monspeliensis",
+      "eventDate": "2023-05-14T13:39:12Z",
+      "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+      "country": "France",
+      "media": [
+        {
+          "type": "StillImage",
+          "format": "image/jpeg",
+          "identifier": "https://bs.plantnet.org/image/o/e547663cfaa29ba78daf26e90f15e6cfce2e933d",
+          "license": "Frederic Heron (cc-by-sa)",
+          "rightsHolder": "Frederic Heron",
+          "creator": "Frederic Heron"
+        }
+      ]
+    },
+    {
+      "key": 5110197029,
+      "scientificName": "Centaurea stoebe L.",
+      "species": "Centaurea stoebe",
+      "eventDate": "2024-08-29T13:23:50Z",
+      "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+      "country": "United Kingdom of Great Britain and Northern Ireland",
+      "media": [
+        {
+          "type": "StillImage",
+          "format": "image/jpeg",
+          "identifier": "https://bs.plantnet.org/image/o/139d1fea27e76cb7c66d9f81c4c55ee789b3c37a",
+          "license": "Jayne Heron (cc-by-sa)",
+          "rightsHolder": "Jayne Heron",
+          "creator": "Jayne Heron"
+        }
+      ]
+    },
+    {
+      "key": 5026839952,
+      "scientificName": "Uranothauma delatorum Heron, 1909",
+      "species": "Uranothauma delatorum",
+      "eventDate": "2019-05-07T00:00",
+      "recordedBy": "1319392442",
+      "license": "http://creativecommons.org/licenses/by/4.0/legalcode",
+      "country": "Uganda",
+      "media": [
+        {
+          "type": "StillImage",
+          "format": "image/jpeg",
+          "identifier": "https://live.staticflickr.com/65535/49260464941_9ab4b09fae_b.jpg",
+          "license": "Copyright by the creator. For license and creator details, see https://nabu-naturgucker-beobachtungen.de/?sprache=en&bild=-204520878.",
+          "references": "https://nabu-naturgucker-beobachtungen.de/?sprache=en&bild=-204520878"
+        }
+      ]
+    },
+    {
+      "key": 9999999999,
+      "scientificName": "Ardea cinerea Linnaeus, 1758",
+      "vernacularName": "Grey Heron",
+      "species": "Ardea cinerea",
+      "eventDate": "2024-06-01T10:00:00Z",
+      "recordedBy": "Test Recorder",
+      "license": "http://creativecommons.org/licenses/by-nc/4.0/legalcode",
+      "country": "Germany",
+      "media": [
+        {
+          "type": "StillImage",
+          "format": "image/jpeg",
+          "identifier": "https://example.org/closed.jpg",
+          "license": "CC BY-NC 4.0",
+          "rightsHolder": "Test Holder",
+          "creator": "Test Holder"
+        }
+      ]
+    }
+  ]
+}
