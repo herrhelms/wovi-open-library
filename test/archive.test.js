@@ -29,10 +29,10 @@ test('archive normalize makes an Item', () => {
   assert.equal(item.source, 'archive');
   assert.equal(item.id, doc.identifier);
   assert.equal(item.full, null);
-  assert.equal(item.thumb, `https://iiif.archive.org/iiif/${doc.identifier}/full/400,/0/default.jpg`);
-  assert.equal(item.thumbFallback, `https://archive.org/services/img/${doc.identifier}`);
+  assert.equal(item.thumb, `https://archive.org/services/img/${doc.identifier}`);
+  assert.equal('thumbFallback' in item, false);
   assert.equal(item.preview, `https://iiif.archive.org/iiif/${doc.identifier}/full/1600,/0/default.jpg`);
-  assert.equal(item.previewFallback, item.thumbFallback);
+  assert.equal(item.previewFallback, item.thumb);
   assert.equal(item.pageUrl, `https://archive.org/details/${doc.identifier}`);
   assert.equal(item.date, '2009-02-19');
   assert.equal(item.width, null);
@@ -58,15 +58,15 @@ test('archive normalize reads array fields and license', () => {
   assert.equal(item.licenseUrl, 'https://creativecommons.org/licenses/by/4.0/');
 });
 
-test('archive normalize builds IIIF thumb and preview and reads the license', () => {
+test('archive normalize builds a fast thumb and the IIIF preview and reads the license', () => {
   const item = normalize({
     identifier: 'abc',
     licenseurl: 'http://creativecommons.org/licenses/by-nc/4.0/',
   });
-  assert.equal(item.thumb, 'https://iiif.archive.org/iiif/abc/full/400,/0/default.jpg');
-  assert.equal(item.thumbFallback, 'https://archive.org/services/img/abc');
+  assert.equal(item.thumb, 'https://archive.org/services/img/abc');
+  assert.equal('thumbFallback' in item, false);
   assert.equal(item.preview, 'https://iiif.archive.org/iiif/abc/full/1600,/0/default.jpg');
-  assert.equal(item.previewFallback, item.thumbFallback);
+  assert.equal(item.previewFallback, 'https://archive.org/services/img/abc');
   assert.equal(item.license, 'CC BY-NC 4.0');
 });
 
