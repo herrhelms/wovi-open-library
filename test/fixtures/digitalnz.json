@@ -1,7 +1,7 @@
 {
   "search": {
     "page": 1,
-    "per_page": 3,
+    "per_page": 7,
     "result_count": 2055,
     "request_url": "https://api.digitalnz.org/v3/records.json?text=moon&and%5Bcategory%5D%5B%5D=Images&and%5Busage%5D%5B%5D=Use%20commercially&per_page=3&page=1&fields=id,title,large_thumbnail_url,thumbnail_url,object_url,landing_url,rights_url,usage,content_partner,creator,date",
     "results": [
@@ -51,7 +51,8 @@
         "rights_url": [],
         "object_url": null,
         "thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153842/default.jpg",
-        "large_thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153842/default.jpg"
+        "large_thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153842/default.jpg",
+        "rights": "No known copyright restrictions"
       },
       {
         "id": 43346387,
@@ -76,7 +77,8 @@
         "rights_url": [],
         "object_url": null,
         "thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153843/default.jpg",
-        "large_thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153843/default.jpg"
+        "large_thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153843/default.jpg",
+        "rights": "No known copyright restrictions"
       },
       {
         "id": 90000001,
@@ -113,6 +115,58 @@
         "object_url": null,
         "thumbnail_url": null,
         "large_thumbnail_url": null
+      },
+      {
+        "id": 22734759,
+        "title": "Moon over Wellington",
+        "content_partner": [
+          "Archives New Zealand"
+        ],
+        "creator": [
+          "Example Photographer"
+        ],
+        "usage": [
+          "Share",
+          "Modify",
+          "Use commercially"
+        ],
+        "date": [
+          ""
+        ],
+        "landing_url": "https://ndhadeliver.natlib.govt.nz/delivery/DeliveryManagerServlet?dps_pid=IE6702609",
+        "rights_url": [
+          "https://creativecommons.org/licenses/by/4.0/"
+        ],
+        "rights": "Attribution 4.0 International (CC BY 4.0)",
+        "object_url": "https://ndhadeliver.natlib.govt.nz/content-aggregator/getIEs?system=emu&id=648313",
+        "thumbnail_url": "https://ndhadeliver.natlib.govt.nz/delivery/DeliveryManagerServlet?dps_pid=IE6702609&dps_func=thumbnail",
+        "large_thumbnail_url": "https://ndhadeliver.natlib.govt.nz/NLNZStreamGate/get?dps_pid=IE6702609"
+      },
+      {
+        "id": 36912839,
+        "title": "Moon photographed at night",
+        "content_partner": [
+          "iNaturalist NZ"
+        ],
+        "creator": [
+          "Jacqui Geux"
+        ],
+        "usage": [
+          "Share",
+          "Modify",
+          "Use commercially"
+        ],
+        "date": [
+          "2026-11-20T00:00:00Z"
+        ],
+        "landing_url": "https://inaturalist.nz/observations/153842",
+        "rights_url": [
+          "https://creativecommons.org/licenses/by/4.0/"
+        ],
+        "rights": "Photo: (c) Jacqui Geux, some rights reserved (CC BY);",
+        "object_url": null,
+        "thumbnail_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2920834/small.JPG",
+        "large_thumbnail_url": "https://inaturalist-open-data.s3.amazonaws.com/photos/2920834/medium.JPG"
       }
     ],
     "facets": {}
