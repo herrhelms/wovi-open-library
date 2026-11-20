@@ -2,7 +2,7 @@
  * Full-screen viewer dialog for Open Library Fetch.
  * One dialog instance is created on first use and then reused.
  */
-import { downloadUrl, el, imageCandidates } from './lib.js';
+import { downloadUrl, el, firstLoaded, imageCandidates, viewerPlan } from './lib.js';
 
 const COPY_RESET_MS = 1500;
 
@@ -11,6 +11,7 @@ let dom = null;
 let state = null;
 let sourceNamesPromise = null;
 let loadToken = 0;
+let loadController = null;
 let copyTimer = 0;
 let previouslyFocused = null;
 
@@ -139,6 +140,10 @@ function onKeydown(event) {
 
 function onClose() {
   loadToken += 1;
+  if (loadController) {
+    loadController.abort();
+    loadController = null;
+  }
   if (copyTimer) {
     clearTimeout(copyTimer);
     copyTimer = 0;
@@ -152,55 +157,122 @@ function onClose() {
 
 /**
  * Probe an image URL without changing the visible image.
+ * When the signal aborts, the request is stopped and the probe fails.
  * @param {string} src
+ * @param {AbortSignal} [signal]
  * @returns {Promise<boolean>}
  */
-function probeImage(src) {
+function probeImage(src, signal) {
   return new Promise((resolve) => {
     const probe = new Image();
-    probe.onload = () => resolve(true);
-    probe.onerror = () => resolve(false);
+    let onAbort = null;
+    const cleanup = () => {
+      if (onAbort && signal) signal.removeEventListener('abort', onAbort);
+    };
+    probe.onload = () => {
+      cleanup();
+      resolve(true);
+    };
+    probe.onerror = () => {
+      cleanup();
+      resolve(false);
+    };
+    if (signal) {
+      onAbort = () => {
+        probe.src = '';
+        cleanup();
+        resolve(false);
+      };
+      signal.addEventListener('abort', onAbort, { once: true });
+    }
     probe.src = src;
   });
 }
 
 /**
- * Show the preview image, fall back to the thumbnail, then show an error.
+ * Show the thumbnail at once and probe the large image in parallel.
+ * The thumbnail stays when no large candidate loads.
  * @param {object} item
  */
 async function loadImage(item) {
   const token = ++loadToken;
-  const candidates = imageCandidates(item);
+  if (loadController) loadController.abort();
+  const controller = new AbortController();
+  loadController = controller;
+
+  const { small, large } = viewerPlan(item);
+  const alt = item.title || 'Image';
+  let largeVisible = false;
 
   dom.image.hidden = true;
+  dom.image.removeAttribute('src');
+  dom.image.alt = alt;
   dom.image.classList.remove('is-empty');
   dom.error.hidden = true;
-  dom.spinner.hidden = candidates.length === 0;
+  dom.canvas.classList.remove('is-loading-small');
 
-  if (candidates.length === 0) {
+  if (small.length === 0 && large.length === 0) {
+    dom.spinner.hidden = true;
     dom.image.classList.add('is-empty');
     dom.error.hidden = false;
     return;
   }
 
-  for (const src of candidates) {
-    const ok = await probeImage(src);
-    if (token !== loadToken) return;
-    if (ok) {
-      dom.image.src = src;
-      dom.image.alt = item.title || 'Image';
-      dom.image.hidden = false;
-      dom.spinner.hidden = true;
-      dom.error.hidden = true;
-      preloadNext();
-      return;
+  dom.spinner.hidden = false;
+
+  const smallPromise = (async () => {
+    for (const src of small) {
+      if (controller.signal.aborted) return null;
+      const ok = await probeImage(src, controller.signal);
+      if (token !== loadToken) return null;
+      if (!ok) continue;
+      if (!largeVisible) {
+        dom.image.src = src;
+        dom.image.alt = alt;
+        dom.image.hidden = false;
+        dom.canvas.classList.add('is-loading-small');
+        if (large.length === 0) dom.spinner.hidden = true;
+      }
+      return src;
     }
+    return null;
+  })();
+
+  const largePromise = (async () => {
+    if (large.length === 0) return null;
+    return firstLoaded(large, probeImage, { signal: controller.signal });
+  })();
+
+  const largeUrl = await largePromise;
+  if (token !== loadToken) return;
+
+  if (largeUrl) {
+    largeVisible = true;
+    dom.image.src = largeUrl;
+    dom.image.alt = alt;
+    dom.image.hidden = false;
+    dom.image.classList.remove('is-empty');
+    dom.canvas.classList.remove('is-loading-small');
+    dom.spinner.hidden = true;
+    dom.error.hidden = true;
+    preloadNext();
+    return;
   }
 
+  const smallUrl = await smallPromise;
   if (token !== loadToken) return;
+
+  dom.spinner.hidden = true;
+
+  if (smallUrl && !dom.image.hidden) {
+    dom.canvas.classList.remove('is-loading-small');
+    return;
+  }
+
   dom.image.removeAttribute('src');
   dom.image.classList.add('is-empty');
-  dom.spinner.hidden = true;
+  dom.image.hidden = true;
+  dom.canvas.classList.remove('is-loading-small');
   dom.error.hidden = false;
 }
 

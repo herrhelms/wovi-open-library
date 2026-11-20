@@ -95,6 +95,20 @@
   display: none;
 }
 
+/* A thumbnail is visible while the large image loads: small spinner in a corner. */
+.viewer-canvas.is-loading-small .viewer-spinner {
+  top: auto;
+  left: auto;
+  right: var(--space-4);
+  bottom: var(--space-4);
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  border-width: 2px;
+  background-color: var(--bg);
+  border-radius: 50%;
+}
+
 .viewer-error {
   margin: 0;
   font-family: var(--font-display);

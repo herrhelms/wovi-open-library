@@ -71,6 +71,111 @@ export function imageCandidates(item) {
   return result;
 }
 
+/** Time limit for one viewer probe. */
+export const VIEWER_PROBE_TIMEOUT_MS = 20000;
+
+/**
+ * Split the image URLs of one item into the small (cached) and large groups.
+ * @param {object|null|undefined} item
+ * @returns {{small: string[], large: string[]}}
+ */
+export function viewerPlan(item) {
+  const small = [];
+  for (const value of [item?.thumb, item?.thumbFallback]) {
+    if (typeof value !== 'string' || value === '') continue;
+    if (!small.includes(value)) small.push(value);
+  }
+
+  const large = [];
+  for (const value of [item?.preview, item?.previewFallback]) {
+    if (typeof value !== 'string' || value === '') continue;
+    if (small.includes(value) || large.includes(value)) continue;
+    large.push(value);
+  }
+
+  return { small, large };
+}
+
+/**
+ * Return the first URL whose probe answers `true`.
+ * Each probe has its own AbortSignal and a time limit. A probe that runs out of
+ * time is aborted and the next URL is tried. An aborted outer signal stops all
+ * work and returns null.
+ * @param {string[]} urls
+ * @param {(url: string, signal: AbortSignal) => Promise<boolean>} probe
+ * @param {{timeoutMs?: number, signal?: AbortSignal}} [options]
+ * @returns {Promise<string|null>}
+ */
+export async function firstLoaded(
+  urls,
+  probe,
+  { timeoutMs = VIEWER_PROBE_TIMEOUT_MS, signal } = {},
+) {
+  const list = Array.isArray(urls) ? urls : [];
+  if (signal?.aborted) return null;
+
+  for (const url of list) {
+    if (signal?.aborted) return null;
+
+    const controller = new AbortController();
+    let timer = 0;
+    let onOuterAbort = null;
+
+    const outcome = await new Promise((resolve) => {
+      let settled = false;
+      const finish = (value) => {
+        if (settled) return;
+        settled = true;
+        resolve(value);
+      };
+      const cleanup = () => {
+        if (timer) {
+          clearTimeout(timer);
+          timer = 0;
+        }
+        if (onOuterAbort && signal) {
+          signal.removeEventListener('abort', onOuterAbort);
+        }
+      };
+
+      if (signal) {
+        onOuterAbort = () => {
+          controller.abort();
+          cleanup();
+          finish('aborted');
+        };
+        signal.addEventListener('abort', onOuterAbort, { once: true });
+      }
+
+      timer = setTimeout(() => {
+        cleanup();
+        controller.abort();
+        finish('timeout');
+      }, timeoutMs);
+
+      Promise.resolve()
+        .then(() => probe(url, controller.signal))
+        .then((ok) => {
+          cleanup();
+          finish(ok === true ? 'loaded' : 'failed');
+        })
+        .catch(() => {
+          cleanup();
+          finish('failed');
+        });
+    });
+
+    if (outcome === 'aborted') {
+      controller.abort();
+      return null;
+    }
+    if (outcome === 'timeout') continue;
+    if (outcome === 'loaded') return url;
+  }
+
+  return null;
+}
+
 /**
  * Build the display rows for the source bar.
  * Empty groups are left out. Sources with an unknown group id go to "Other".
