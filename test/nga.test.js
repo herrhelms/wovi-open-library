@@ -144,8 +144,9 @@ test('normalize maps a fixture object and image', () => {
   );
   assert.ok(item.thumb.endsWith('/full/!400,400/0/default.jpg'));
   assert.ok(item.preview.endsWith('/full/!1600,1600/0/default.jpg'));
-  assert.equal(item.width, 3365);
-  assert.equal(item.height, 4332);
+  // Native 3365x4332 is scaled so that the long side is at most 4096.
+  assert.equal(item.width, 3182);
+  assert.equal(item.height, 4096);
   assert.equal(item.license, 'CC0');
   assert.equal(
     item.licenseUrl,
@@ -158,6 +159,30 @@ test('normalize maps a fixture object and image', () => {
   assert.equal(item.description, 'watercolor and graphite on paper. Drawing');
   assert.equal(item.creator, 'Index of American Design');
   assert.equal(item.date, 'c. 1938');
+});
+
+test('normalize caps the long side at 4096 without maxpixels', () => {
+  const make = (width, height, maxpixels = '') =>
+    normalize({
+      object: { ...fixture.object, objectid: '1' },
+      image: { ...fixture.image, width: String(width), height: String(height), maxpixels },
+    });
+
+  const large = make(8000, 6000);
+  assert.equal(large.width, 4096);
+  assert.equal(large.height, 3072);
+
+  const small = make(3000, 2000);
+  assert.equal(small.width, 3000);
+  assert.equal(small.height, 2000);
+
+  const capped = make(10000, 5000, '3000');
+  assert.equal(capped.width, 3000);
+  assert.equal(capped.height, 1500);
+
+  const portrait = make(5000, 10000, '6000');
+  assert.equal(portrait.width, 2048);
+  assert.equal(portrait.height, 4096);
 });
 
 test('normalize uses maxpixels for full and scales the size', () => {

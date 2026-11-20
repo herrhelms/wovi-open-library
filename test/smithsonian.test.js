@@ -11,7 +11,7 @@ const fixture = JSON.parse(readFileSync(join(here, 'fixtures/smithsonian.json'),
 
 test('smithsonian parseSearch reads rows and total', () => {
   const result = parseSearch(fixture, 1);
-  assert.equal(result.items.length, 3);
+  assert.equal(result.items.length, 5);
   assert.equal(result.total, 2119);
   assert.equal(result.hasMore, true);
 });
@@ -20,11 +20,20 @@ test('smithsonian normalize makes an Item (query form)', () => {
   const item = normalize(fixture.response.rows[0]);
   assert.equal(item.source, 'smithsonian');
   assert.equal(item.title, 'Moon and Clouds, Terni, Italy');
-  assert.equal(item.full, 'https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_03-000001');
-  assert.ok(item.thumb.endsWith('&max=400'));
-  assert.ok(item.preview.endsWith('&max=1600'));
-  assert.equal(item.width, 6720);
-  assert.equal(item.height, 3838);
+  assert.equal(
+    item.full,
+    'https://ids.si.edu/ids/download?id=CHSDM-23484_03-000001.jpg',
+  );
+  assert.equal(
+    item.thumb,
+    'https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_03-000001&max=400',
+  );
+  assert.equal(
+    item.preview,
+    'https://ids.si.edu/ids/deliveryService?id=CHSDM-23484_03-000001&max=1600',
+  );
+  assert.equal(item.width, 6765);
+  assert.equal(item.height, 3864);
   assert.ok(item.creator.startsWith('Frederic Edwin Church'));
   assert.equal(item.date, 'October 1, 1868');
   assert.equal(item.license, 'CC0');
@@ -40,8 +49,39 @@ test('smithsonian normalize makes an Item (query form)', () => {
 
 test('smithsonian normalize handles the path form', () => {
   const item = normalize(fixture.response.rows[1]);
-  assert.equal(item.thumb, `${item.full}/400`);
-  assert.equal(item.preview, `${item.full}/1600`);
+  assert.equal(
+    item.full,
+    'https://ids.si.edu/ids/download?id=NMNH-EO_050655_Common_Northern_Moon_Euspira_heros_001.jpg',
+  );
+  assert.equal(item.width, 2500);
+  assert.equal(item.height, 1660);
+  assert.ok(item.thumb.endsWith('/90') === false);
+  assert.equal(
+    item.thumb,
+    'https://ids.si.edu/ids/deliveryService/id/ark:/65665/m3385547e54dbd452eadac2e1539602208/400',
+  );
+  assert.equal(
+    item.preview,
+    'https://ids.si.edu/ids/deliveryService/id/ark:/65665/m3385547e54dbd452eadac2e1539602208/1600',
+  );
+});
+
+test('smithsonian normalize falls back to media.content without resources', () => {
+  const row = fixture.response.rows.find((entry) => entry.id === 'test-no-resources');
+  const item = normalize(row);
+  assert.equal(item.full, 'https://ids.si.edu/ids/deliveryService?id=TEST-000001');
+  assert.equal(item.width, null);
+  assert.equal(item.height, null);
+  assert.equal(item.thumb, 'https://ids.si.edu/ids/deliveryService?id=TEST-000001&max=400');
+  assert.equal(item.preview, 'https://ids.si.edu/ids/deliveryService?id=TEST-000001&max=1600');
+});
+
+test('smithsonian normalize ignores a High-resolution TIFF resource', () => {
+  const row = fixture.response.rows.find((entry) => entry.id === 'test-tiff-only');
+  const item = normalize(row);
+  assert.equal(item.full, 'https://ids.si.edu/ids/deliveryService?id=TEST-000001');
+  assert.equal(item.width, null);
+  assert.equal(item.height, null);
 });
 
 test('smithsonian normalize returns null without images', () => {
