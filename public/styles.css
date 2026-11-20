@@ -223,6 +223,15 @@ h1 {
   gap: var(--space-3);
 }
 
+.source-groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+}
+
 .source-actions {
   display: flex;
   flex-wrap: wrap;
@@ -305,9 +314,26 @@ h1 {
   background-color: var(--error);
 }
 
-.chip-key-missing {
+.chip-needs-key {
+  border-style: dashed;
+  border-color: var(--rule);
+  color: var(--ink-muted);
+  background-color: transparent;
+  cursor: default;
+}
+
+.chip-needs-key:hover {
+  border-color: var(--rule);
+  color: var(--ink-muted);
+}
+
+.chip-needs-key .chip-name {
+  color: var(--ink-muted);
+}
+
+.chip-needs-key-text {
   font-size: 0.7rem;
-  color: var(--error);
+  color: var(--ink-muted);
   white-space: nowrap;
 }
 
@@ -639,6 +665,11 @@ body:has(.selection-bar:not([hidden])) .site-main {
 
   .search-submit {
     width: 100%;
+  }
+
+  .source-actions-group {
+    flex-wrap: nowrap;
+    white-space: nowrap;
   }
 
   .batch {

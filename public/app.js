@@ -2,7 +2,18 @@
  * Open Library Fetch — frontend entry module.
  * Plain ES module, no build step. All API data is inserted with DOM methods.
  */
-import { downloadUrl, el, itemKey, sleep } from './lib.js';
+import {
+  DEFAULT_GROUPS,
+  downloadUrl,
+  el,
+  groupSources,
+  isUsable,
+  itemKey,
+  parseSavedSelection,
+  serializeSelection,
+  sleep,
+  subtitleText,
+} from './lib.js';
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
@@ -13,7 +24,7 @@ const DOWNLOAD_DELAY = 800;
 // ---------- DOM ----------
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
-const chipsEl = document.getElementById('source-chips');
+const groupsEl = document.getElementById('source-groups');
 const allButton = document.getElementById('sources-all');
 const noneButton = document.getElementById('sources-none');
 const errorListEl = document.getElementById('error-list');
@@ -33,6 +44,7 @@ const clearSelectionButton = document.getElementById('selection-clear');
 /** @type {Array<{id:string,name:string,homepage:string,needsKey:boolean,keyConfigured:boolean}>} */
 let registry = [];
 let registryById = new Map();
+let groups = DEFAULT_GROUPS;
 let selected = new Set();
 let query = '';
 let generation = 0;
@@ -54,11 +66,7 @@ const selection = new Map();
 // ---------- Storage helpers ----------
 function loadSavedSelection() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return null;
-    return parsed.filter((entry) => typeof entry === 'string');
+    return parseSavedSelection(localStorage.getItem(STORAGE_KEY), registry);
   } catch {
     return null;
   }
@@ -66,21 +74,21 @@ function loadSavedSelection() {
 
 function saveSelection() {
   try {
-    const ids = registry.map((source) => source.id).filter((id) => selected.has(id));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(ids));
+    localStorage.setItem(STORAGE_KEY, serializeSelection(selected, registry));
   } catch {
     // Storage may be blocked or full; selection still works for this session.
   }
 }
 
 function defaultSelection() {
-  return registry
-    .filter((source) => !(source.needsKey && !source.keyConfigured))
-    .map((source) => source.id);
+  return registry.filter(isUsable).map((source) => source.id);
 }
 
 function knownIds(ids) {
-  return ids.filter((id) => registryById.has(id));
+  return ids.filter((id) => {
+    const source = registryById.get(id);
+    return Boolean(source) && isUsable(source);
+  });
 }
 
 // ---------- Source state ----------
@@ -118,33 +126,86 @@ function sourceShownCount(id) {
 }
 
 // ---------- Chips ----------
-function renderChips() {
-  chipsEl.replaceChildren();
-  chipEls.clear();
-  for (const source of registry) {
-    const statusEl = el('span', { class: 'chip-status' });
-    const button = el(
-      'button',
-      {
-        type: 'button',
-        class: 'chip',
-        'aria-pressed': selected.has(source.id) ? 'true' : 'false',
-      },
-      [el('span', { class: 'chip-name', text: source.name }), statusEl],
+function needsKeyText(source) {
+  return `Set ${source.keyEnv ?? 'the key'} in .env to use ${source.name}.`;
+}
+
+function createChip(source) {
+  const statusEl = el('span', { class: 'chip-status' });
+  const button = el(
+    'button',
+    {
+      type: 'button',
+      class: 'chip',
+      'aria-pressed': selected.has(source.id) ? 'true' : 'false',
+    },
+    [el('span', { class: 'chip-name', text: source.name }), statusEl],
+  );
+
+  if (!isUsable(source)) {
+    const descriptionId = `source-key-${source.id}`;
+    button.classList.add('chip-needs-key');
+    button.removeAttribute('aria-pressed');
+    button.setAttribute('aria-disabled', 'true');
+    button.setAttribute('aria-describedby', descriptionId);
+    button.title = needsKeyText(source);
+    button.append(el('span', { class: 'chip-needs-key-text', text: 'needs key' }));
+    button.append(
+      el('span', {
+        class: 'visually-hidden',
+        id: descriptionId,
+        text: needsKeyText(source),
+      }),
     );
-    if (source.needsKey && !source.keyConfigured) {
-      button.append(el('span', { class: 'chip-key-missing', text: 'key missing' }));
-    }
-    button.addEventListener('click', () => toggleSource(source.id));
-    chipEls.set(source.id, { button, statusEl });
-    chipsEl.append(button);
-    updateChip(source.id);
+    // Keep the status element for layout consistency but never fill it.
+    chipEls.set(source.id, { button, statusEl, usable: false });
+    return button;
+  }
+
+  button.addEventListener('click', () => toggleSource(source.id));
+  chipEls.set(source.id, { button, statusEl, usable: true });
+  updateChip(source.id);
+  return button;
+}
+
+function createGroupAllButton(rowId, isOn) {
+  return el('button', {
+    class: 'text-button',
+    type: 'button',
+    text: isOn ? 'All' : 'None',
+    onclick: () => setGroupAll(rowId, isOn),
+  });
+}
+
+function renderChips() {
+  groupsEl.replaceChildren();
+  chipEls.clear();
+
+  const rows = groupSources(registry, groups);
+  for (const row of rows) {
+    const chips = el(
+      'div',
+      { class: 'chips' },
+      row.sources.map((source) => createChip(source)),
+    );
+    const actions = el('div', { class: 'source-actions source-actions-group' }, [
+      el('span', { class: 'section-label', text: row.label }),
+      createGroupAllButton(row.id, true),
+      createGroupAllButton(row.id, false),
+    ]);
+    const groupEl = el(
+      'div',
+      { class: 'source-group', role: 'group', 'aria-label': row.label },
+      [actions, chips],
+    );
+    groupsEl.append(groupEl);
   }
 }
 
 function updateChip(id) {
   const entry = chipEls.get(id);
   if (!entry) return;
+  if (!entry.usable) return;
   const isOn = selected.has(id);
   entry.button.setAttribute('aria-pressed', isOn ? 'true' : 'false');
   entry.button.removeAttribute('title');
@@ -514,6 +575,8 @@ function canLoadMore() {
 
 // ---------- Source toggles ----------
 function toggleSource(id) {
+  const source = registryById.get(id);
+  if (!source || !isUsable(source)) return;
   if (selected.has(id)) {
     selected.delete(id);
     abortSource(id);
@@ -545,7 +608,9 @@ function abortSource(id) {
 
 function setAll(isOn) {
   if (isOn) {
-    const added = registry.filter((source) => !selected.has(source.id));
+    const added = registry.filter(
+      (source) => isUsable(source) && !selected.has(source.id),
+    );
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
       const batch = createBatch();
@@ -561,6 +626,37 @@ function setAll(isOn) {
       errors.delete(id);
     }
     selected.clear();
+    renderErrors();
+  }
+
+  for (const source of registry) updateChip(source.id);
+  saveSelection();
+  updateUrl('replace');
+  updateUi();
+}
+
+function setGroupAll(groupId, isOn) {
+  const row = groupSources(registry, groups).find((entry) => entry.id === groupId);
+  if (!row) return;
+  const targets = row.sources.filter(isUsable);
+  if (isOn) {
+    const added = targets.filter((source) => !selected.has(source.id));
+    for (const source of added) selected.add(source.id);
+    if (query && added.length > 0) {
+      const batch = createBatch();
+      const gen = generation;
+      for (const source of added) loadSource(source.id, 1, batch, gen);
+    }
+  } else {
+    for (const source of targets) {
+      if (!selected.has(source.id)) continue;
+      selected.delete(source.id);
+      abortSource(source.id);
+      cancelRetry(source.id);
+      removeSourceCards(source.id);
+      states.delete(source.id);
+      errors.delete(source.id);
+    }
     renderErrors();
   }
 
@@ -653,6 +749,10 @@ function applyUrlState() {
   const sourceParam = params.get('sources');
   if (sourceParam !== null) {
     selected = new Set(knownIds(sourceParam.split(',').filter(Boolean)));
+    for (const id of [...selected]) {
+      const source = registryById.get(id);
+      if (!source || !isUsable(source)) selected.delete(id);
+    }
   } else {
     const saved = loadSavedSelection();
     selected = new Set(knownIds(saved ?? defaultSelection()));
@@ -696,6 +796,19 @@ function orderedSelection() {
   return items;
 }
 
+function directDownloadNote(items) {
+  const counts = new Map();
+  for (const item of items) {
+    if (item.directDownload !== true) continue;
+    const name = sourceName(item.source);
+    counts.set(name, (counts.get(name) ?? 0) + 1);
+  }
+  if (counts.size === 0) return '';
+  const total = [...counts.values()].reduce((sum, count) => sum + count, 0);
+  const names = [...counts.keys()].join(', ');
+  return `${total} item${total === 1 ? '' : 's'} from ${names} were skipped: open them in the viewer and save them from there.`;
+}
+
 async function downloadSelected() {
   if (downloading) return;
   const items = orderedSelection();
@@ -704,9 +817,11 @@ async function downloadSelected() {
   downloading = true;
   downloadSelectedButton.disabled = true;
   const total = items.length;
+  const skippedNote = directDownloadNote(items);
 
   for (let index = 0; index < total; index += 1) {
     const item = items[index];
+    if (item.directDownload === true) continue;
     downloadSelectedButton.textContent = `Downloading ${index + 1} of ${total}`;
     const link = el('a', { href: downloadUrl(item), download: '' });
     document.body.append(link);
@@ -718,26 +833,50 @@ async function downloadSelected() {
   downloading = false;
   downloadSelectedButton.disabled = false;
   downloadSelectedButton.textContent = 'Download selected';
+
+  if (skippedNote) statusLineEl.textContent = skippedNote;
 }
 
 // ---------- Init ----------
-async function init() {
-  let sourceListError = '';
+async function loadGroups() {
   try {
-    const response = await fetch('/api/sources');
+    const response = await fetch('/api/groups');
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const data = await response.json();
-    registry = Array.isArray(data) ? data : [];
+    if (Array.isArray(data) && data.length > 0) {
+      const clean = data.filter(
+        (entry) => entry && typeof entry.id === 'string' && typeof entry.label === 'string',
+      );
+      if (clean.length > 0) return clean;
+    }
   } catch {
+    // Use the fallback groups below.
+  }
+  return DEFAULT_GROUPS;
+}
+
+async function init() {
+  let sourceListError = '';
+  const [sourceResult, groupList] = await Promise.all([
+    fetch('/api/sources')
+      .then((response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .catch(() => null),
+    loadGroups(),
+  ]);
+  groups = groupList;
+
+  if (Array.isArray(sourceResult)) {
+    registry = sourceResult;
+  } else {
     registry = [];
     sourceListError = 'The source list could not be loaded.';
   }
   registryById = new Map(registry.map((source) => [source.id, source]));
 
-  if (registry.length >= 1 && subtitleEl) {
-    subtitleEl.textContent =
-      `Search ${registry.length} open image libraries and download the full resolution.`;
-  }
+  if (subtitleEl) subtitleEl.textContent = subtitleText(registry);
 
   applyUrlState();
   if (sourceListError && statusLineEl.textContent === '') {
