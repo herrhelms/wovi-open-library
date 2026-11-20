@@ -201,7 +201,10 @@ test('dpla resolveDownload gets the detail record', async (t) => {
     return fixture.item;
   };
 
-  const resolved = await resolveDownload('abc123', { fetchJson: fake });
+  const resolved = await resolveDownload('abc123', {
+    fetchJson: fake,
+    fetch: async () => fakeResponse(200, 'image/jpeg'),
+  });
   assert.equal(requested, 'https://api.dp.la/v2/items/abc123?api_key=test-key');
   assert.equal(resolved.url, fixture.item.docs[0].object);
   assert.equal(resolved.filename, fixture.item.docs[0].sourceResource.title[0]);
@@ -232,7 +235,12 @@ test('dpla resolveDownload rejects a record without an object URL', async (t) =>
 test('dpla rewriteObject keeps the NYPL scheme and changes t', () => {
   assert.deepEqual(rewriteObject('https://images.nypl.org/index.php?t=t&id=1992631'), {
     preview: 'https://images.nypl.org/index.php?t=q&id=1992631',
+    previewFallback: 'https://images.nypl.org/index.php?t=w&id=1992631',
     full: 'https://images.nypl.org/index.php?t=g&id=1992631',
+    downloads: [
+      'https://images.nypl.org/index.php?t=g&id=1992631',
+      'https://iiif.nypl.org/iiif/2/1992631/full/max/0/default.jpg',
+    ],
   });
 });
 
@@ -242,11 +250,18 @@ test('dpla rewriteObject uses https for images.nypl.org', () => {
   assert.equal(preview.protocol, 'https:');
   assert.equal(preview.searchParams.get('t'), 'q');
   assert.equal(preview.searchParams.get('id'), '5');
-  assert.equal(preview.searchParams.get('t'), 'q');
+  const previewFallback = new URL(rewrite.previewFallback);
+  assert.equal(previewFallback.protocol, 'https:');
+  assert.equal(previewFallback.searchParams.get('t'), 'w');
+  assert.equal(previewFallback.searchParams.get('id'), '5');
   const full = new URL(rewrite.full);
   assert.equal(full.protocol, 'https:');
   assert.equal(full.searchParams.get('t'), 'g');
   assert.equal(full.searchParams.get('id'), '5');
+  assert.deepEqual(rewrite.downloads, [
+    rewrite.full,
+    'https://iiif.nypl.org/iiif/2/5/full/max/0/default.jpg',
+  ]);
 });
 
 test('dpla rewriteObject sets max=1600 for ids.si.edu', () => {
@@ -257,6 +272,8 @@ test('dpla rewriteObject sets max=1600 for ids.si.edu', () => {
   const full = new URL(rewrite.full);
   assert.equal(full.searchParams.get('id'), 'X');
   assert.equal(full.searchParams.has('max'), false);
+  assert.deepEqual(rewrite.downloads, [rewrite.full]);
+  assert.equal('previewFallback' in rewrite, false);
 });
 
 test('dpla rewriteObject removes an existing max for ids.si.edu', () => {
@@ -272,7 +289,11 @@ test('dpla rewriteObject expands self-hosted CONTENTdm links', () => {
   assert.deepEqual(rewrite, {
     preview: 'http://digitalcollections.hclib.org/digital/iiif/MplsPhotos/51644/full/1600,/0/default.jpg',
     full: 'http://digitalcollections.hclib.org/digital/iiif/MplsPhotos/51644/full/max/0/default.jpg',
+    downloads: [
+      'http://digitalcollections.hclib.org/digital/iiif/MplsPhotos/51644/full/max/0/default.jpg',
+    ],
   });
+  assert.equal('previewFallback' in rewrite, false);
 });
 
 test('dpla rewriteObject expands IIIF image URLs', () => {
@@ -308,6 +329,11 @@ test('dpla rewriteObject expands IIIF image URLs', () => {
     'https://repository.duke.edu/iiif/ark:/87924/r42v2hn18/full/1600,/0/default.jpg',
   );
   assert.equal(duke.full, 'https://repository.duke.edu/iiif/ark:/87924/r42v2hn18/full/max/0/default.jpg');
+
+  for (const rewrite of [washington, virginia, duke]) {
+    assert.deepEqual(rewrite.downloads, [rewrite.full]);
+    assert.equal('previewFallback' in rewrite, false);
+  }
 });
 
 test('dpla rewriteObject rewrites indiana thumbnail links', () => {
@@ -317,7 +343,9 @@ test('dpla rewriteObject rewrites indiana thumbnail links', () => {
   assert.deepEqual(rewrite, {
     preview: 'http://purl.dlib.indiana.edu/iudl/lilly/devincent/large/LL-SDV-218020-01-01',
     full: 'http://purl.dlib.indiana.edu/iudl/lilly/devincent/large/LL-SDV-218020-01-01',
+    downloads: ['http://purl.dlib.indiana.edu/iudl/lilly/devincent/large/LL-SDV-218020-01-01'],
   });
+  assert.equal('previewFallback' in rewrite, false);
 });
 
 test('dpla rewriteObject rewrites Digital Commonwealth thumbnail links', () => {
@@ -325,7 +353,9 @@ test('dpla rewriteObject rewrites Digital Commonwealth thumbnail links', () => {
   assert.deepEqual(rewrite, {
     preview: 'https://ark.digitalcommonwealth.org/ark:/50959/fn10dd60v/large_image',
     full: 'https://ark.digitalcommonwealth.org/ark:/50959/fn10dd60v/large_image',
+    downloads: ['https://ark.digitalcommonwealth.org/ark:/50959/fn10dd60v/large_image'],
   });
+  assert.equal('previewFallback' in rewrite, false);
 });
 
 test('dpla rewriteObject returns null for unknown or invalid objects', () => {
@@ -372,7 +402,7 @@ test('dpla normalize rewrites the NYPL record', () => {
   assert.equal(item.thumb, 'https://dp.la/thumb/61380d0c7159c9e8c282178701d2b68b');
   assert.equal(item.thumbFallback, raw.object);
   assert.equal(item.preview, 'https://images.nypl.org/index.php?t=q&id=1992631');
-  assert.equal(item.previewFallback, raw.object);
+  assert.equal(item.previewFallback, 'https://images.nypl.org/index.php?t=w&id=1992631');
   assert.equal(item.full, 'https://images.nypl.org/index.php?t=g&id=1992631');
   assert.equal(item.note, null);
 });
@@ -420,63 +450,116 @@ function nyplDetail() {
   return { docs: [fixture.nypl] };
 }
 
-test('dpla resolveDownload uses the full rewrite when it is an image', async (t) => {
+test('dpla resolveDownload uses the NYPL IIIF when t=g is missing', async (t) => {
   t.after(restoreKey);
   process.env.DPLA_KEY = 'test-key';
 
-  let requested = '';
+  const requested = [];
   const fetchJsonFake = async () => nyplDetail();
   const fetchFake = async (url) => {
-    requested = url;
+    requested.push(url);
+    if (url === 'https://images.nypl.org/index.php?t=g&id=1992631') {
+      return fakeResponse(404, 'text/html');
+    }
     return fakeResponse(200, 'image/jpeg');
   };
 
   const resolved = await resolveDownload('abc123', { fetchJson: fetchJsonFake, fetch: fetchFake });
-  assert.equal(requested, 'https://images.nypl.org/index.php?t=g&id=1992631');
+  assert.deepEqual(requested, [
+    'https://images.nypl.org/index.php?t=g&id=1992631',
+    'https://iiif.nypl.org/iiif/2/1992631/full/max/0/default.jpg',
+  ]);
+  assert.equal(resolved.url, 'https://iiif.nypl.org/iiif/2/1992631/full/max/0/default.jpg');
+});
+
+test('dpla resolveDownload uses t=g when it is an image and stops', async (t) => {
+  t.after(restoreKey);
+  process.env.DPLA_KEY = 'test-key';
+
+  const requested = [];
+  const fetchFake = async (url) => {
+    requested.push(url);
+    return fakeResponse(200, 'image/jpeg');
+  };
+
+  const resolved = await resolveDownload('abc123', {
+    fetchJson: async () => nyplDetail(),
+    fetch: fetchFake,
+  });
+  assert.deepEqual(requested, ['https://images.nypl.org/index.php?t=g&id=1992631']);
   assert.equal(resolved.url, 'https://images.nypl.org/index.php?t=g&id=1992631');
 });
 
-test('dpla resolveDownload falls back to the object when the rewrite is not usable', async (t) => {
+test('dpla resolveDownload falls back to the object when t=g and IIIF fail', async (t) => {
   t.after(restoreKey);
   process.env.DPLA_KEY = 'test-key';
 
-  const fetchJsonFake = async () => nyplDetail();
   const object = fixture.nypl.object;
+  const requested = [];
+  const fetchFake = async (url) => {
+    requested.push(url);
+    if (url === object) return fakeResponse(200, 'image/gif');
+    return fakeResponse(404, 'text/html');
+  };
+
+  const resolved = await resolveDownload('abc123', {
+    fetchJson: async () => nyplDetail(),
+    fetch: fetchFake,
+  });
+  assert.deepEqual(requested, [
+    'https://images.nypl.org/index.php?t=g&id=1992631',
+    'https://iiif.nypl.org/iiif/2/1992631/full/max/0/default.jpg',
+    object,
+  ]);
+  assert.equal(resolved.url, object);
+});
+
+test('dpla resolveDownload uses the dp.la thumb when all candidates fail', async (t) => {
+  t.after(restoreKey);
+  process.env.DPLA_KEY = 'test-key';
+
+  const requested = [];
+  const replies = [
+    async () => fakeResponse(404, 'text/html'),
+    async () => fakeResponse(200, 'text/html'),
+    async () => {
+      throw new Error('network down');
+    },
+  ];
+  for (const reply of replies) {
+    const resolved = await resolveDownload('abc123', {
+      fetchJson: async () => nyplDetail(),
+      fetch: async (url) => {
+        requested.push(url);
+        return reply();
+      },
+    });
+    assert.equal(resolved.url, 'https://dp.la/thumb/abc123');
+  }
+  assert.equal(requested.includes('https://dp.la/thumb/abc123'), false);
+});
+
+test('dpla resolveDownload checks the object for a record without a rewrite', async (t) => {
+  t.after(restoreKey);
+  process.env.DPLA_KEY = 'test-key';
+
+  const object = 'https://nohc.catalogaccess.com/objects/abc';
+  const fetchJsonFake = async () => ({ docs: [{ ...fixture.nara, object }] });
 
   const forbidden = await resolveDownload('abc123', {
     fetchJson: fetchJsonFake,
-    fetch: async () => fakeResponse(403, 'image/jpeg'),
+    fetch: async () => fakeResponse(403, 'text/html'),
   });
-  assert.equal(forbidden.url, object);
+  assert.equal(forbidden.url, 'https://dp.la/thumb/abc123');
 
-  const html = await resolveDownload('abc123', {
+  const requested = [];
+  const ok = await resolveDownload('abc123', {
     fetchJson: fetchJsonFake,
-    fetch: async () => fakeResponse(200, 'text/html'),
-  });
-  assert.equal(html.url, object);
-
-  const thrown = await resolveDownload('abc123', {
-    fetchJson: fetchJsonFake,
-    fetch: async () => {
-      throw new Error('network down');
+    fetch: async (url) => {
+      requested.push(url);
+      return fakeResponse(200, 'image/jpeg');
     },
   });
-  assert.equal(thrown.url, object);
-});
-
-test('dpla resolveDownload does not probe a record without a rewrite', async (t) => {
-  t.after(restoreKey);
-  process.env.DPLA_KEY = 'test-key';
-
-  let called = false;
-  const resolved = await resolveDownload('abc123', {
-    fetchJson: async () => ({ docs: [fixture.nara] }),
-    fetch: async () => {
-      called = true;
-      throw new Error('must not be called');
-    },
-  });
-
-  assert.equal(called, false);
-  assert.equal(resolved.url, fixture.nara.object);
+  assert.deepEqual(requested, [object]);
+  assert.equal(ok.url, object);
 });
