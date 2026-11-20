@@ -1,0 +1,68 @@
+{
+  "search": {
+    "count": 1234,
+    "start": 0,
+    "limit": 24,
+    "docs": [
+      {
+        "id": "7f6a0e0b2f9c4a1d8e3b5c6d7e8f9a0b",
+        "sourceResource": {
+          "title": ["Full moon over Boston"],
+          "creator": ["Smith, John"],
+          "date": { "displayDate": "1905" },
+          "description": ["Night photograph of the full moon above Boston harbor."]
+        },
+        "object": "https://example-partner.org/thumbs/123.jpg",
+        "isShownAt": "https://example-partner.org/items/123",
+        "rights": "http://rightsstatements.org/vocab/NoC-US/1.0/",
+        "provider": { "name": "Digital Commonwealth" },
+        "dataProvider": "Boston Public Library"
+      },
+      {
+        "id": "1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d",
+        "sourceResource": {
+          "title": ["Carte de la Lune"],
+          "creator": ["Cassini, Giovanni Domenico", "Unknown engraver"],
+          "date": [{ "displayDate": "1679" }],
+          "description": ["Engraved map of the moon.", "Second description entry."]
+        },
+        "object": ["https://images.example.org/lune.jpg"],
+        "isShownAt": ["https://partner.example.org/fr/notice/42"],
+        "rights": "https://creativecommons.org/licenses/by-sa/4.0/",
+        "provider": { "name": "Gallica" },
+        "dataProvider": { "name": "Bibliotheque nationale de France" }
+      },
+      {
+        "id": "aaaa1111bbbb2222cccc3333dddd4444",
+        "sourceResource": {
+          "title": ["Moon without an image"],
+          "creator": [],
+          "description": ["This record has no object URL."]
+        },
+        "isShownAt": "https://example-partner.org/items/999",
+        "dataProvider": "Example Library"
+      }
+    ]
+  },
+  "item": {
+    "count": 1,
+    "start": 0,
+    "limit": 1,
+    "docs": [
+      {
+        "id": "abc123",
+        "sourceResource": {
+          "title": ["Full moon over Boston"],
+          "creator": ["Smith, John"],
+          "date": { "displayDate": "1905" },
+          "description": ["Night photograph of the full moon above Boston harbor."]
+        },
+        "object": "https://example-partner.org/thumbs/123.jpg",
+        "isShownAt": "https://example-partner.org/items/123",
+        "rights": "http://rightsstatements.org/vocab/NoC-US/1.0/",
+        "provider": { "name": "Digital Commonwealth" },
+        "dataProvider": "Boston Public Library"
+      }
+    ]
+  }
+}
