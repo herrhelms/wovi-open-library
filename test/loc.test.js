@@ -742,3 +742,331 @@ test('a failed set writes the reason to stderr', async () => {
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+const LIGHTHOUSES_SET = {
+  title: 'Lighthouses',
+  url: LIGHTHOUSES_SET_URL,
+  items: lighthousesFixture.content.components[0].masonry_gallery[0].items,
+};
+
+const WOMEN_SET = {
+  title: "Women's History",
+  url: OTHER_SET_URL,
+  items: [],
+};
+
+const HOUR = 60 * 60 * 1000;
+
+async function writeSavedIndex(dir, { sets, failed, savedAt, ageMs = 2 * HOUR }) {
+  const data = {
+    version: 1,
+    savedAt: savedAt ?? new Date(Date.now() - ageMs).toISOString(),
+    sets,
+  };
+  if (failed !== undefined) data.failed = failed;
+  const file = join(dir, 'free-to-use.json');
+  await writeFile(file, JSON.stringify(data));
+  const date = new Date(Date.now() - ageMs);
+  await utimes(file, date, date);
+  return data;
+}
+
+function onlyFailedSetFetch() {
+  const calls = [];
+  async function fetchJson(url) {
+    calls.push(url);
+    if (url === `${LIGHTHOUSES_SET_URL}?fo=json`) return lighthousesFixture;
+    throw httpError(500);
+  }
+  return { fetchJson, calls };
+}
+
+test('a full read saves the failed sets', async () => {
+  const dir = await makeTempDir();
+  try {
+    const fake = makeFetchJson({ otherSetError: () => httpError(500) });
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('lighthouse', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+
+    const saved = JSON.parse(await readFile(join(dir, 'free-to-use.json'), 'utf8'));
+    assert.equal(saved.sets.length, 1);
+    assert.deepEqual(saved.failed, [
+      { title: "Women's History", url: OTHER_SET_URL },
+    ]);
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('an old index with failed sets refreshes only those sets', async () => {
+  const dir = await makeTempDir();
+  try {
+    const savedAt = '2024-01-02T03:04:05.000Z';
+    await writeSavedIndex(dir, {
+      sets: [WOMEN_SET],
+      failed: [{ title: 'Lighthouses', url: LIGHTHOUSES_SET_URL }],
+      savedAt,
+    });
+    const before = await stat(join(dir, 'free-to-use.json'));
+
+    const fake = onlyFailedSetFetch();
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+
+    const saved = JSON.parse(await readFile(join(dir, 'free-to-use.json'), 'utf8'));
+    assert.equal(saved.sets.length, 2);
+    assert.deepEqual(saved.failed, []);
+    assert.equal(saved.savedAt, savedAt);
+
+    const after = await stat(join(dir, 'free-to-use.json'));
+    assert.ok(Math.abs(after.mtimeMs - before.mtimeMs) < 5000);
+
+    const result = await source.search('heceta', 1);
+    assert.ok(result.items.some((item) => item.id === 'highsm.12127'));
+
+    assert.deepEqual(fake.calls, [`${LIGHTHOUSES_SET_URL}?fo=json`]);
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('a young index with failed sets is not refreshed', async () => {
+  const dir = await makeTempDir();
+  try {
+    await writeSavedIndex(dir, {
+      sets: [WOMEN_SET],
+      failed: [{ title: 'Lighthouses', url: LIGHTHOUSES_SET_URL }],
+      ageMs: 10 * 60 * 1000,
+    });
+
+    const fake = onlyFailedSetFetch();
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+
+    assert.deepEqual(fake.calls, []);
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('a failed refresh leaves the index file unchanged', async () => {
+  const dir = await makeTempDir();
+  try {
+    await writeSavedIndex(dir, {
+      sets: [LIGHTHOUSES_SET],
+      failed: [{ title: "Women's History", url: OTHER_SET_URL }],
+    });
+    const file = join(dir, 'free-to-use.json');
+    const beforeText = await readFile(file, 'utf8');
+    const before = await stat(file);
+
+    const calls = [];
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: async (url) => {
+        calls.push(url);
+        throw httpError(500);
+      },
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+
+    assert.deepEqual(calls, [`${OTHER_SET_URL}?fo=json`]);
+    assert.equal(await readFile(file, 'utf8'), beforeText);
+    const after = await stat(file);
+    assert.equal(after.mtimeMs, before.mtimeMs);
+
+    const result = await source.search('heceta', 1);
+    assert.ok(result.items.some((item) => item.id === 'highsm.12127'));
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('an old index without a failed key fetches the missing sets', async () => {
+  const dir = await makeTempDir();
+  try {
+    await writeSavedIndex(dir, { sets: [LIGHTHOUSES_SET], failed: undefined });
+
+    const fake = makeFetchJson();
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+
+    assert.equal(fake.state.setListCalls, 1);
+    assert.equal(fake.state.setCalls, 1);
+    assert.deepEqual(fake.calls, [
+      SETS_URL,
+      `${OTHER_SET_URL}?fo=json`,
+    ]);
+
+    const saved = JSON.parse(await readFile(join(dir, 'free-to-use.json'), 'utf8'));
+    assert.equal(saved.sets.length, 2);
+    assert.deepEqual(saved.failed, []);
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('an old index with all sets only rewrites the format', async () => {
+  const dir = await makeTempDir();
+  try {
+    await writeSavedIndex(dir, {
+      sets: [LIGHTHOUSES_SET, WOMEN_SET],
+      failed: undefined,
+    });
+
+    const fake = makeFetchJson();
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+
+    assert.deepEqual(fake.calls, [SETS_URL]);
+
+    const saved = JSON.parse(await readFile(join(dir, 'free-to-use.json'), 'utf8'));
+    assert.deepEqual(saved.failed, []);
+    await source.flushCache();
+
+    const nextFake = makeFetchJson();
+    const next = createLocSource({
+      dataDir: dir,
+      fetchJson: nextFake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+    await expectPreparing(next.search('heceta', 1));
+    await waitFor(() => next.status() === 'ready');
+    await next.refreshDone();
+    assert.deepEqual(nextFake.calls, []);
+    await next.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('an old index with no failed sets is not refreshed', async () => {
+  const dir = await makeTempDir();
+  try {
+    await writeSavedIndex(dir, { sets: [LIGHTHOUSES_SET], failed: [] });
+
+    const fake = makeFetchJson();
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    await source.refreshDone();
+    assert.deepEqual(fake.calls, []);
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('refreshDone resolves at once without a refresh', async () => {
+  const dir = await makeTempDir();
+  try {
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: async () => {
+        throw new Error('must not fetch');
+      },
+    });
+    await source.refreshDone();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test('the failed set refresh does not block a search', async () => {
+  const dir = await makeTempDir();
+  try {
+    await writeSavedIndex(dir, {
+      sets: [LIGHTHOUSES_SET],
+      failed: [{ title: "Women's History", url: OTHER_SET_URL }],
+    });
+
+    let release;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    const calls = [];
+    const source = createLocSource({
+      dataDir: dir,
+      fetchJson: async (url) => {
+        calls.push(url);
+        if (url === `${OTHER_SET_URL}?fo=json`) {
+          await gate;
+          return { content: { title: "Women's History", components: [] } };
+        }
+        throw new Error(`unexpected ${url}`);
+      },
+      probeIiif: async () => null,
+      retryDelayMs: 0,
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    assert.deepEqual(calls, [`${OTHER_SET_URL}?fo=json`]);
+
+    const result = await source.search('heceta', 1);
+    assert.ok(result.items.some((item) => item.id === 'highsm.12127'));
+
+    release();
+    await source.refreshDone();
+    await source.flushCache();
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
