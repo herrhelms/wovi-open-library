@@ -404,7 +404,7 @@ test('IIIF resolution, caching and failures', async () => {
     assert.ok(bases.some((base) => base.includes('mrg')));
 
     await source.flushCache();
-    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache-2.json'), 'utf8'));
     assert.deepEqual(cache['highsm.12127'], {
       base: HIGHSM_BASE,
       width: 3500,
@@ -510,7 +510,7 @@ test('flushCache does nothing without a pending write', async () => {
     await source.flushCache();
     let exists = true;
     try {
-      await stat(join(dir, 'iiif-cache.json'));
+      await stat(join(dir, 'iiif-cache-2.json'));
     } catch {
       exists = false;
     }
@@ -524,7 +524,7 @@ test('the cache ignores bad entries', async () => {
   const dir = await makeTempDir();
   try {
     await writeFile(
-      join(dir, 'iiif-cache.json'),
+      join(dir, 'iiif-cache-2.json'),
       JSON.stringify({
         'highsm.12127': { base: HIGHSM_BASE, width: 3500, height: 4225 },
         'ppmsca.09037': null,
@@ -598,7 +598,7 @@ test('a probe time-out caches null in memory only', async () => {
     );
 
     await source.flushCache();
-    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache-2.json'), 'utf8'));
     assert.equal(Object.hasOwn(cache, 'mrg.10350'), false);
 
     const again = [];
@@ -656,7 +656,7 @@ test('a time-out followed by a size is cached and written', async () => {
     assert.deepEqual(bases, [HIGHSM_BASE, `${HIGHSM_BASE}v`]);
 
     await source.flushCache();
-    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache-2.json'), 'utf8'));
     assert.deepEqual(cache['highsm.12127'], {
       base: `${HIGHSM_BASE}v`,
       width: 848,
@@ -699,7 +699,7 @@ test('a network error during a probe is not cached', async () => {
     await source.flushCache();
     let cache = null;
     try {
-      cache = JSON.parse(await readFile(join(dir, 'iiif-cache.json'), 'utf8'));
+      cache = JSON.parse(await readFile(join(dir, 'iiif-cache-2.json'), 'utf8'));
     } catch {
       cache = null;
     }

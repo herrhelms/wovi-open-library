@@ -77,3 +77,69 @@ test('nasa resolveDownload picks the original from collection.json', async () =>
   );
   assert.equal(result.filename, null);
 });
+
+function nasaItem(links) {
+  return {
+    data: [{ nasa_id: 'X1', title: 'Test' }],
+    links,
+  };
+}
+
+const ASSET = 'https://images-assets.nasa.gov/image/X1/X1';
+
+test('nasa preview prefers large, then medium', () => {
+  const item = normalize(
+    nasaItem([
+      { href: `${ASSET}~orig.tif`, rel: 'canonical', width: 3000, height: 2000, size: 9000000 },
+      { href: `${ASSET}~large.jpg`, rel: 'alternate', size: 800000 },
+      { href: `${ASSET}~medium.jpg`, rel: 'alternate', size: 200000 },
+      { href: `${ASSET}~thumb.jpg`, rel: 'preview', size: 30000 },
+    ]),
+  );
+  assert.equal(item.preview, `${ASSET}~large.jpg`);
+  assert.equal(item.full, `${ASSET}~orig.tif`);
+});
+
+test('nasa preview uses a small JPEG original when large and medium are missing', () => {
+  const item = normalize(
+    nasaItem([
+      { href: `${ASSET}~orig.jpg`, rel: 'canonical', width: 2000, height: 1400, size: 2000000 },
+      { href: `${ASSET}~thumb.jpg`, rel: 'preview', size: 30000 },
+    ]),
+  );
+  assert.equal(item.preview, `${ASSET}~orig.jpg`);
+  assert.equal(item.full, `${ASSET}~orig.jpg`);
+});
+
+test('nasa preview rejects a big original', () => {
+  const item = normalize(
+    nasaItem([
+      { href: `${ASSET}~orig.jpg`, rel: 'canonical', width: 8000, height: 6000, size: 9000000 },
+      { href: `${ASSET}~thumb.jpg`, rel: 'preview', size: 30000 },
+    ]),
+  );
+  assert.equal(item.preview, `${ASSET}~thumb.jpg`);
+  assert.equal(item.full, `${ASSET}~orig.jpg`);
+});
+
+test('nasa preview rejects a TIFF original', () => {
+  const item = normalize(
+    nasaItem([
+      { href: `${ASSET}~orig.tif`, rel: 'canonical', width: 3000, height: 2000, size: 1000 },
+      { href: `${ASSET}~thumb.jpg`, rel: 'preview', size: 30000 },
+    ]),
+  );
+  assert.equal(item.preview, `${ASSET}~thumb.jpg`);
+  assert.equal(item.full, `${ASSET}~orig.tif`);
+});
+
+test('nasa preview rejects a PNG original without a size', () => {
+  const item = normalize(
+    nasaItem([
+      { href: `${ASSET}~orig.png`, rel: 'canonical', width: 3000, height: 2000 },
+      { href: `${ASSET}~thumb.jpg`, rel: 'preview', size: 30000 },
+    ]),
+  );
+  assert.equal(item.preview, `${ASSET}~thumb.jpg`);
+  assert.equal(item.full, `${ASSET}~orig.png`);
+});
