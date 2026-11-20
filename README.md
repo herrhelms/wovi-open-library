@@ -1,6 +1,6 @@
 # Open Library Fetch
 
-A local web app that searches 38 open image libraries in one grid and downloads
+A local web app that searches 51 open image libraries in one grid and downloads
 the highest available resolution of each image.
 
 ## Sources
@@ -14,6 +14,12 @@ the highest available resolution of each image.
 - Internet Archive
 - Europeana
 - DPLA
+- Japan Search
+- Swedish heritage (K-samsök)
+- DigitalNZ
+- Pixabay
+- Pexels
+- Unsplash
 
 ### Museums and galleries
 
@@ -30,6 +36,8 @@ the highest available resolution of each image.
 - Walters Art Museum
 - Brooklyn Museum
 - Auckland Museum
+- Princeton University Art Museum
+- Harvard Art Museums
 
 ### Libraries and archives
 
@@ -43,6 +51,9 @@ the highest available resolution of each image.
 - German Federal Archive
 - ETH Library Zurich
 - State Library of Queensland
+- National Library of Norway
+- Digital Commonwealth (Massachusetts)
+- David Rumsey Map Collection
 
 ### Science, nature and medicine
 
@@ -54,6 +65,8 @@ the highest available resolution of each image.
 - Biodiversity Heritage Library
 - NOAA Photo Library
 - iNaturalist
+- GBIF
+- Natural History Museum, London
 
 ## Requirements
 
@@ -80,6 +93,11 @@ SMITHSONIAN_KEY=DEMO_KEY
 FLICKR_KEY=...
 DPLA_KEY=...
 TROVE_KEY=...
+PIXABAY_KEY=...
+PEXELS_KEY=...
+UNSPLASH_KEY=...
+HARVARD_KEY=...
+DIGITALNZ_KEY=...
 PORT=5173
 ```
 
@@ -94,12 +112,24 @@ PORT=5173
   `curl -X POST https://api.dp.la/v2/api_key/<your email>`.
 - `TROVE_KEY` — required for Trove. Get one at <https://trove.nla.gov.au>,
   Profile → API.
+- `PIXABAY_KEY` — required for Pixabay. Get one at
+  <https://pixabay.com/api/docs/>.
+- `PEXELS_KEY` — required for Pexels. Get one at
+  <https://www.pexels.com/api/>.
+- `UNSPLASH_KEY` — required for Unsplash. Use the "Access Key" from
+  <https://unsplash.com/developers>.
+- `HARVARD_KEY` — required for Harvard Art Museums. Get one at
+  <https://harvardartmuseums.org/collections/api>.
+- `DIGITALNZ_KEY` — optional for DigitalNZ. Get one at
+  <https://digitalnz.org/developers>. The API works without it now. On HTTP
+  401/403 the app asks for it.
 - `PARIS_MUSEES_TOKEN` — planned. Get one at
   <https://apicollections.parismusees.paris.fr>.
 - `PORT` — default `5173`.
 
-Flickr Commons, Flickr (open licenses), DPLA and Trove are built from the public
-API documentation. They are NOT yet tested live (no key yet).
+Flickr Commons, Flickr (open licenses), DPLA, Trove, Pixabay, Pexels, Unsplash
+and Harvard Art Museums are built from the public API documentation. They are
+NOT yet tested live (no key yet).
 
 Without a key the chip shows "needs key" and the app sends no request.
 
@@ -164,6 +194,49 @@ The keys stay on the server. They are never sent to the browser.
   photos.
 - **DPLA and Trove**: often only a thumbnail; the viewer links to the partner
   page.
+- **David Rumsey Map Collection**: license CC BY-NC-SA 3.0 — NON-COMMERCIAL. It
+  is the only non-commercial source. The viewer shows a note. "Download full
+  resolution" gets the full width from the IIIF server (for example 8007 px; it
+  can take some seconds).
+- **Princeton University Art Museum**: only objects whose primary image is not
+  restricted. One search needs one request for each object (24), so it is
+  slower.
+- **GBIF**: the photo license is checked for each photo (the GBIF license filter
+  is for the record, not the photo); only CC0, CC BY, CC BY-SA and public
+  domain photos.
+- **Japan Search**: only public domain (`pdm`) items with an image.
+- **K-samsök**: only images with license public domain mark, CC0, CC BY or
+  CC BY-SA.
+- **Digital Commonwealth**: only items marked "no restrictions" (the "creative
+  commons" items include NC and ND licenses and are left out).
+- **DigitalNZ** and **Trove**: some records give only a thumbnail; the viewer
+  then shows a note.
+- **Pixabay**: max 1280 px (the original needs special approval).
+  **Unsplash**: a download calls the Unsplash download endpoint, as Unsplash
+  requires.
+- **Natural History Museum**: the item page (`data.nhm.ac.uk/object/…`) can
+  answer HTTP 403 to scripts; in a browser it works.
+
+## Checked, not supported
+
+- Gallica direct API, Finna (Finland), Museums Victoria, Science Museum Group,
+  Auckland Museum, Brooklyn Museum, Walters Art Museum, State Library of NSW,
+  Cambridge Digital Library: blocked (Cloudflare or HTTP 403) from this
+  machine. Gallica, Auckland Museum, Brooklyn Museum and Walters Art Museum
+  come through Wikimedia Commons instead.
+- Paris Musées direct API: needs a token; schema not tested (planned). Today it
+  comes through Wikimedia Commons.
+- Deutsche Digitale Bibliothek, BHL API, DigitaltMuseum: need a key. Trove is
+  supported with a key; BHL comes through Wikimedia Commons.
+- V&A: the API works, but the images are low resolution.
+- Te Papa: the API works with a guest token, but most images are "All Rights
+  Reserved".
+- Yale LUX, NLM Digital Collections: answer HTTP 202 with no content (needs more
+  work).
+- Harvard Library (LibraryCloud): works, but the rights statements are not
+  machine-readable.
+- Encyclopedia of Life: works, but its images are mostly already in GBIF,
+  iNaturalist and Wikimedia Commons.
 
 ## Paris Musées
 
@@ -185,9 +258,9 @@ tries one more time.
 ## Downloads
 
 The server streams files through `/api/download`. Only hosts of the libraries
-are allowed, so the app is not an open proxy. Europeana, Openverse, DPLA and
-Trove files come from the record API of the source (their files can be on any
-host).
+are allowed, so the app is not an open proxy. Europeana, Openverse, DPLA,
+Trove, GBIF, Japan Search, K-samsök, DigitalNZ and Unsplash files come from the
+record API of the source (their files can be on any host).
 
 ## Development
 

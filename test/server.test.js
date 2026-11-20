@@ -206,6 +206,18 @@ test('isAllowedHost', () => {
   assert.equal(isAllowedHost('cdn.eso.org'), true);
   assert.equal(isAllowedHost('live.staticflickr.com'), true);
   assert.equal(isAllowedHost('www.artic.edu'), false);
+  assert.equal(isAllowedHost('data.nhm.ac.uk'), true);
+  assert.equal(isAllowedHost('www.nb.no'), true);
+  assert.equal(isAllowedHost('iiif.digitalcommonwealth.org'), true);
+  assert.equal(isAllowedHost('media.artmuseum.princeton.edu'), true);
+  assert.equal(isAllowedHost('media.davidrumsey.com'), true);
+  assert.equal(isAllowedHost('cdn.pixabay.com'), true);
+  assert.equal(isAllowedHost('images.pexels.com'), true);
+  assert.equal(isAllowedHost('images.unsplash.com'), true);
+  assert.equal(isAllowedHost('nrs.harvard.edu'), true);
+  assert.equal(isAllowedHost('princeton.edu'), false);
+  assert.equal(isAllowedHost('evil-nb.no'), false);
+  assert.equal(isAllowedHost('nb.no.evil.com'), false);
   assert.equal(isAllowedHost('127.0.0.1'), false);
   assert.equal(isAllowedHost('localhost'), false);
   assert.equal(isAllowedHost(''), false);
