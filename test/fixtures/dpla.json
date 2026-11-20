@@ -44,6 +44,32 @@
       }
     ]
   },
+  "nara": {
+    "id": "02356839048efd39ec158c7b5bc70858",
+    "sourceResource": {
+      "title": ["Moon over the Earth"],
+      "creator": ["National Aeronautics and Space Administration. John C. Stennis Space Center"],
+      "date": { "displayDate": "1990" },
+      "description": ["Photograph of the moon."]
+    },
+    "object": "https://s3.amazonaws.com/NARAprodstorage/lz/stillpix/255-grc/Batch013/255-GRC-1990-C-12366.JPG",
+    "isShownAt": "https://catalog.archives.gov/id/255-GRC-1990-C-12366",
+    "rights": "http://rightsstatements.org/vocab/NoC-US/1.0/",
+    "dataProvider": "National Archives and Records Administration"
+  },
+  "nypl": {
+    "id": "61380d0c7159c9e8c282178701d2b68b",
+    "sourceResource": {
+      "title": ["The moon"],
+      "creator": ["Rutherford, Lewis Morris"],
+      "date": { "displayDate": "1874" },
+      "description": ["Photograph of the moon."]
+    },
+    "object": "https://images.nypl.org/index.php?t=t&id=1992631",
+    "isShownAt": "https://digitalcollections.nypl.org/items/61380d0c-7159-c9e8-e040-e00a180642db",
+    "rights": "http://rightsstatements.org/vocab/NoC-US/1.0/",
+    "dataProvider": "New York Public Library"
+  },
   "item": {
     "count": 1,
     "start": 0,
