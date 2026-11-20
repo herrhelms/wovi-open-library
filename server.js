@@ -369,7 +369,11 @@ async function handleSearch(url, res, sourceList, searchCache, thumbCache, setti
   } catch (err) {
     const message = err?.message ?? 'Search failed';
     process.stderr.write(`[search ${source.id}] ${message}\n`);
-    sendJson(res, 502, { error: message, code: err?.code ?? null });
+    const body = { error: message, code: err?.code ?? null };
+    if (err?.code === 'RATE_LIMIT' && Number.isFinite(err.retryAfterSeconds)) {
+      body.retryAfterSeconds = err.retryAfterSeconds;
+    }
+    sendJson(res, 502, body);
   }
 }
 

@@ -19,7 +19,9 @@ import {
   keyStatus,
   parseSavedSelection,
   pickColumn,
+  rateLimitWaitText,
   rememberLimited,
+  retryDelay,
   searchKey,
   serializeSelection,
   shouldAutoLoad,
@@ -559,4 +561,43 @@ test('countActive counts enabled adaptors', () => {
   assert.equal(countActive([]), 0);
   assert.equal(countActive(undefined), 0);
   assert.equal(countActive([{}, { enabled: 'true' }]), 0);
+});
+
+test('retryDelay computes the rate limit delay', () => {
+  assert.equal(retryDelay('RATE_LIMIT', 12, 0, 0), 15000);
+  assert.equal(retryDelay('RATE_LIMIT', 20, 0, 0), 20000);
+  assert.equal(retryDelay('RATE_LIMIT', 20, 1, 0.5), 21500);
+  assert.equal(retryDelay('RATE_LIMIT', null, 2, 0.999), 17997);
+  assert.equal(retryDelay('RATE_LIMIT', 5, 3, 0), null);
+});
+
+test('retryDelay keeps the PREPARING behaviour', () => {
+  assert.equal(retryDelay('PREPARING', undefined, 0, 0.7), 15000);
+  assert.equal(retryDelay('PREPARING', undefined, 20, 0), null);
+});
+
+test('retryDelay gives null for other codes', () => {
+  assert.equal(retryDelay('HTTP', 10, 0, 0), null);
+  assert.equal(retryDelay(null, null, 0, 0), null);
+});
+
+test('rateLimitWaitText names Wikimedia Commons', () => {
+  assert.equal(
+    rateLimitWaitText(
+      'Wikimedia Commons rate limit reached. Try again in a minute.',
+      17,
+    ),
+    'Wikimedia Commons rate limit reached. Trying again in 17 s.',
+  );
+});
+
+test('rateLimitWaitText is generic for other adaptors', () => {
+  assert.equal(
+    rateLimitWaitText('Pixabay rate limit reached.', 15),
+    'Rate limit reached. Trying again in 15 s.',
+  );
+  assert.equal(
+    rateLimitWaitText(null, 15),
+    'Rate limit reached. Trying again in 15 s.',
+  );
 });
