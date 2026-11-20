@@ -2,7 +2,7 @@
  * Full-screen viewer dialog for Open Library Fetch.
  * One dialog instance is created on first use and then reused.
  */
-import { downloadUrl, el, firstLoaded, imageCandidates, viewerPlan } from './lib.js';
+import { downloadUrl, el, firstLoaded, imageCandidates, isUpgrade, viewerPlan } from './lib.js';
 
 const COPY_RESET_MS = 1500;
 
@@ -157,10 +157,10 @@ function onClose() {
 
 /**
  * Probe an image URL without changing the visible image.
- * When the signal aborts, the request is stopped and the probe fails.
+ * When the signal aborts, the request is stopped and the probe resolves with 0.
  * @param {string} src
  * @param {AbortSignal} [signal]
- * @returns {Promise<boolean>}
+ * @returns {Promise<number>} the natural width, or 0 on error and on abort
  */
 function probeImage(src, signal) {
   return new Promise((resolve) => {
@@ -171,17 +171,18 @@ function probeImage(src, signal) {
     };
     probe.onload = () => {
       cleanup();
-      resolve(true);
+      const width = Number(probe.naturalWidth);
+      resolve(Number.isFinite(width) && width > 0 ? width : 0);
     };
     probe.onerror = () => {
       cleanup();
-      resolve(false);
+      resolve(0);
     };
     if (signal) {
       onAbort = () => {
         probe.src = '';
         cleanup();
-        resolve(false);
+        resolve(0);
       };
       signal.addEventListener('abort', onAbort, { once: true });
     }
@@ -203,6 +204,7 @@ async function loadImage(item) {
   const { small, large } = viewerPlan(item);
   const alt = item.title || 'Image';
   let largeVisible = false;
+  let smallWidth = 0;
 
   dom.image.hidden = true;
   dom.image.removeAttribute('src');
@@ -223,9 +225,10 @@ async function loadImage(item) {
   const smallPromise = (async () => {
     for (const src of small) {
       if (controller.signal.aborted) return null;
-      const ok = await probeImage(src, controller.signal);
+      const width = await probeImage(src, controller.signal);
       if (token !== loadToken) return null;
-      if (!ok) continue;
+      if (width <= 0) continue;
+      smallWidth = width;
       if (!largeVisible) {
         dom.image.src = src;
         dom.image.alt = alt;
@@ -240,7 +243,11 @@ async function loadImage(item) {
 
   const largePromise = (async () => {
     if (large.length === 0) return null;
-    return firstLoaded(large, probeImage, { signal: controller.signal });
+    const probe = async (src, signal) => {
+      const width = await probeImage(src, signal);
+      return isUpgrade(smallWidth, width);
+    };
+    return firstLoaded(large, probe, { signal: controller.signal });
   })();
 
   const largeUrl = await largePromise;

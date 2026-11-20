@@ -8,6 +8,7 @@ import {
   groupSources,
   imageCandidates,
   isSearchable,
+  isUpgrade,
   isUsable,
   parseSavedSelection,
   serializeSelection,
@@ -247,6 +248,30 @@ test('viewerPlan keeps thumb and preview groups apart', () => {
     large: [],
   });
   assert.deepEqual(viewerPlan(null), { small: [], large: [] });
+  assert.deepEqual(viewerPlan(undefined), { small: [], large: [] });
+});
+
+test('viewerPlan keeps a partner fallback that equals the thumb fallback', () => {
+  assert.deepEqual(
+    viewerPlan({ thumb: 'd', thumbFallback: 'o', preview: 'd', previewFallback: 'o' }),
+    { small: ['d', 'o'], large: ['o'] },
+  );
+  assert.deepEqual(
+    viewerPlan({ thumbFallback: 'o', preview: 'o' }),
+    { small: ['o'], large: ['o'] },
+  );
+});
+
+test('isUpgrade accepts only a positive, finite, larger candidate', () => {
+  assert.equal(isUpgrade(0, 0), false);
+  assert.equal(isUpgrade(0, 400), true);
+  assert.equal(isUpgrade(400, 400), false);
+  assert.equal(isUpgrade(400, 1536), true);
+  assert.equal(isUpgrade(1536, 88), false);
+  assert.equal(isUpgrade(400, NaN), false);
+  assert.equal(isUpgrade(400, Infinity), false);
+  assert.equal(isUpgrade(undefined, 400), true);
+  assert.equal(isUpgrade(400, null), false);
 });
 
 test('VIEWER_PROBE_TIMEOUT_MS is 20 s', () => {
