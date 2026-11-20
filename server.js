@@ -8,7 +8,7 @@ import { pathToFileURL } from 'node:url';
 
 import { PROJECT_ROOT, loadEnv } from './lib/env.js';
 import { isOpenLicense } from './lib/license.js';
-import { GROUPS, sources as registrySources } from './lib/sources/index.js';
+import { GROUPS, INVALID, sources as registrySources } from './lib/sources/index.js';
 import { extFromContentType, openRemote, safeFilename } from './lib/download.js';
 import { mediaIdFor } from './lib/media-id.js';
 import { createSearchCache, searchCacheKey } from './lib/search-cache.js';
@@ -17,10 +17,12 @@ import {
   createThumbCache,
 } from './lib/thumb-cache.js';
 import { fetchWithTimeout } from './lib/http.js';
+import { openSettings } from './lib/settings-db.js';
 
 const JSON_TYPE = 'application/json; charset=utf-8';
 const DEFAULT_SEARCH_CACHE_TTL_MS = 1_800_000;
 const DEFAULT_THUMB_CACHE_BYTES = 500 * 1024 * 1024;
+const MAX_ADAPTER_BODY_BYTES = 1024;
 
 const STATIC_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -82,8 +84,160 @@ function hasMissingKey(source) {
   return sourceNeedsKey(source) && !isKeyConfigured(source.keyEnv);
 }
 
-async function handleSources(res, sourceList) {
-  const data = sourceList.map((source) => {
+function sourceDefaultEnabled(source) {
+  return source.config?.defaultEnabled ?? true;
+}
+
+function sourceEnabled(source, settings) {
+  const stored = settings.getAdapterEnabled(source.id);
+  return stored === null ? sourceDefaultEnabled(source) : stored;
+}
+
+function keyEntry(source) {
+  const configKey = source.config?.key ?? null;
+  let key;
+  if (configKey !== null) {
+    key = {
+      env: configKey.env,
+      required: configKey.required ?? true,
+      default: configKey.default ?? null,
+      signupUrl: configKey.signupUrl ?? null,
+      steps: Array.isArray(configKey.steps) ? configKey.steps : [],
+      limits: configKey.limits ?? null,
+    };
+  } else if (source.keyEnv != null) {
+    key = {
+      env: source.keyEnv,
+      required: source.keyOptional !== true,
+      default: null,
+      signupUrl: null,
+      steps: [],
+      limits: null,
+    };
+  } else {
+    return null;
+  }
+  return { ...key, configured: isKeyConfigured(key.env) };
+}
+
+function adapterEntry(source, settings) {
+  const config = source.config ?? {};
+  return {
+    id: source.id,
+    name: source.name,
+    homepage: source.homepage,
+    group: source.group ?? null,
+    description: config.description ?? null,
+    enabled: sourceEnabled(source, settings),
+    defaultEnabled: sourceDefaultEnabled(source),
+    openLicenses: source.openLicenses !== false,
+    docsUrl: config.docsUrl ?? null,
+    notes: Array.isArray(config.notes) ? config.notes : [],
+    base: config.base ?? null,
+    key: keyEntry(source),
+  };
+}
+
+function readLimitedBody(req, max) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let length = 0;
+    let done = false;
+    req.on('data', (chunk) => {
+      if (done) return;
+      length += chunk.length;
+      if (length > max) {
+        done = true;
+        req.resume();
+        resolve({ tooLarge: true });
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      if (done) return;
+      done = true;
+      resolve({ tooLarge: false, body: Buffer.concat(chunks).toString('utf8') });
+    });
+    req.on('error', (err) => {
+      if (done) return;
+      done = true;
+      reject(err);
+    });
+  });
+}
+
+function isAllowedOrigin(req) {
+  const origin = req.headers.origin;
+  if (origin === undefined) return true;
+  const port = req.socket.localPort;
+  return origin === `http://127.0.0.1:${port}` || origin === `http://localhost:${port}`;
+}
+
+function isJsonContentType(req) {
+  const header = req.headers['content-type'];
+  if (typeof header !== 'string') return false;
+  return header.split(';', 1)[0].trim().toLowerCase() === 'application/json';
+}
+
+function decodeSegment(segment) {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return null;
+  }
+}
+
+async function handleAdaptersGet(res, sourceList, groupList, invalidList, settings) {
+  sendJson(res, 200, {
+    groups: groupList,
+    adapters: sourceList.map((source) => adapterEntry(source, settings)),
+    invalid: invalidList,
+  });
+}
+
+async function handleAdapterToggle(req, res, id, sourceList, settings) {
+  if (!isAllowedOrigin(req)) {
+    sendJson(res, 403, { error: 'Forbidden' });
+    return;
+  }
+  if (!isJsonContentType(req)) {
+    sendJson(res, 415, { error: 'Content-Type must be application/json' });
+    return;
+  }
+
+  const { tooLarge, body } = await readLimitedBody(req, MAX_ADAPTER_BODY_BYTES);
+  if (tooLarge) {
+    sendJson(res, 413, { error: 'Body is too large' });
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    sendJson(res, 400, { error: 'Invalid JSON' });
+    return;
+  }
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)
+    || typeof parsed.enabled !== 'boolean') {
+    sendJson(res, 400, { error: 'Body must have a boolean enabled' });
+    return;
+  }
+
+  const source = sourceList.find((entry) => entry.id === id) ?? null;
+  if (!source) {
+    sendJson(res, 404, { error: 'Unknown adaptor' });
+    return;
+  }
+
+  settings.setAdapterEnabled(id, parsed.enabled);
+  sendJson(res, 200, adapterEntry(source, settings));
+}
+
+async function handleSources(res, sourceList, settings) {
+  const enabledList = sourceList.filter((source) => sourceEnabled(source, settings));
+  const data = enabledList.map((source) => {
     const needsKey = sourceNeedsKey(source);
     const keyEnv = needsKey ? source.keyEnv : null;
     const keyConfigured = keyEnv === null || isKeyConfigured(keyEnv);
@@ -101,11 +255,16 @@ async function handleSources(res, sourceList) {
   sendJson(res, 200, data);
 }
 
-async function handleSearch(url, res, sourceList, searchCache, thumbCache) {
+async function handleSearch(url, res, sourceList, searchCache, thumbCache, settings) {
   const sourceId = url.searchParams.get('source');
   const source = sourceId ? sourceList.find((entry) => entry.id === sourceId) : null;
   if (!source) {
     sendJson(res, 400, { error: 'Unknown source' });
+    return;
+  }
+
+  if (!sourceEnabled(source, settings)) {
+    sendJson(res, 404, { error: 'Adaptor is deactivated', code: 'DISABLED' });
     return;
   }
 
@@ -240,11 +399,16 @@ function imageExtensionFromUrl(url) {
   return match ? match[1].toLowerCase() : null;
 }
 
-async function handleDownload(url, req, res, sourceList) {
+async function handleDownload(url, req, res, sourceList, settings) {
   const sourceId = url.searchParams.get('source');
   const source = sourceId ? sourceList.find((entry) => entry.id === sourceId) : null;
   if (!source) {
     sendJson(res, 400, { error: 'Unknown source' });
+    return;
+  }
+
+  if (!sourceEnabled(source, settings)) {
+    sendJson(res, 404, { error: 'Adaptor is deactivated', code: 'DISABLED' });
     return;
   }
 
@@ -516,14 +680,18 @@ export function createServer({
   publicDir = join(PROJECT_ROOT, 'public'),
   sourcesOverride,
   groupsOverride,
+  invalidOverride,
   searchCacheTtlMs,
   now,
+  settingsDbPath = join(PROJECT_ROOT, 'data', 'settings.sqlite'),
   thumbCacheDir = join(PROJECT_ROOT, 'data', 'thumb-cache'),
   thumbCacheMaxBytes = DEFAULT_THUMB_CACHE_BYTES,
   thumbFetch = fetchWithTimeout,
 } = {}) {
   const sourceList = Array.isArray(sourcesOverride) ? sourcesOverride : registrySources;
   const groupList = Array.isArray(groupsOverride) ? groupsOverride : GROUPS;
+  const invalidList = Array.isArray(invalidOverride) ? invalidOverride : INVALID;
+  const settings = openSettings(settingsDbPath);
 
   const ttlMs =
     typeof searchCacheTtlMs === 'number' && searchCacheTtlMs > 0
@@ -542,14 +710,18 @@ export function createServer({
     now: clock,
   });
 
-  return createHttpServer(async (req, res) => {
+  const server = createHttpServer(async (req, res) => {
     try {
       const url = new URL(req.url ?? '/', 'http://localhost');
 
       if (req.method === 'POST') {
         const warmMatch = /^\/api\/thumb\/([^/]+)\/warm$/.exec(url.pathname);
         if (warmMatch) {
-          const mediaId = decodeURIComponent(warmMatch[1]);
+          const mediaId = decodeSegment(warmMatch[1]);
+          if (mediaId === null) {
+            sendJson(res, 400, { error: 'Invalid media ID' });
+            return;
+          }
           if (!MEDIA_ID_PATTERN.test(mediaId)) {
             sendJson(res, 400, { error: 'Invalid media ID' });
             return;
@@ -557,6 +729,18 @@ export function createServer({
           handleThumbWarm(res, mediaId, thumbCache);
           return;
         }
+
+        const adapterMatch = /^\/api\/adapters\/([^/]+)$/.exec(url.pathname);
+        if (adapterMatch) {
+          const id = decodeSegment(adapterMatch[1]);
+          if (id === null) {
+            sendJson(res, 400, { error: 'Invalid adaptor ID' });
+            return;
+          }
+          await handleAdapterToggle(req, res, id, sourceList, settings);
+          return;
+        }
+
         sendText(res, 405, 'Method not allowed');
         return;
       }
@@ -571,9 +755,18 @@ export function createServer({
         return;
       }
 
+      if (/^\/api\/adapters\/[^/]+$/.test(url.pathname)) {
+        sendText(res, 405, 'Method not allowed');
+        return;
+      }
+
       const thumbMatch = /^\/api\/thumb\/([^/]+)$/.exec(url.pathname);
       if (thumbMatch) {
-        const mediaId = decodeURIComponent(thumbMatch[1]);
+        const mediaId = decodeSegment(thumbMatch[1]);
+        if (mediaId === null) {
+          sendJson(res, 400, { error: 'Invalid media ID' });
+          return;
+        }
         if (!MEDIA_ID_PATTERN.test(mediaId)) {
           sendJson(res, 400, { error: 'Invalid media ID' });
           return;
@@ -582,8 +775,12 @@ export function createServer({
         return;
       }
 
+      if (url.pathname === '/api/adapters') {
+        await handleAdaptersGet(res, sourceList, groupList, invalidList, settings);
+        return;
+      }
       if (url.pathname === '/api/sources') {
-        await handleSources(res, sourceList);
+        await handleSources(res, sourceList, settings);
         return;
       }
       if (url.pathname === '/api/groups') {
@@ -591,11 +788,11 @@ export function createServer({
         return;
       }
       if (url.pathname === '/api/search') {
-        await handleSearch(url, res, sourceList, searchCache, thumbCache);
+        await handleSearch(url, res, sourceList, searchCache, thumbCache, settings);
         return;
       }
       if (url.pathname === '/api/download') {
-        await handleDownload(url, req, res, sourceList);
+        await handleDownload(url, req, res, sourceList, settings);
         return;
       }
       if (url.pathname.startsWith('/api/')) {
@@ -612,6 +809,12 @@ export function createServer({
       }
     }
   });
+
+  server.on('close', () => {
+    settings.close();
+  });
+
+  return server;
 }
 
 const isMain =

@@ -101,30 +101,8 @@ DIGITALNZ_KEY=...
 PORT=5173
 ```
 
-- `NYPL_TOKEN` — required for NYPL. Get one at <https://api.repo.nypl.org/>.
-- `EUROPEANA_KEY` — default `api2demo`. A personal key is available at
-  <https://pro.europeana.eu/page/get-api>.
-- `SMITHSONIAN_KEY` — default `DEMO_KEY`. A personal key is available at
-  <https://api.data.gov/signup/>.
-- `FLICKR_KEY` — required for Flickr Commons and Flickr (open licenses). Sign up
-  at <https://www.flickr.com/services/apps/create/>.
-- `DPLA_KEY` — required for DPLA. Get one with
-  `curl -X POST https://api.dp.la/v2/api_key/<your email>`.
-- `TROVE_KEY` — required for Trove. Get one at <https://trove.nla.gov.au>,
-  Profile → API.
-- `PIXABAY_KEY` — required for Pixabay. Get one at
-  <https://pixabay.com/api/docs/>.
-- `PEXELS_KEY` — required for Pexels. Get one at
-  <https://www.pexels.com/api/>.
-- `UNSPLASH_KEY` — required for Unsplash. Use the "Access Key" from
-  <https://unsplash.com/developers>.
-- `HARVARD_KEY` — required for Harvard Art Museums. Get one at
-  <https://harvardartmuseums.org/collections/api>.
-- `DIGITALNZ_KEY` — optional for DigitalNZ. Get one at
-  <https://digitalnz.org/developers>. The API works without it now. On HTTP
-  401/403 the app asks for it.
-- `PARIS_MUSEES_TOKEN` — planned. Get one at
-  <https://apicollections.parismusees.paris.fr>.
+- Each adaptor's key information is in `adapters/<id>/adapter.json` and in the
+  Adaptors window of the app.
 - `PORT` — default `5173`.
 
 Flickr Commons, Flickr (open licenses), DPLA, Trove, Pixabay, Pexels, Unsplash
