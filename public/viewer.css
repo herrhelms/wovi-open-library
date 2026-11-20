@@ -253,6 +253,15 @@
   overflow-wrap: anywhere;
 }
 
+.viewer-note {
+  margin: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
 .viewer-page-link {
   font-size: 0.9rem;
   text-underline-offset: 3px;
@@ -274,6 +283,11 @@
 .viewer-download {
   width: 100%;
   text-align: center;
+}
+
+.viewer-download-direct {
+  display: inline-block;
+  text-decoration: none;
 }
 
 .viewer-tiff-link {

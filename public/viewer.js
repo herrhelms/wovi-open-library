@@ -329,6 +329,12 @@ function renderPanel(item) {
     panel.append(el('div', { class: 'viewer-block' }, [facts]));
   }
 
+  if (typeof item.note === 'string' && item.note.trim() !== '') {
+    panel.append(
+      el('p', { class: 'viewer-note', text: item.note.trim() }),
+    );
+  }
+
   // Page link
   let pageLink = null;
   if (item.pageUrl) {
@@ -343,12 +349,23 @@ function renderPanel(item) {
   }
 
   // Download and copy
-  const downloadButton = el('button', {
-    class: 'button-primary viewer-download',
-    type: 'button',
-    text: 'Download full resolution',
-  });
-  downloadButton.addEventListener('click', () => startDownload(item));
+  let downloadControl;
+  if (item.directDownload === true && typeof item.full === 'string' && item.full !== '') {
+    downloadControl = el('a', {
+      class: 'button-primary viewer-download viewer-download-direct',
+      href: item.full,
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      text: 'Open full resolution',
+    });
+  } else {
+    downloadControl = el('button', {
+      class: 'button-primary viewer-download',
+      type: 'button',
+      text: 'Download full resolution',
+    });
+    downloadControl.addEventListener('click', () => startDownload(item));
+  }
 
   let tiffLink = null;
   if (typeof item.fullTiff === 'string' && item.fullTiff !== '') {
@@ -376,7 +393,7 @@ function renderPanel(item) {
 
   panel.append(
     el('div', { class: 'viewer-block viewer-actions' }, [
-      downloadButton,
+      downloadControl,
       tiffLink,
       el('div', { class: 'viewer-action-row' }, [copyButton, zoomButton]),
     ]),
