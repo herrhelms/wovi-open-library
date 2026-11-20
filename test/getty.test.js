@@ -198,6 +198,81 @@ test('getty search removes an item when its object request fails', async () => {
   );
 });
 
+test('getty search does not cache a failed object request', async () => {
+  clearCache();
+  const failingUrl = OBJECT_URLS[0];
+  const objectCalls = [];
+  let failed = false;
+  const fake = async (url) => {
+    if (url.startsWith(SPARQL_URL)) return fixture.sparql;
+    objectCalls.push(url);
+    if (url === failingUrl && !failed) {
+      failed = true;
+      throw new Error('temporary');
+    }
+    const uuid = url.slice(url.lastIndexOf('/') + 1);
+    return fixture.objects[uuid];
+  };
+
+  const first = await search('swan moon', 1, { fetchJson: fake });
+  assert.deepEqual(
+    first.items.map((item) => item.id),
+    UUIDS.slice(1),
+  );
+
+  const second = await search('swan moon', 1, { fetchJson: fake });
+  assert.deepEqual(
+    second.items.map((item) => item.id),
+    UUIDS,
+  );
+  assert.equal(objectCalls.filter((url) => url === failingUrl).length, 2);
+});
+
+test('getty search caches an object without representation', async () => {
+  clearCache();
+  const uuid = UUIDS[0];
+  const objectUrl = OBJECT_URLS[0];
+  let objectCalls = 0;
+  const fake = async (url) => {
+    if (url.startsWith(SPARQL_URL)) {
+      return sparqlAnswer([{ uuid, title: 'Without image' }]);
+    }
+    objectCalls += 1;
+    return { id: objectUrl, representation: [] };
+  };
+
+  const first = await search('swan', 1, { fetchJson: fake });
+  assert.equal(first.items.length, 0);
+  assert.equal(objectCalls, 1);
+
+  const second = await search('swan', 1, { fetchJson: fake });
+  assert.equal(second.items.length, 0);
+  assert.equal(objectCalls, 1);
+});
+
+test('getty search shares running object requests', async () => {
+  clearCache();
+  const objectCalls = new Map();
+  const fake = async (url) => {
+    if (url.startsWith(SPARQL_URL)) return fixture.sparql;
+    const uuid = url.slice(url.lastIndexOf('/') + 1);
+    objectCalls.set(uuid, (objectCalls.get(uuid) ?? 0) + 1);
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    return fixture.objects[uuid];
+  };
+
+  const [first, second] = await Promise.all([
+    search('swan moon', 1, { fetchJson: fake }),
+    search('swan moon', 1, { fetchJson: fake }),
+  ]);
+
+  assert.equal(first.items.length, UUIDS.length);
+  assert.equal(second.items.length, UUIDS.length);
+  for (const uuid of UUIDS) {
+    assert.equal(objectCalls.get(uuid), 1);
+  }
+});
+
 test('getty search caches objects', async () => {
   clearCache();
   const fake = makeFake();
