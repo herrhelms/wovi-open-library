@@ -17,6 +17,12 @@ import {
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(readFileSync(join(here, 'fixtures/inaturalist.json'), 'utf8'));
 
+function photoUrlOf(url, size) {
+  const slash = url.lastIndexOf('/');
+  const name = url.slice(slash + 1);
+  return `${url.slice(0, slash + 1)}${size}${name.slice('square'.length)}`;
+}
+
 function rateError() {
   return new HttpError('api.inaturalist.org answered HTTP 429', {
     status: 429,
@@ -55,7 +61,9 @@ test('inaturalist normalize makes an Item', () => {
   assert.equal(item.date, raw.observed_on);
   assert.equal(item.description, photo.attribution);
   assert.ok(item.thumb.endsWith('/medium.jpg'));
-  assert.ok(item.preview.endsWith('/large.jpg'));
+  assert.ok(item.preview.endsWith('/original.jpg'));
+  assert.equal(item.previewFallback, photoUrlOf(photo.url, 'large'));
+  assert.ok(item.previewFallback.endsWith('/large.jpg'));
   assert.ok(item.full.endsWith('/original.jpg'));
   assert.equal(new URL(item.thumb).host, 'inaturalist-open-data.s3.amazonaws.com');
   assert.ok(item.pageUrl.startsWith('https://www.inaturalist.org/observations/'));
@@ -90,7 +98,8 @@ test('inaturalist normalize uses the first open photo', () => {
   assert.equal(item.license, 'CC0');
   assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/zero/1.0/');
   assert.ok(item.thumb.endsWith('/medium.jpeg'));
-  assert.ok(item.preview.endsWith('/large.jpeg'));
+  assert.ok(item.preview.endsWith('/original.jpeg'));
+  assert.ok(item.previewFallback.endsWith('/large.jpeg'));
   assert.ok(item.full.endsWith('/original.jpeg'));
   assert.equal(item.title, 'Untitled');
   assert.equal(item.creator, null);
@@ -118,6 +127,7 @@ test('inaturalist normalize keeps the URL when there is no square segment', () =
   const item = normalize({ id: 3, photos: [{ license_code: 'cc-by', url }] });
   assert.equal(item.thumb, url);
   assert.equal(item.preview, url);
+  assert.equal(item.previewFallback, url);
   assert.equal(item.full, url);
 });
 

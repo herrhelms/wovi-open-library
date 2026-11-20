@@ -88,6 +88,20 @@ test('digital-commonwealth license labels', () => {
   assert.equal(licenseLabel('a'.repeat(100), null).length, 80);
 });
 
+test('digital-commonwealth normalize gives CC0 a label and URL', () => {
+  const raw = structuredClone(fixture.data[0]);
+  raw.attributes.license_ss = 'This work has been released into the public domain using CC0.';
+  const item = normalize(raw);
+  assert.equal(item.license, 'CC0');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/zero/1.0/');
+
+  const noKnown = structuredClone(fixture.data[0]);
+  noKnown.attributes.license_ss = 'No known restrictions on use.';
+  const itemNoKnown = normalize(noKnown);
+  assert.equal(itemNoKnown.license, 'No known restrictions');
+  assert.equal(itemNoKnown.licenseUrl, null);
+});
+
 test('digital-commonwealth search builds the search URL', async () => {
   let requested = '';
   const fake = async (url) => {

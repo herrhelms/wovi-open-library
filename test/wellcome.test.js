@@ -31,7 +31,7 @@ test('wellcome normalize makes an Item', () => {
   assert.ok(!item.full.includes('/max/'));
   assert.equal(item.width, null);
   assert.equal(item.height, null);
-  assert.equal(item.license, loc.license.label);
+  assert.equal(item.license, 'Public domain');
   assert.equal(item.licenseUrl, loc.license.url);
   assert.equal(
     item.pageUrl,
@@ -40,6 +40,24 @@ test('wellcome normalize makes an Item', () => {
   assert.equal(item.creator, null);
   assert.equal(item.date, null);
   assert.equal(item.description, null);
+});
+
+test('wellcome normalize uses short licence labels', () => {
+  const raw = structuredClone(fixture.results[0]);
+  raw.locations[0].license = { id: 'pdm', label: 'Public Domain Mark' };
+  assert.equal(normalize(raw).license, 'Public domain');
+
+  raw.locations[0].license = { id: 'cc-0' };
+  assert.equal(normalize(raw).license, 'CC0');
+
+  raw.locations[0].license = { id: 'cc-by', label: 'Attribution 4.0 International (CC BY 4.0)' };
+  assert.equal(normalize(raw).license, 'CC BY 4.0');
+
+  raw.locations[0].license = { id: 'x', label: 'Other' };
+  assert.equal(normalize(raw).license, 'Other');
+
+  delete raw.locations[0].license;
+  assert.equal(normalize(raw).license, 'See item page');
 });
 
 test('wellcome normalize uses a credit that is not Wellcome Collection', () => {

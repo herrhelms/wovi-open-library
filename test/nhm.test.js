@@ -57,13 +57,15 @@ test('nhm normalize makes an Item', () => {
   assert.equal(item.description, media.title);
   assert.equal(item.thumb, `${media.identifier}/thumbnail`);
   assert.equal(item.preview, `${media.identifier}/preview`);
-  assert.equal(item.full, `${media.identifier}/original`);
-  for (const key of ['thumb', 'preview', 'full']) {
+  assert.equal(item.full, `${media.identifier}/full/max/0/default.jpg`);
+  assert.equal(item.fullTiff, `${media.identifier}/original`);
+  for (const key of ['thumb', 'preview', 'full', 'fullTiff']) {
     assert.ok(item[key].startsWith('https://data.nhm.ac.uk/media/'), key);
   }
   assert.ok(item.thumb.endsWith('/thumbnail'));
   assert.ok(item.preview.endsWith('/preview'));
-  assert.ok(item.full.endsWith('/original'));
+  assert.ok(item.full.endsWith('/full/max/0/default.jpg'));
+  assert.ok(item.fullTiff.endsWith('/original'));
   assert.equal(item.width, 2828);
   assert.equal(item.height, 2268);
   assert.equal(item.license, 'CC BY 4.0');
