@@ -488,16 +488,22 @@ h1 {
   gap: var(--space-5);
 }
 
-.batch {
-  column-width: 240px;
-  column-gap: var(--space-5);
-  column-fill: balance;
+.masonry {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-start;
+}
+
+.masonry-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
 }
 
 .card {
   position: relative;
-  break-inside: avoid;
-  margin: 0 0 var(--space-5);
   padding: 0;
   display: block;
 }
@@ -711,11 +717,6 @@ body:has(.selection-bar:not([hidden])) .site-main {
   .source-actions-group {
     flex-wrap: nowrap;
     white-space: nowrap;
-  }
-
-  .batch {
-    column-width: auto;
-    column-count: 1;
   }
 
   .selection-bar {
