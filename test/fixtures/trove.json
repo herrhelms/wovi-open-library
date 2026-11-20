@@ -1,0 +1,111 @@
+{
+  "page1": {
+    "category": [
+      {
+        "code": "image",
+        "name": "Images, Maps & Artefacts",
+        "records": {
+          "s": "*",
+          "n": 24,
+          "total": 5321,
+          "nextStart": "CURSOR2",
+          "next": "https://api.trove.nla.gov.au/v3/result?q=moon&category=image&encoding=json&n=24&s=CURSOR2&reclevel=full&include=links&l-availability=y%2Ff",
+          "work": [
+            {
+              "id": "12345678",
+              "title": "Moonrise over Sydney Harbour",
+              "contributor": ["Kerry, Charles, 1857-1928"],
+              "issued": "1890",
+              "troveUrl": "https://trove.nla.gov.au/work/12345678",
+              "identifier": [
+                {
+                  "type": "url",
+                  "linktype": "thumbnail",
+                  "value": "https://nla.gov.au/nla.obj-123/image?wid=150"
+                },
+                {
+                  "type": "url",
+                  "linktype": "fulltext",
+                  "value": "https://nla.gov.au/nla.obj-123"
+                }
+              ]
+            },
+            {
+              "id": "23456789",
+              "title": "The moon",
+              "contributor": "Phillips, John, 1800-1874",
+              "issued": 1901,
+              "troveUrl": "https://trove.nla.gov.au/work/23456789",
+              "identifier": {
+                "type": "url",
+                "linktype": "thumbnail",
+                "value": "https://nla.gov.au/nla.obj-456/image?wid=150"
+              }
+            },
+            {
+              "id": "34567890",
+              "title": "A work without an image",
+              "issued": "1899",
+              "troveUrl": "https://trove.nla.gov.au/work/34567890",
+              "identifier": [
+                {
+                  "type": "url",
+                  "linktype": "fulltext",
+                  "value": "https://nla.gov.au/nla.obj-789"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "page2": {
+    "category": [
+      {
+        "code": "image",
+        "name": "Images, Maps & Artefacts",
+        "records": {
+          "s": "CURSOR2",
+          "n": 24,
+          "total": 5321,
+          "work": [
+            {
+              "id": "45678901",
+              "title": "Lunar craters",
+              "contributor": ["Nasmyth, James, 1808-1890"],
+              "issued": "1874",
+              "troveUrl": "https://trove.nla.gov.au/work/45678901",
+              "identifier": [
+                {
+                  "type": "url",
+                  "linktype": "thumbnail",
+                  "value": "https://nla.gov.au/nla.obj-321/image?wid=150"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "work": {
+    "id": "12345678",
+    "title": "Moonrise over Sydney Harbour",
+    "contributor": ["Kerry, Charles, 1857-1928"],
+    "issued": "1890",
+    "troveUrl": "https://trove.nla.gov.au/work/12345678",
+    "identifier": [
+      {
+        "type": "url",
+        "linktype": "thumbnail",
+        "value": "https://nla.gov.au/nla.obj-123/image?wid=150"
+      },
+      {
+        "type": "url",
+        "linktype": "fulltext",
+        "value": "https://nla.gov.au/nla.obj-123"
+      }
+    ]
+  }
+}
