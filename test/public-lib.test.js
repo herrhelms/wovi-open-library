@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {
   DEFAULT_GROUPS,
   downloadUrl,
+  firstLoaded,
   groupSources,
   imageCandidates,
   isSearchable,
@@ -12,6 +13,8 @@ import {
   serializeSelection,
   shouldAutoLoad,
   subtitleText,
+  VIEWER_PROBE_TIMEOUT_MS,
+  viewerPlan,
 } from '../public/lib.js';
 
 const source = (id, extra = {}) => ({
@@ -223,6 +226,100 @@ test('shouldAutoLoad honours maxWithoutGain', () => {
     }),
     false,
   );
+});
+
+test('viewerPlan keeps thumb and preview groups apart', () => {
+  assert.deepEqual(
+    viewerPlan({ thumb: 't', thumbFallback: 'tf', preview: 'p', previewFallback: 'pf' }),
+    { small: ['t', 'tf'], large: ['p', 'pf'] },
+  );
+  assert.deepEqual(
+    viewerPlan({ thumb: 't', preview: 't', previewFallback: 'pf' }),
+    { small: ['t'], large: ['pf'] },
+  );
+  assert.deepEqual(
+    viewerPlan({ thumb: 't', thumbFallback: 't', preview: 'p', previewFallback: 'p' }),
+    { small: ['t'], large: ['p'] },
+  );
+  assert.deepEqual(viewerPlan({ preview: 'p' }), { small: [], large: ['p'] });
+  assert.deepEqual(viewerPlan({ thumb: '', thumbFallback: null, preview: 5 }), {
+    small: [],
+    large: [],
+  });
+  assert.deepEqual(viewerPlan(null), { small: [], large: [] });
+});
+
+test('VIEWER_PROBE_TIMEOUT_MS is 20 s', () => {
+  assert.equal(VIEWER_PROBE_TIMEOUT_MS, 20000);
+});
+
+test('firstLoaded returns the first URL that loads', async () => {
+  const result = await firstLoaded(['a', 'b'], async (url) => url === 'b');
+  assert.equal(result, 'b');
+});
+
+test('firstLoaded skips a probe that does not answer in time', async () => {
+  const signals = new Map();
+  const result = await firstLoaded(
+    ['a', 'b'],
+    (url, signal) => {
+      signals.set(url, signal);
+      if (url === 'a') return new Promise(() => {});
+      return Promise.resolve(true);
+    },
+    { timeoutMs: 20 },
+  );
+  assert.equal(result, 'b');
+  assert.equal(signals.get('a').aborted, true);
+});
+
+test('firstLoaded returns null when all probes fail', async () => {
+  assert.equal(await firstLoaded(['a', 'b'], async () => false), null);
+});
+
+test('firstLoaded does not probe an empty list', async () => {
+  let calls = 0;
+  const result = await firstLoaded([], async () => {
+    calls += 1;
+    return true;
+  });
+  assert.equal(result, null);
+  assert.equal(calls, 0);
+});
+
+test('firstLoaded stops when the outer signal aborts during a probe', async () => {
+  const controller = new AbortController();
+  const probed = [];
+  let probeSignal = null;
+  const promise = firstLoaded(
+    ['a', 'b'],
+    (url, signal) => {
+      probed.push(url);
+      probeSignal = signal;
+      controller.abort();
+      return new Promise(() => {});
+    },
+    { signal: controller.signal },
+  );
+  assert.equal(await promise, null);
+  assert.deepEqual(probed, ['a']);
+  assert.equal(probeSignal.aborted, true);
+});
+
+test('firstLoaded does not probe when the outer signal is already aborted', async () => {
+  const controller = new AbortController();
+  controller.abort();
+  let calls = 0;
+  const result = await firstLoaded(
+    ['a'],
+    async () => {
+      calls += 1;
+      return true;
+    },
+    { signal: controller.signal },
+  );
+  assert.equal(result, null);
+  assert.equal(calls, 0);
 });
 
 test('downloadUrl keeps the existing behaviour', () => {
