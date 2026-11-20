@@ -12,9 +12,15 @@ import { GROUPS, sources as registrySources } from './lib/sources/index.js';
 import { extFromContentType, openRemote, safeFilename } from './lib/download.js';
 import { mediaIdFor } from './lib/media-id.js';
 import { createSearchCache, searchCacheKey } from './lib/search-cache.js';
+import {
+  MEDIA_ID_PATTERN,
+  createThumbCache,
+} from './lib/thumb-cache.js';
+import { fetchWithTimeout } from './lib/http.js';
 
 const JSON_TYPE = 'application/json; charset=utf-8';
 const DEFAULT_SEARCH_CACHE_TTL_MS = 1_800_000;
+const DEFAULT_THUMB_CACHE_BYTES = 500 * 1024 * 1024;
 
 const STATIC_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -95,7 +101,7 @@ async function handleSources(res, sourceList) {
   sendJson(res, 200, data);
 }
 
-async function handleSearch(url, res, sourceList, searchCache) {
+async function handleSearch(url, res, sourceList, searchCache, thumbCache) {
   const sourceId = url.searchParams.get('source');
   const source = sourceId ? sourceList.find((entry) => entry.id === sourceId) : null;
   if (!source) {
@@ -173,6 +179,21 @@ async function handleSearch(url, res, sourceList, searchCache) {
       unique.push(item);
     }
     items = unique;
+
+    for (const item of items) {
+      if (item.mediaId === null) {
+        item.thumbCached = false;
+        continue;
+      }
+      thumbCache.register(item.mediaId, item.thumbSource);
+      if (thumbCache.has(item.mediaId)) {
+        item.thumb = `/api/thumb/${item.mediaId}`;
+        item.thumbCached = true;
+      } else {
+        item.thumb = item.thumbSource;
+        item.thumbCached = false;
+      }
+    }
 
     sendJson(
       res,
@@ -369,6 +390,66 @@ async function handleDownload(url, req, res, sourceList) {
   }
 }
 
+function thumbCacheHeaders(entry) {
+  return {
+    'Content-Type': entry.contentType,
+    'Content-Length': entry.bytes,
+    'Cache-Control': 'public, max-age=31536000, immutable',
+    'X-Content-Type-Options': 'nosniff',
+  };
+}
+
+async function handleThumbGet(req, res, mediaId, thumbCache) {
+  const found = thumbCache.entry(mediaId);
+  if (!found) {
+    sendJson(res, 404, { error: 'Not found' });
+    return;
+  }
+
+  let info;
+  try {
+    info = await stat(found.file);
+  } catch {
+    info = null;
+  }
+  if (!info || !info.isFile()) {
+    thumbCache.remove(mediaId);
+    sendJson(res, 404, { error: 'Not found' });
+    return;
+  }
+
+  res.writeHead(200, thumbCacheHeaders(found));
+
+  if (req.method === 'HEAD') {
+    res.end();
+    return;
+  }
+
+  try {
+    await pipeline(createReadStream(found.file), res);
+  } catch {
+    // The client disconnected.
+  }
+}
+
+function handleThumbWarm(res, mediaId, thumbCache) {
+  const result = thumbCache.warm(mediaId);
+  if (result === 'unknown') {
+    sendJson(res, 404, { error: 'Unknown thumbnail' });
+    return;
+  }
+  if (result === 'cached') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+  if (result === 'full') {
+    sendJson(res, 503, { error: 'Thumbnail queue is full' });
+    return;
+  }
+  sendJson(res, 202, { status: 'queued' });
+}
+
 function resolveStaticPath(publicDir, rawPath) {
   let decoded;
   try {
@@ -437,6 +518,9 @@ export function createServer({
   groupsOverride,
   searchCacheTtlMs,
   now,
+  thumbCacheDir = join(PROJECT_ROOT, 'data', 'thumb-cache'),
+  thumbCacheMaxBytes = DEFAULT_THUMB_CACHE_BYTES,
+  thumbFetch = fetchWithTimeout,
 } = {}) {
   const sourceList = Array.isArray(sourcesOverride) ? sourcesOverride : registrySources;
   const groupList = Array.isArray(groupsOverride) ? groupsOverride : GROUPS;
@@ -447,13 +531,54 @@ export function createServer({
       : DEFAULT_SEARCH_CACHE_TTL_MS;
   const clock = typeof now === 'function' ? now : Date.now;
   const searchCache = createSearchCache({ ttlMs, now: clock });
+  const cacheBytes =
+    typeof thumbCacheMaxBytes === 'number' && thumbCacheMaxBytes > 0
+      ? thumbCacheMaxBytes
+      : DEFAULT_THUMB_CACHE_BYTES;
+  const thumbCache = createThumbCache({
+    dir: thumbCacheDir,
+    maxBytes: cacheBytes,
+    fetch: thumbFetch,
+    now: clock,
+  });
 
   return createHttpServer(async (req, res) => {
     try {
       const url = new URL(req.url ?? '/', 'http://localhost');
 
+      if (req.method === 'POST') {
+        const warmMatch = /^\/api\/thumb\/([^/]+)\/warm$/.exec(url.pathname);
+        if (warmMatch) {
+          const mediaId = decodeURIComponent(warmMatch[1]);
+          if (!MEDIA_ID_PATTERN.test(mediaId)) {
+            sendJson(res, 400, { error: 'Invalid media ID' });
+            return;
+          }
+          handleThumbWarm(res, mediaId, thumbCache);
+          return;
+        }
+        sendText(res, 405, 'Method not allowed');
+        return;
+      }
+
       if (req.method !== 'GET' && req.method !== 'HEAD') {
         sendText(res, 405, 'Method not allowed');
+        return;
+      }
+
+      if (/^\/api\/thumb\/[^/]+\/warm$/.test(url.pathname)) {
+        sendText(res, 405, 'Method not allowed');
+        return;
+      }
+
+      const thumbMatch = /^\/api\/thumb\/([^/]+)$/.exec(url.pathname);
+      if (thumbMatch) {
+        const mediaId = decodeURIComponent(thumbMatch[1]);
+        if (!MEDIA_ID_PATTERN.test(mediaId)) {
+          sendJson(res, 400, { error: 'Invalid media ID' });
+          return;
+        }
+        await handleThumbGet(req, res, mediaId, thumbCache);
         return;
       }
 
@@ -466,7 +591,7 @@ export function createServer({
         return;
       }
       if (url.pathname === '/api/search') {
-        await handleSearch(url, res, sourceList, searchCache);
+        await handleSearch(url, res, sourceList, searchCache, thumbCache);
         return;
       }
       if (url.pathname === '/api/download') {
