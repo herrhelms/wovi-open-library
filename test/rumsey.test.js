@@ -54,7 +54,8 @@ test('rumsey normalize makes an Item', () => {
   assert.equal(item.creator, 'Neurath, Marie');
   assert.equal(item.date, '1953');
   assert.equal(item.thumb, raw.urlSize2);
-  assert.equal(item.preview, `${IIIF}/${raw.id}/full/1600,/0/default.jpg`);
+  assert.equal(item.preview, `${IIIF}/${raw.id}/full/2400,/0/default.jpg`);
+  assert.equal(item.previewFallback, `${IIIF}/${raw.id}/full/1600,/0/default.jpg`);
   assert.equal(item.full, null);
   assert.equal(item.width, null);
   assert.equal(item.height, null);
@@ -137,7 +138,8 @@ test('rumsey resolveDownload uses the IIIF width', async () => {
 test('rumsey resolveDownload falls back without width', async () => {
   const fake = async () => ({ '@id': `${IIIF}/${FIRST_ID}` });
   const resolved = await resolveDownload(FIRST_ID, { fetchJson: fake });
-  assert.equal(resolved.url, `${IIIF}/${FIRST_ID}/full/full/0/default.jpg`);
+  assert.equal(resolved.url, `${IIIF}/${FIRST_ID}/full/max/0/default.jpg`);
+  assert.ok(!resolved.url.includes('/full/full/'));
 });
 
 test('rumsey resolveDownload rejects a bad id without a request', async () => {
