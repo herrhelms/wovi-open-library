@@ -173,6 +173,7 @@ async function createFixture() {
   const server = createServer({
     publicDir,
     sourcesOverride: makeSourceList(upstreamBase),
+    settingsDbPath: ':memory:',
     thumbCacheDir,
     thumbFetch,
   });
@@ -316,6 +317,7 @@ test('GET /api/groups', async () => {
     publicDir: fixture.publicDir,
     sourcesOverride: makeSourceList(fixture.upstreamBase),
     groupsOverride: GROUPS_FIXTURE,
+    settingsDbPath: ':memory:',
     thumbCacheDir: fixture.thumbCacheDir,
     thumbFetch: fixture.thumbFetch,
   });
@@ -443,6 +445,7 @@ test('GET /api/download europeana rejects non-images', async () => {
   const server = createServer({
     publicDir: fixture.publicDir,
     sourcesOverride: sources,
+    settingsDbPath: ':memory:',
     thumbCacheDir: fixture.thumbCacheDir,
     thumbFetch: fixture.thumbFetch,
   });
@@ -470,6 +473,7 @@ test('GET /api/download europeana follows redirects', async () => {
   const server = createServer({
     publicDir: fixture.publicDir,
     sourcesOverride: sources,
+    settingsDbPath: ':memory:',
     thumbCacheDir: fixture.thumbCacheDir,
     thumbFetch: fixture.thumbFetch,
   });
@@ -521,6 +525,7 @@ async function withServer(sources, fn, extra = {}) {
   const server = createServer({
     publicDir: fixture.publicDir,
     sourcesOverride: sources,
+    settingsDbPath: ':memory:',
     thumbCacheDir: fixture.thumbCacheDir,
     thumbFetch: fixture.thumbFetch,
     ...extra,
@@ -785,6 +790,7 @@ test('GET /api/search expires the cache after the TTL', async () => {
     publicDir: fixture.publicDir,
     sourcesOverride: [fake.source],
     searchCacheTtlMs: 1000,
+    settingsDbPath: ':memory:',
     now: () => clock,
     thumbCacheDir: fixture.thumbCacheDir,
     thumbFetch: fixture.thumbFetch,
@@ -1003,4 +1009,257 @@ test('thumb warm stores the image and serves it', async () => {
 test('POST on other routes stays 405', async () => {
   const res = await fetch(`${fixture.base}/api/sources`, { method: 'POST' });
   assert.equal(res.status, 405);
+});
+
+function postJson(port, path, body, headers = {}) {
+  return new Promise((resolve, reject) => {
+    import('node:http').then(({ request }) => {
+      const payload = typeof body === 'string' ? body : JSON.stringify(body);
+      const req = request(
+        {
+          host: '127.0.0.1',
+          port,
+          path,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(payload),
+            ...headers,
+          },
+        },
+        (res) => {
+          const chunks = [];
+          res.on('data', (chunk) => chunks.push(chunk));
+          res.on('end', () =>
+            resolve({
+              status: res.statusCode,
+              headers: res.headers,
+              body: Buffer.concat(chunks).toString('utf8'),
+            }),
+          );
+        },
+      );
+      req.on('error', reject);
+      req.end(payload);
+    });
+  });
+}
+
+test('GET /api/groups uses the group list', async () => {
+  await withServer(
+    makeSourceList(fixture.upstreamBase),
+    async (base) => {
+      const data = await (await fetch(`${base}/api/groups`)).json();
+      assert.deepEqual(data, GROUPS_FIXTURE);
+    },
+    { groupsOverride: GROUPS_FIXTURE },
+  );
+});
+
+test('POST /api/adapters/<id> and GET /api/adapters', async () => {
+  const sources = makeSourceList(fixture.upstreamBase);
+  await withServer(
+    sources,
+    async (base, port) => {
+      const res = await fetch(`${base}/api/adapters`);
+      assert.equal(res.status, 200);
+      const data = await res.json();
+      assert.deepEqual(data.groups, GROUPS_FIXTURE);
+      assert.equal(data.adapters.length, sources.length);
+      assert.deepEqual(data.invalid, []);
+      for (const entry of data.adapters) {
+        assert.equal(entry.enabled, true, entry.id);
+        assert.equal(entry.defaultEnabled, true, entry.id);
+        assert.equal(entry.description, null, entry.id);
+        assert.equal(entry.docsUrl, null, entry.id);
+        assert.equal(entry.base, null, entry.id);
+        assert.deepEqual(entry.notes, [], entry.id);
+      }
+
+      const toggle = await postJson(port, '/api/adapters/ok', { enabled: false });
+      assert.equal(toggle.status, 200);
+      const toggled = JSON.parse(toggle.body);
+      assert.equal(toggled.id, 'ok');
+      assert.equal(toggled.enabled, false);
+
+      const afterList = await (await fetch(`${base}/api/adapters`)).json();
+      assert.equal(afterList.adapters.find((entry) => entry.id === 'ok').enabled, false);
+
+      const sourcesAfter = await (await fetch(`${base}/api/sources`)).json();
+      assert.equal(sourcesAfter.some((entry) => entry.id === 'ok'), false);
+
+      const search = await fetch(`${base}/api/search?source=ok&q=x`);
+      assert.equal(search.status, 404);
+      assert.deepEqual(await search.json(), {
+        error: 'Adaptor is deactivated',
+        code: 'DISABLED',
+      });
+
+      const download = await fetch(`${base}/api/download?source=ok&id=1`);
+      assert.equal(download.status, 404);
+      assert.equal((await download.json()).code, 'DISABLED');
+
+      const back = await postJson(port, '/api/adapters/ok', { enabled: true });
+      assert.equal(back.status, 200);
+      assert.equal(JSON.parse(back.body).enabled, true);
+      const sourcesBack = await (await fetch(`${base}/api/sources`)).json();
+      assert.equal(sourcesBack.some((entry) => entry.id === 'ok'), true);
+    },
+    { groupsOverride: GROUPS_FIXTURE },
+  );
+});
+
+test('GET /api/adapters never sends a key value', async () => {
+  process.env.TEST_KEY_X = 'secret-value';
+  try {
+    await withServer(makeSourceList(fixture.upstreamBase), async (base) => {
+      const res = await fetch(`${base}/api/adapters`);
+      const text = await res.text();
+      assert.ok(!text.includes('secret-value'));
+      const data = JSON.parse(text);
+      const keyed = data.adapters.find((entry) => entry.id === 'keyed');
+      assert.equal(keyed.key.configured, true);
+      assert.equal(keyed.key.env, 'TEST_KEY_X');
+      assert.equal(keyed.key.required, true);
+      const optional = data.adapters.find((entry) => entry.id === 'optional');
+      assert.equal(optional.key.required, false);
+      const met = data.adapters.find((entry) => entry.id === 'met');
+      assert.equal(met.key, null);
+    });
+  } finally {
+    delete process.env.TEST_KEY_X;
+  }
+});
+
+test('a source with defaultEnabled false is off at start', async () => {
+  const off = { ...makeSourceList(fixture.upstreamBase)[0], id: 'off', config: { defaultEnabled: false } };
+  await withServer([off], async (base) => {
+    const sources = await (await fetch(`${base}/api/sources`)).json();
+    assert.equal(sources.some((entry) => entry.id === 'off'), false);
+    const data = await (await fetch(`${base}/api/adapters`)).json();
+    const entry = data.adapters.find((item) => item.id === 'off');
+    assert.equal(entry.enabled, false);
+    assert.equal(entry.defaultEnabled, false);
+  });
+});
+
+test('GET /api/adapters reports invalid folders from invalidOverride', async () => {
+  await withServer(
+    makeSourceList(fixture.upstreamBase),
+    async (base) => {
+      const data = await (await fetch(`${base}/api/adapters`)).json();
+      assert.deepEqual(data.invalid, [{ folder: 'x', error: 'bad' }]);
+    },
+    { invalidOverride: [{ folder: 'x', error: 'bad' }] },
+  );
+});
+
+test('POST /api/adapters checks Origin, Content-Type, size, JSON and ID', async () => {
+  const sources = makeSourceList(fixture.upstreamBase);
+  await withServer(sources, async (base, port) => {
+    const foreign = await postJson(
+      port,
+      '/api/adapters/ok',
+      { enabled: false },
+      { Origin: 'http://evil.example' },
+    );
+    assert.equal(foreign.status, 403);
+
+    const same = await postJson(
+      port,
+      '/api/adapters/ok',
+      { enabled: true },
+      { Origin: `http://127.0.0.1:${port}` },
+    );
+    assert.equal(same.status, 200);
+
+    const localhost = await postJson(
+      port,
+      '/api/adapters/ok',
+      { enabled: true },
+      { Origin: `http://localhost:${port}` },
+    );
+    assert.equal(localhost.status, 200);
+
+    const noOrigin = await postJson(port, '/api/adapters/ok', { enabled: true });
+    assert.equal(noOrigin.status, 200);
+
+    const textPlain = await postJson(
+      port,
+      '/api/adapters/ok',
+      { enabled: false },
+      { 'Content-Type': 'text/plain' },
+    );
+    assert.equal(textPlain.status, 415);
+
+    const tooLarge = await postJson(
+      port,
+      '/api/adapters/ok',
+      { enabled: false, pad: 'x'.repeat(2000) },
+    );
+    assert.equal(tooLarge.status, 413);
+
+    const notJson = await postJson(port, '/api/adapters/ok', 'not json');
+    assert.equal(notJson.status, 400);
+
+    const notBoolean = await postJson(port, '/api/adapters/ok', { enabled: 'yes' });
+    assert.equal(notBoolean.status, 400);
+
+    const arrayBody = await postJson(port, '/api/adapters/ok', []);
+    assert.equal(arrayBody.status, 400);
+
+    const unknown = await postJson(port, '/api/adapters/nope', { enabled: false });
+    assert.equal(unknown.status, 404);
+
+    const getAdapter = await fetch(`${base}/api/adapters/ok`);
+    assert.equal(getAdapter.status, 405);
+
+    const postSources = await fetch(`${base}/api/sources`, { method: 'POST' });
+    assert.equal(postSources.status, 405);
+  });
+});
+
+test('thumb routes give 400 for a bad percent escape', async () => {
+  const get = await fetch(`${fixture.base}/api/thumb/%zz`);
+  assert.equal(get.status, 400);
+  const warm = await fetch(`${fixture.base}/api/thumb/%zz/warm`, { method: 'POST' });
+  assert.equal(warm.status, 400);
+});
+
+test('adapter settings stay after a server restart', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'olf-settings-server-'));
+  const dbPath = join(root, 'settings.sqlite');
+  try {
+    const first = createServer({
+      publicDir: fixture.publicDir,
+      sourcesOverride: makeSourceList(fixture.upstreamBase),
+      settingsDbPath: dbPath,
+      thumbCacheDir: fixture.thumbCacheDir,
+      thumbFetch: fixture.thumbFetch,
+    });
+    const firstPort = await listen(first);
+    try {
+      const res = await postJson(firstPort, '/api/adapters/ok', { enabled: false });
+      assert.equal(res.status, 200);
+    } finally {
+      await close(first);
+    }
+
+    const second = createServer({
+      publicDir: fixture.publicDir,
+      sourcesOverride: makeSourceList(fixture.upstreamBase),
+      settingsDbPath: dbPath,
+      thumbCacheDir: fixture.thumbCacheDir,
+      thumbFetch: fixture.thumbFetch,
+    });
+    const secondPort = await listen(second);
+    try {
+      const data = await (await fetch(`http://127.0.0.1:${secondPort}/api/adapters`)).json();
+      assert.equal(data.adapters.find((entry) => entry.id === 'ok').enabled, false);
+    } finally {
+      await close(second);
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
 });
