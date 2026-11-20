@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "bundesarchiv",
+  "name": "German Federal Archive (via Wikimedia Commons)",
+  "homepage": "https://www.bundesarchiv.de",
+  "group": "libraries",
+  "order": 360,
+  "description": "German Federal Archive images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_the_German_Federal_Archive\""
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "ksamsok",
+  "name": "Swedish heritage (K-samsök)",
+  "homepage": "https://www.raa.se/hitta-information/k-samsok/",
+  "group": "aggregators",
+  "order": 90,
+  "description": "Swedish heritage images from K-samsök.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Only images with license public domain mark, CC0, CC BY or CC BY-SA."
+  ]
+}

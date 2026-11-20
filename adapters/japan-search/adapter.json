@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "japan-search",
+  "name": "Japan Search",
+  "homepage": "https://jpsearch.go.jp",
+  "group": "aggregators",
+  "order": 80,
+  "description": "Japan Search: public domain items with an image.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Only public domain (pdm) items with an image."
+  ]
+}

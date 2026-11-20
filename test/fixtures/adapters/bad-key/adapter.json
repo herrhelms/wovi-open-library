@@ -1,0 +1,1 @@
+{ "schema": 1, "id": "bad-key", "name": "N", "homepage": "https://example.org", "group": "alpha", "description": "D", "key": { "required": true } }

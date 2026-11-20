@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "id": "noaa",
+  "name": "NOAA Photo Library (via Wikimedia Commons)",
+  "homepage": "https://photolib.noaa.gov",
+  "group": "science",
+  "order": 480,
+  "description": "NOAA Photo Library images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Searched through Wikimedia Commons with a category filter.",
+    "NOAA uses the category \"Files from the NOAA Photo Library Flickr stream\" (more hits than the source filter).",
+    "The item page is the Commons file page."
+  ],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Files_from_the_NOAA_Photo_Library_Flickr_stream\""
+  }
+}

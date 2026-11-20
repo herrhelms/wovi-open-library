@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "eth-library",
+  "name": "ETH Library Zurich (via Wikimedia Commons)",
+  "homepage": "https://library.ethz.ch",
+  "group": "libraries",
+  "order": 370,
+  "description": "ETH Library Zurich images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Media_contributed_by_the_ETH-Bibliothek\""
+  }
+}

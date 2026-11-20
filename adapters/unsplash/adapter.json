@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "unsplash",
+  "name": "Unsplash",
+  "homepage": "https://unsplash.com",
+  "group": "aggregators",
+  "order": 130,
+  "description": "Unsplash free photos.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": {
+    "env": "UNSPLASH_KEY",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://unsplash.com/developers",
+    "steps": [
+      "Use the \"Access Key\" from https://unsplash.com/developers.",
+      "Put UNSPLASH_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": "https://unsplash.com/developers",
+  "notes": [
+    "A download calls the Unsplash download endpoint, as Unsplash requires.",
+    "Built from the public API documentation; not yet tested live (no key yet)."
+  ]
+}

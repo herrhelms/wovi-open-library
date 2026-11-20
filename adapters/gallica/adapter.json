@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "gallica",
+  "name": "Gallica (BnF) (via Wikimedia Commons)",
+  "homepage": "https://gallica.bnf.fr",
+  "group": "libraries",
+  "order": 320,
+  "description": "Gallica (BnF) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Searched through Wikimedia Commons with a category or source filter.",
+    "The item page is the Commons file page."
+  ],
+  "base": "commons-subset",
+  "options": {
+    "filter": "insource:\"gallica.bnf.fr\""
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "archive",
+  "name": "Internet Archive",
+  "homepage": "https://archive.org",
+  "group": "aggregators",
+  "order": 50,
+  "description": "Internet Archive image items.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": []
+}

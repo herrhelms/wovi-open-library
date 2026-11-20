@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "smithsonian",
+  "name": "Smithsonian Open Access",
+  "homepage": "https://www.si.edu/openaccess",
+  "group": "museums",
+  "order": 150,
+  "description": "Smithsonian Open Access CC0 images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": {
+    "env": "SMITHSONIAN_KEY",
+    "required": false,
+    "default": "DEMO_KEY",
+    "signupUrl": "https://api.data.gov/signup/",
+    "steps": [
+      "The default key is DEMO_KEY.",
+      "A personal key is available at https://api.data.gov/signup/.",
+      "Put SMITHSONIAN_KEY=<key> in .env in the project root."
+    ],
+    "limits": "DEMO_KEY allows about 30 requests per hour."
+  },
+  "docsUrl": null,
+  "notes": [
+    "DEMO_KEY allows about 30 requests per hour. Put a personal key in .env."
+  ]
+}

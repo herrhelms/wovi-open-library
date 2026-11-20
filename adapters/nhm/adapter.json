@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "nhm",
+  "name": "Natural History Museum, London",
+  "homepage": "https://data.nhm.ac.uk",
+  "group": "science",
+  "order": 510,
+  "description": "Natural History Museum, London images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "The item page (data.nhm.ac.uk/object/…) can answer HTTP 403 to scripts; in a browser it works."
+  ]
+}

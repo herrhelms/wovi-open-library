@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "openverse",
+  "name": "Openverse",
+  "homepage": "https://openverse.org",
+  "group": "aggregators",
+  "order": 20,
+  "description": "Openverse: openly licensed images from many sites.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Without a key, the API allows about 20 requests in each minute and 200 in each day; results stop at about 240.",
+    "On HTTP 429 the app shows an Openverse rate limit message.",
+    "Openverse collects images from other sites; the viewer shows \"via <provider>\"."
+  ]
+}

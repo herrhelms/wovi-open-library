@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "id": "trove",
+  "name": "Trove (National Library of Australia)",
+  "homepage": "https://trove.nla.gov.au",
+  "group": "libraries",
+  "order": 330,
+  "description": "Trove: images from Australian libraries.",
+  "defaultEnabled": true,
+  "openLicenses": false,
+  "trustResolvedUrl": true,
+  "key": {
+    "env": "TROVE_KEY",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://trove.nla.gov.au",
+    "steps": [
+      "Open https://trove.nla.gov.au, go to Profile → API and get a key.",
+      "Put TROVE_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": null,
+  "notes": [
+    "Often only a thumbnail; the viewer links to the partner page.",
+    "Harvard and Trove have no usable licence data.",
+    "Built from the public API documentation; not yet tested live (no key yet)."
+  ]
+}

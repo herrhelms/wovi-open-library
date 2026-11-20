@@ -1,0 +1,18 @@
+[
+  {
+    "id": "aggregators",
+    "label": "Open-licence aggregators"
+  },
+  {
+    "id": "museums",
+    "label": "Museums and galleries"
+  },
+  {
+    "id": "libraries",
+    "label": "Libraries and archives"
+  },
+  {
+    "id": "science",
+    "label": "Science, nature and medicine"
+  }
+]

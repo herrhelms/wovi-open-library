@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "esa-hubble",
+  "name": "ESA/Hubble",
+  "homepage": "https://esahubble.org",
+  "group": "science",
+  "order": 430,
+  "description": "ESA/Hubble space images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "\"Download full resolution\" gives the largest JPEG of the item page (\"Large JPEG\", else \"Publication JPEG\", else \"Screensize JPEG\").",
+    "The TIFF originals are not offered."
+  ],
+  "base": "djangoplicity",
+  "options": {
+    "origin": "https://esahubble.org",
+    "imagesPath": "/images/",
+    "cdn": "https://cdn.esahubble.org/archives/images/",
+    "creator": "ESA/Hubble"
+  }
+}

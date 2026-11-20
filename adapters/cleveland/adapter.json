@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "cleveland",
+  "name": "Cleveland Museum of Art",
+  "homepage": "https://www.clevelandart.org",
+  "group": "museums",
+  "order": 190,
+  "description": "Cleveland Museum of Art open access images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "\"Download full resolution\" gives the print JPEG (about 3400 px).",
+    "The TIFF master can be more than 200 MB; the viewer shows it as a separate link."
+  ]
+}

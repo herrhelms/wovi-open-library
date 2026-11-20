@@ -12,10 +12,12 @@ import {
   parseImageList,
   parseTotal,
   pickDownload,
-} from '../lib/sources/djangoplicity.js';
-import * as hubble from '../lib/sources/esa-hubble.js';
-import * as webb from '../lib/sources/esa-webb.js';
-import * as eso from '../lib/sources/eso.js';
+} from '../lib/bases/djangoplicity.js';
+import { getSource } from '../lib/sources/index.js';
+
+const hubble = getSource('esa-hubble');
+const webb = getSource('esa-webb');
+const eso = getSource('eso');
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = (name) => readFileSync(join(here, 'fixtures', name), 'utf8');

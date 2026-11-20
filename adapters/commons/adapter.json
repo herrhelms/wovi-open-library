@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "commons",
+  "name": "Wikimedia Commons",
+  "homepage": "https://commons.wikimedia.org",
+  "group": "aggregators",
+  "order": 10,
+  "description": "Wikimedia Commons free media files.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": []
+}

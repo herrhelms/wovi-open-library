@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ok-code",
+  "name": "OK Code",
+  "homepage": "https://example.org/ok-code",
+  "group": "alpha",
+  "order": 20,
+  "description": "A code adaptor for the loader test.",
+  "key": {
+    "env": "OK_CODE_KEY",
+    "required": false,
+    "default": "demo",
+    "signupUrl": "https://example.org/keys",
+    "steps": ["Ask for a key."],
+    "limits": null
+  },
+  "docsUrl": "https://example.org/docs",
+  "notes": ["A note."]
+}

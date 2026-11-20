@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "other",
+  "name": "Other",
+  "homepage": "https://example.org/other",
+  "group": "alpha",
+  "description": "The adaptor that keeps its id."
+}

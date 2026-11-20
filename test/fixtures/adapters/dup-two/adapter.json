@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "dup-two",
+  "name": "Dup Two",
+  "homepage": "https://example.org/dup-two",
+  "group": "beta",
+  "description": "The other adaptor that uses the same code id.",
+  "base": "alias",
+  "options": { "aliasId": "shared" }
+}

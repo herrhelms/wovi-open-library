@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "loc",
+  "name": "Library of Congress (Free to Use)",
+  "homepage": "https://www.loc.gov/free-to-use/",
+  "group": "libraries",
+  "order": 290,
+  "description": "Library of Congress Free to Use image sets.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "The first search reads the 101 Free to Use sets (102 requests, about one minute) and saves them for 7 days.",
+    "Prints & Photographs items come from the LoC IIIF server.",
+    "Other items give only the small web-size image from the set."
+  ]
+}

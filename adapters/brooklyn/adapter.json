@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "brooklyn",
+  "name": "Brooklyn Museum (via Wikimedia Commons)",
+  "homepage": "https://www.brooklynmuseum.org",
+  "group": "museums",
+  "order": 250,
+  "description": "Brooklyn Museum images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Media contributed by the Brooklyn Museum\""
+  }
+}

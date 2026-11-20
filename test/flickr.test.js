@@ -7,9 +7,11 @@ import { dirname, join } from 'node:path';
 import {
   FLICKR_LICENSES,
   buildSearchUrl,
-} from '../lib/sources/flickr.js';
-import * as commons from '../lib/sources/flickr-commons.js';
-import * as cc from '../lib/sources/flickr-cc.js';
+} from '../lib/bases/flickr.js';
+import { getSource } from '../lib/sources/index.js';
+
+const commons = getSource('flickr-commons');
+const cc = getSource('flickr-cc');
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(readFileSync(join(here, 'fixtures/flickr.json'), 'utf8'));

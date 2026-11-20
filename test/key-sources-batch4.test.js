@@ -5,10 +5,12 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 import { HttpError } from '../lib/http.js';
-import * as pixabay from '../lib/sources/pixabay.js';
-import * as pexels from '../lib/sources/pexels.js';
-import * as unsplash from '../lib/sources/unsplash.js';
-import * as harvard from '../lib/sources/harvard.js';
+import { getSource } from '../lib/sources/index.js';
+
+const pixabay = getSource('pixabay');
+const pexels = getSource('pexels');
+const unsplash = getSource('unsplash');
+const harvard = getSource('harvard');
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (name) => JSON.parse(readFileSync(join(here, 'fixtures', name), 'utf8'));

@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "bhl",
+  "name": "Biodiversity Heritage Library (via Wikimedia Commons)",
+  "homepage": "https://www.biodiversitylibrary.org",
+  "group": "science",
+  "order": 470,
+  "description": "Biodiversity Heritage Library images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Searched through Wikimedia Commons with a category or source filter.",
+    "The item page is the Commons file page."
+  ],
+  "base": "commons-subset",
+  "options": {
+    "filter": "insource:\"biodiversitylibrary.org\""
+  }
+}

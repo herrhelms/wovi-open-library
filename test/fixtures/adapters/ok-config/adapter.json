@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "ok-config",
+  "name": "OK Config",
+  "homepage": "https://example.org/ok-config",
+  "group": "alpha",
+  "order": 10,
+  "description": "A config-only adaptor for the loader test.",
+  "key": null,
+  "base": "demo",
+  "options": { "prefix": "ok" }
+}

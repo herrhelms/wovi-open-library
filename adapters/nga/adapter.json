@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "nga",
+  "name": "National Gallery of Art",
+  "homepage": "https://www.nga.gov",
+  "group": "museums",
+  "order": 170,
+  "description": "National Gallery of Art open data images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "There is no search API. The first search downloads the open data CSV files (~175 MB) into data/nga/ and builds an index.",
+    "The files are refreshed after 30 days."
+  ]
+}

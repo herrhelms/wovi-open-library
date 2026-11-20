@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "gbif",
+  "name": "GBIF",
+  "homepage": "https://www.gbif.org",
+  "group": "science",
+  "order": 500,
+  "description": "GBIF biodiversity photos.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "The photo license is checked for each photo (the GBIF license filter is for the record, not the photo); only CC0, CC BY, CC BY-SA and public domain photos."
+  ]
+}

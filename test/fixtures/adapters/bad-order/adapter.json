@@ -1,0 +1,1 @@
+{ "schema": 1, "id": "bad-order", "name": "N", "homepage": "https://example.org", "group": "alpha", "description": "D", "order": "first" }
