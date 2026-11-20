@@ -79,6 +79,95 @@ test('digitalnz normalize uses the large thumbnail when object_url is missing', 
   assert.equal(item.licenseUrl, raw.rights_url[0]);
 });
 
+test('digitalnz normalize ignores an HTML getIEs object_url', () => {
+  const raw = resultById(22734759);
+  const item = normalize(raw);
+
+  assert.equal(item.preview, 'https://ndhadeliver.natlib.govt.nz/NLNZStreamGate/get?dps_pid=IE6702609');
+  assert.equal(item.full, item.preview);
+  assert.equal(item.thumb, raw.thumbnail_url);
+  assert.equal(item.note, NOTE_THUMB);
+  assert.equal(item.license, 'CC BY 4.0');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/licenses/by/4.0/');
+});
+
+test('digitalnz normalize rewrites kura CONTENTdm images to IIIF', () => {
+  const raw = resultById(43346385);
+  const item = normalize(raw);
+
+  assert.equal(
+    item.thumb,
+    'https://kura.aucklandlibraries.govt.nz/digital/iiif/photos/153842/full/400,/0/default.jpg',
+  );
+  assert.equal(item.thumbFallback, raw.thumbnail_url);
+  assert.equal(
+    item.preview,
+    'https://kura.aucklandlibraries.govt.nz/digital/iiif/photos/153842/full/1600,/0/default.jpg',
+  );
+  assert.equal(item.previewFallback, raw.large_thumbnail_url);
+  assert.equal(
+    item.full,
+    'https://kura.aucklandlibraries.govt.nz/digital/iiif/photos/153842/full/max/0/default.jpg',
+  );
+  assert.equal(item.license, 'No known copyright restrictions');
+  assert.equal(item.licenseUrl, null);
+  assert.equal(item.note, null);
+});
+
+test('digitalnz normalize rewrites iNaturalist sizes to the original', () => {
+  const raw = resultById(36912839);
+  const item = normalize(raw);
+
+  assert.equal(item.thumb, 'https://inaturalist-open-data.s3.amazonaws.com/photos/2920834/small.JPG');
+  assert.equal(item.thumbFallback, undefined);
+  assert.equal(item.preview, 'https://inaturalist-open-data.s3.amazonaws.com/photos/2920834/original.JPG');
+  assert.equal(item.previewFallback, raw.large_thumbnail_url);
+  assert.equal(item.full, 'https://inaturalist-open-data.s3.amazonaws.com/photos/2920834/original.JPG');
+  assert.equal(item.note, null);
+});
+
+test('digitalnz normalize reads the licence from rights_url and rights', () => {
+  const base = {
+    id: 1,
+    title: 'x',
+    object_url: 'https://example.org/a.jpg',
+    landing_url: 'https://example.org/1',
+  };
+
+  const by = normalize({ ...base, rights_url: ['http://creativecommons.org/licenses/by/2.0/'] });
+  assert.equal(by.license, 'CC BY 2.0');
+  assert.equal(by.licenseUrl, 'http://creativecommons.org/licenses/by/2.0/');
+
+  const zero = normalize({ ...base, rights_url: ['https://creativecommons.org/publicdomain/zero/1.0/'] });
+  assert.equal(zero.license, 'CC0');
+
+  const mark = normalize({ ...base, rights_url: ['https://creativecommons.org/publicdomain/mark/1.0/'] });
+  assert.equal(mark.license, 'Public domain');
+
+  const noc = normalize({ ...base, rights_url: [], rights: 'No Known Copyright Restrictions' });
+  assert.equal(noc.license, 'No known copyright restrictions');
+  assert.equal(noc.licenseUrl, null);
+
+  const plain = normalize(base);
+  assert.equal(plain.license, 'Free to reuse (commercial use OK)');
+  assert.equal(plain.licenseUrl, null);
+});
+
+test('digitalnz resolveDownload uses the rewritten URL', async () => {
+  const fake = async () => ({
+    record: {
+      id: 22734759,
+      title: 'Moon over Wellington',
+      object_url: 'https://ndhadeliver.natlib.govt.nz/content-aggregator/getIEs?system=emu&id=648313',
+      large_thumbnail_url: 'https://ndhadeliver.natlib.govt.nz/NLNZStreamGate/get?dps_pid=IE6702609',
+      thumbnail_url: 'https://ndhadeliver.natlib.govt.nz/x-thumb.jpg',
+    },
+  });
+
+  const resolved = await withKey(null, () => resolveDownload('22734759', { fetchJson: fake }));
+  assert.equal(resolved.url, 'https://ndhadeliver.natlib.govt.nz/NLNZStreamGate/get?dps_pid=IE6702609');
+});
+
 test('digitalnz normalize uses object_url as the full image', () => {
   const raw = resultById(90000001);
   const item = normalize(raw);
@@ -185,7 +274,7 @@ test('digitalnz resolveDownload gets the record', async () => {
   assert.equal(receivedHeaders['Authentication-Token'], undefined);
   assert.equal(
     resolved.url,
-    'https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153879/default.jpg',
+    'https://kura.aucklandlibraries.govt.nz/digital/iiif/photos/153879/full/max/0/default.jpg',
   );
   assert.equal(resolved.filename, 'The moon when nine days thirteen hours old');
 });

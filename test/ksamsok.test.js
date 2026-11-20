@@ -55,6 +55,44 @@ test('ksamsok licenseOf maps open licenses', () => {
   assert.equal(licenseOf('http://kulturarvsdata.se/resurser/License#by-nc-nd'), null);
 });
 
+test('ksamsok licenseOf takes the CC version from mediaLicenseUrl', () => {
+  const bySa = licenseOf(
+    'http://kulturarvsdata.se/resurser/License#by-sa',
+    'http://creativecommons.org/licenses/by-sa/3.0/',
+  );
+  assert.equal(bySa.label, 'CC BY-SA 3.0');
+
+  const by = licenseOf(
+    'http://kulturarvsdata.se/resurser/License#by',
+    'http://creativecommons.org/licenses/by/2.5/',
+  );
+  assert.equal(by.label, 'CC BY 2.5');
+
+  const noVersion = licenseOf('http://kulturarvsdata.se/resurser/License#by');
+  assert.equal(noVersion.label, 'CC BY');
+});
+
+test('ksamsok normalize reads the CC version and the licence URL', () => {
+  const record = {
+    '@graph': [
+      {
+        '@type': 'ns1:Entity',
+        '@id': 'http://kulturarvsdata.se/X/photo/2',
+        'ns1:itemLabel': 'Moon',
+      },
+      {
+        '@type': 'ns1:Image',
+        'ns1:mediaLicense': { '@id': 'http://kulturarvsdata.se/resurser/License#by-sa' },
+        'ns1:mediaLicenseUrl': { '@id': 'http://creativecommons.org/licenses/by-sa/3.0/' },
+        'ns1:highresSource': 'https://example.org/a.jpg',
+      },
+    ],
+  };
+  const item = normalize(record);
+  assert.equal(item.license, 'CC BY-SA 3.0');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/licenses/by-sa/3.0/');
+});
+
 test('ksamsok parseSearch reads the Form A record', () => {
   const result = parseSearch(fixture.search, 1);
   assert.equal(result.total, 364);
@@ -64,8 +102,9 @@ test('ksamsok parseSearch reads the Form A record', () => {
   assert.equal(item.source, 'ksamsok');
   assert.equal(item.id, 'S-TEK/photo/TEKA0164922');
   assert.equal(item.title, 'Text på baksida "Moon"');
-  assert.equal(item.thumb, 'https://ems.dimu.org/image/069EJVgVTCBUL?dimension=145x105');
-  assert.equal(item.preview, 'https://ems.dimu.org/image/069EJVgVTCBUL?dimension=1200x1200');
+  assert.equal(item.thumb, 'https://ems.dimu.org/image/069EJVgVTCBUL?dimension=400x400');
+  assert.equal(item.thumbFallback, 'https://ems.dimu.org/image/069EJVgVTCBUL?dimension=145x105');
+  assert.equal(item.preview, 'https://ems.dimu.org/image/069EJVgVTCBUL?dimension=1600x1600');
   assert.equal(item.full, 'https://ems.dimu.org/image/069EJVgVTCBUL?dimension=max');
   assert.equal(item.pageUrl, 'https://digitaltmuseum.se/0210115420674');
   assert.equal(item.license, 'Public domain');
@@ -130,7 +169,10 @@ test('ksamsok search builds the search URL', async () => {
 
   const params = new URL(requested).searchParams;
   assert.equal(params.get('method'), 'search');
-  assert.equal(params.get('query'), 'text=moon and thumbnailExists=j');
+  assert.equal(
+    params.get('query'),
+    'text=moon and thumbnailExists=j and (mediaLicense="http://kulturarvsdata.se/resurser/License#pdmark" or mediaLicense="http://kulturarvsdata.se/resurser/License#cc0" or mediaLicense="http://kulturarvsdata.se/resurser/License#by" or mediaLicense="http://kulturarvsdata.se/resurser/License#by-sa")',
+  );
   assert.equal(params.get('startRecord'), '25');
   assert.equal(params.get('hitsPerPage'), '24');
   assert.equal(new URL(requested).host, 'kulturarvsdata.se');
