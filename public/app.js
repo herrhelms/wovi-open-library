@@ -23,6 +23,7 @@ import {
   subtitleText,
   thumbCandidates,
 } from './lib.js';
+import { initSettings } from './settings.js';
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
@@ -855,17 +856,26 @@ function canLoadMore() {
 }
 
 // ---------- Source toggles ----------
+/**
+ * Stop one source, save its cards and remove them from the grid.
+ * Shared by the chip toggles, the group actions and the settings modal.
+ * @param {string} id
+ */
+function turnSourceOff(id) {
+  saveSourceToCache(id);
+  abortSource(id);
+  cancelRetry(id);
+  removeSourceCards(id);
+  errors.delete(id);
+  states.delete(id);
+}
+
 function toggleSource(id) {
   const source = registryById.get(id);
   if (!source || !isSearchable(source, openOnly)) return;
   if (selected.has(id)) {
     selected.delete(id);
-    saveSourceToCache(id);
-    abortSource(id);
-    cancelRetry(id);
-    removeSourceCards(id);
-    errors.delete(id);
-    states.delete(id);
+    turnSourceOff(id);
     resetAutoLoad();
     renderErrors();
     updateChip(id);
@@ -890,6 +900,59 @@ function abortSource(id) {
   controllers.delete(id);
 }
 
+/**
+ * Reload the source list after an adaptor changed in the settings modal.
+ * @param {object} adapter
+ */
+async function reloadSources(adapter) {
+  try {
+    const response = await fetch('/api/sources');
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error('Bad source list');
+    registry = data;
+  } catch {
+    // Keep the current registry when the new list cannot be loaded.
+    return;
+  }
+
+  registryById = new Map(registry.map((source) => [source.id, source]));
+  if (subtitleEl) subtitleEl.textContent = subtitleText(registry);
+  renderChips();
+
+  if (adapter && adapter.enabled === false) {
+    if (selected.has(adapter.id)) {
+      selected.delete(adapter.id);
+      turnSourceOff(adapter.id);
+      resetAutoLoad();
+    }
+    updateChip(adapter.id);
+  } else if (adapter && adapter.enabled === true) {
+    const source = registryById.get(adapter.id);
+    if (source && isSearchable(source, openOnly) && !selected.has(source.id)) {
+      selected.add(source.id);
+      resetAutoLoad();
+      if (query && !restoreIfCached(source.id)) {
+        startLoad(source.id, 1, generation);
+      }
+    }
+    updateChip(adapter.id);
+  }
+
+  saveSelection();
+  updateUrl('replace');
+  renderErrors();
+  updateUi();
+}
+
+/**
+ * Handle one successful adaptor toggle from the settings modal.
+ * @param {object} adapter
+ */
+function onAdapterChange(adapter) {
+  reloadSources(adapter);
+}
+
 function setAll(isOn) {
   resetAutoLoad();
   if (isOn) {
@@ -906,12 +969,7 @@ function setAll(isOn) {
     }
   } else {
     for (const id of [...selected]) {
-      saveSourceToCache(id);
-      abortSource(id);
-      cancelRetry(id);
-      removeSourceCards(id);
-      states.delete(id);
-      errors.delete(id);
+      turnSourceOff(id);
     }
     selected.clear();
     renderErrors();
@@ -942,12 +1000,7 @@ function setGroupAll(groupId, isOn) {
     for (const source of targets) {
       if (!selected.has(source.id)) continue;
       selected.delete(source.id);
-      saveSourceToCache(source.id);
-      abortSource(source.id);
-      cancelRetry(source.id);
-      removeSourceCards(source.id);
-      states.delete(source.id);
-      errors.delete(source.id);
+      turnSourceOff(source.id);
     }
     renderErrors();
   }
@@ -1258,5 +1311,7 @@ if (typeof ResizeObserver === 'function') {
 }
 
 window.addEventListener('popstate', applyUrlState);
+
+initSettings({ onChange: onAdapterChange });
 
 init();

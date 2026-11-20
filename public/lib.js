@@ -490,6 +490,69 @@ export function rememberLimited(map, key, value, max = 10) {
 }
 
 /**
+ * Key state of one adaptor for the settings modal.
+ * A missing or `null` key gives `none`. A configured key gives `set`.
+ * A required key that is not configured gives `missing`. Any other key gives
+ * `optional`; the text names the demo key when one exists.
+ * @param {object} adapter
+ * @returns {{kind: 'none'|'set'|'missing'|'optional', text: string}}
+ */
+export function keyStatus(adapter) {
+  const key = adapter?.key;
+  if (!key) return { kind: 'none', text: 'No key needed' };
+  if (key.configured === true) return { kind: 'set', text: 'Key set' };
+  if (key.required !== false) {
+    return { kind: 'missing', text: 'Key required, not set' };
+  }
+  const hasDemo = typeof key.default === 'string' && key.default !== '';
+  return {
+    kind: 'optional',
+    text: hasDemo
+      ? 'Optional key not set, uses demo key'
+      : 'Optional key not set',
+  };
+}
+
+/**
+ * Filter adaptors by a search text. The text matches `name`, `id` or
+ * `description`, without case. A trimmed empty text gives a copy of the list.
+ * A `null` field does not match. A value that is not an array gives `[]`.
+ * The order is unchanged.
+ * @param {object[]} list
+ * @param {string} text
+ * @returns {object[]}
+ */
+export function filterAdapters(list, text) {
+  if (!Array.isArray(list)) return [];
+  const needle = typeof text === 'string' ? text.trim().toLowerCase() : '';
+  if (needle === '') return list.slice();
+  return list.filter((adapter) => {
+    if (!adapter || typeof adapter !== 'object') return false;
+    for (const field of [adapter.name, adapter.id, adapter.description]) {
+      if (typeof field === 'string' && field.toLowerCase().includes(needle)) {
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
+/**
+ * Number of adaptors with `enabled === true`.
+ * A value that is not an array gives 0.
+ * @param {object[]} list
+ * @returns {number}
+ */
+export function countActive(list) {
+  if (!Array.isArray(list)) return 0;
+  let count = 0;
+  for (const adapter of list) {
+    if (adapter?.enabled === true) count += 1;
+  }
+  return count;
+}
+
+/**
  * Create a DOM element.
  * `attrs` supports `class`, `text`, `dataset`, regular attributes and
  * `on<Event>` listener functions. `children` may contain nodes or strings.
