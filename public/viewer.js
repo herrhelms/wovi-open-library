@@ -294,6 +294,15 @@ function renderPanel(item) {
     document.createTextNode(withProvider(item.source || 'Unknown source')),
   );
 
+  if (Array.isArray(item.sets)) {
+    const setNames = item.sets
+      .filter((value) => typeof value === 'string' && value.trim() !== '')
+      .map((value) => value.trim());
+    if (setNames.length > 0) {
+      addFact('In sets', document.createTextNode(setNames.join(', ')));
+    }
+  }
+
   if (item.license || item.licenseUrl) {
     if (item.licenseUrl) {
       addFact(
