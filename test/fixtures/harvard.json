@@ -1,0 +1,78 @@
+{
+  "info": {
+    "totalrecordsperquery": 24,
+    "totalrecords": 61,
+    "pages": 3,
+    "page": 1,
+    "next": "https://api.harvardartmuseums.org/object?apikey=KEY&q=moon&hasimage=1&size=24&page=2",
+    "prev": ""
+  },
+  "records": [
+    {
+      "id": 299843,
+      "objectid": 299843,
+      "title": "Moon over a Landscape",
+      "dated": "1880",
+      "url": "https://harvardartmuseums.org/collections/object/299843",
+      "primaryimageurl": "https://nrs.harvard.edu/urn-3:HUAM:299843",
+      "imagepermissionlevel": 0,
+      "people": [
+        {
+          "name": "Example Artist",
+          "role": "Artist"
+        }
+      ],
+      "images": [
+        {
+          "baseimageurl": "https://nrs.harvard.edu/urn-3:HUAM:299843",
+          "iiifbaseuri": "https://ids.lib.harvard.edu/ids/iiif/299843",
+          "width": 2400,
+          "height": 1800,
+          "imagepermissionlevel": 0
+        }
+      ]
+    },
+    {
+      "id": 112233,
+      "objectid": 112233,
+      "title": "Lunar Study",
+      "dated": "1901",
+      "url": "",
+      "primaryimageurl": "https://nrs.harvard.edu/urn-3:HUAM:112233",
+      "imagepermissionlevel": 0,
+      "people": [],
+      "images": [
+        {
+          "baseimageurl": "https://nrs.harvard.edu/urn-3:HUAM:112233",
+          "width": 1200,
+          "height": 900,
+          "imagepermissionlevel": 0
+        }
+      ]
+    },
+    {
+      "id": 445566,
+      "objectid": 445566,
+      "title": "Restricted Image",
+      "dated": "1920",
+      "url": "https://harvardartmuseums.org/collections/object/445566",
+      "primaryimageurl": "https://nrs.harvard.edu/urn-3:HUAM:445566",
+      "imagepermissionlevel": 1,
+      "people": [
+        {
+          "name": "Restricted Artist",
+          "role": "Artist"
+        }
+      ],
+      "images": [
+        {
+          "baseimageurl": "https://nrs.harvard.edu/urn-3:HUAM:445566",
+          "iiifbaseuri": "https://ids.lib.harvard.edu/ids/iiif/445566",
+          "width": 2000,
+          "height": 1500,
+          "imagepermissionlevel": 1
+        }
+      ]
+    }
+  ]
+}
