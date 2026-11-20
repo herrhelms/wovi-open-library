@@ -7,7 +7,8 @@ const QUERY = 'moon';
 const PAGE = 1;
 const ID_WIDTH = 12;
 const NGA_POLL_MS = 10_000;
-const NGA_MAX_MS = 5 * 60_000;
+const MAX_WAIT_MS = 5 * 60_000;
+const POLL_MS = 10_000;
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -60,9 +61,9 @@ async function runSource(source) {
   }
 }
 
-async function runNga(source) {
+async function runPrepared(source) {
   const started = performance.now();
-  const deadline = started + NGA_MAX_MS;
+  const deadline = started + MAX_WAIT_MS;
   let announced = false;
 
   for (;;) {
@@ -76,6 +77,9 @@ async function runNga(source) {
 
       if (err?.code !== 'PREPARING') {
         if (announced) process.stdout.write('\n');
+        if (source.id === 'loc' && err?.code === 'BLOCKED') {
+          return { status: 'WARN', message: errorMessage(err), elapsed };
+        }
         return { status: 'FAIL', message: errorMessage(err), elapsed };
       }
 
@@ -83,21 +87,21 @@ async function runNga(source) {
         if (announced) process.stdout.write('\n');
         return {
           status: 'FAIL',
-          message: 'timed out waiting for NGA data (5 min)',
+          message: `timed out waiting for ${source.id} data (5 min)`,
           elapsed,
         };
       }
 
       if (!announced) {
         process.stdout.write(
-          '…  nga: preparing data, waiting (poll every 10 s, max 5 min)',
+          `…  ${source.id}: preparing data, waiting (poll every 10 s, max 5 min)`,
         );
         announced = true;
       } else {
         process.stdout.write('.');
       }
 
-      const wait = Math.min(NGA_POLL_MS, deadline - performance.now());
+      const wait = Math.min(POLL_MS, deadline - performance.now());
       if (wait > 0) await sleep(wait);
     }
   }
@@ -117,7 +121,9 @@ function formatResult(result) {
 
 const results = new Map();
 
-const parallelSources = sources.filter((source) => source.id !== 'nga');
+const preparedIds = new Set(['loc', 'nga']);
+const parallelSources = sources.filter((source) => !preparedIds.has(source.id));
+const locSource = sources.find((source) => source.id === 'loc');
 const ngaSource = sources.find((source) => source.id === 'nga');
 
 const parallelResults = await Promise.all(
@@ -127,8 +133,12 @@ for (const { source, result } of parallelResults) {
   results.set(source.id, result);
 }
 
+if (locSource) {
+  results.set(locSource.id, await runPrepared(locSource));
+}
+
 if (ngaSource) {
-  results.set(ngaSource.id, await runNga(ngaSource));
+  results.set(ngaSource.id, await runPrepared(ngaSource));
 }
 
 const summary = { OK: 0, WARN: 0, FAIL: 0 };

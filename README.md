@@ -8,7 +8,7 @@ The libraries are:
 - Wikimedia Commons
 - Europeana
 - Internet Archive
-- Library of Congress
+- Library of Congress (Free to Use)
 - Smithsonian Open Access
 - Rijksmuseum
 - The Met
@@ -60,9 +60,23 @@ The keys stay on the server. They are never sent to the browser.
 
 ## Known limits
 
-- **Library of Congress**: loc.gov can answer with a Cloudflare challenge
-  (HTTP 403). The app then shows an error for LoC. The app does not try to
-  bypass it.
+- **Library of Congress (Free to Use)**: the general loc.gov search
+  (`/photos/?fo=json` and the other JSON APIs) answers HTTP 403 with a
+  Cloudflare challenge from some networks. The app does not try to bypass it.
+  So the app searches the LoC "Free to Use" sets
+  (<https://www.loc.gov/free-to-use/>): 101 sets with about 5000 items. The
+  search text is the title, the description and the set names.
+  The first LoC search reads the 101 sets (102 requests, about one minute) and
+  saves them in `data/loc/free-to-use.json`. The file is used again for 7 days.
+  While the data is prepared, the UI shows a message and tries again
+  automatically.
+  Resolution: for Prints & Photographs items the app gets the image from the
+  LoC IIIF server (`tile.loc.gov`). Carol M. Highsmith items (`highsm`) come in
+  the master size (often more than 3000 px). Other Prints & Photographs items
+  (for example `cph`, `det`, `ppmsca`, `mrg`) come as reference images of about
+  1024 px. All other items (for example HABS/HAER/HALS `hhh`, maps, sheet
+  music) give only the small web-size image from the set (about 300 px).
+  The IIIF results are cached in `data/loc/iiif-cache.json`.
 - **National Gallery of Art**: there is no search API. The first NGA search
   downloads the open data CSV files (~175 MB) into `data/nga/` and builds an
   index. This takes a few minutes. The files are refreshed after 30 days.
