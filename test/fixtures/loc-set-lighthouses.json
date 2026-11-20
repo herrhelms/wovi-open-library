@@ -1,0 +1,92 @@
+{
+  "content": {
+    "active": true,
+    "components": [
+      {
+        "blurb": "Heceta Head Lighthouse, Pacific Ocean, Oregon, Cape Hatteras Lighthouse, Outer Banks, North Carolina, Bodie Island Lighthouse, Outer Banks, North Carolina. Lamp inside the lens, Holland Harbor Light,  Lake Michigan, Michigan. Also known as Big Red, Cape St. George Light, Gulf of Mexico, Florida, A chart exhibiting the light houses and light vessels on the coast of the United States of America : from Maine to Virginia inclusive, 1848. Geography & Map Division\n, A chart exhibiting the lighthouses of the lake coast of the United States of America. Great Lakes, 1848. Geography & Map Division, Cape Lookout Lighthouse, Outer Banks, North Carolina, Portland Head Light, Casco Bay, Maine, West Quoddy Head Lighthouse, Lubec, Maine, Fire Island Lighthouse, Atlantic Ocean, New York, Barnegat Lighthouse, Atlantic Ocean, New Jersey, Lynde Point Lighthouse, Long Island Sound, Connecticut, Biloxi Light, Gulf of Mexico, Mississippi, Old Point Loma Lighthouse, San Diego Bay, California, Minot's Ledge Light, Cohasset Harbor, Massachusetts\n, Isles of Shoals Light, Atlantic Ocean, New Hampshire, Erie Land Light,  Lake Erie, Pennsylvania. Also known as Old Presque Isle Light, Point Iroquois Lighthouse, Lake Superior, Michigan, Rose Island Lighthouse, Narragansett Bay, Rhode Island, Au Sable Light Station, Lake Superior, Michigan, Point Fermin Light, San Pedro Bay, California, Spiral staircase at Thirty Mile Point Light, Lake Ontario, New York, Light house and buoys, on display at the International Exhibition, Philadelphia, 1876, Stepping Stones Light, Long Island Sound, New York, Fowey Rocks Light, Key Biscayne, Florida, Cape Neddick Light, Nubble Island, Maine, Edgartown Harbor Light, Martha's Vineyard, Massachusetts\n, Cape Henry lighthouses, Virginia Beach, Virginia, Robbins Reef Light, Bayonne, New Jersey, Middle Bay Light,  Mobile Bay, Alabama, \"Outward Bound,\" 1886\n, \"The Lighthouse by the Sea,\" Sheet music cover, 1886. Music Division\n, Little Red Lighthouse, under the George Washington Bridge, New York City, Fort Point Light Station, Penobscot Bay, Maine. Fog bell, Mona Island Light, Puerto Rico, Devils Island Light, Lake Superior, Wisconsin, Sabine Bank Light, Gulf of Mexico, Texas. Lantern, on display in a museum park, The Mukilteo Light, Possession Sound, Washington, Moloka'i Light, Hawaii\n, Split Rock Lighthouse, Lake Superior, Minnesota. Fresnel lens in lantern, Split Rock Lighthouse, Lake Superior, Minnesota, \"Harbor Entrance and Lights, Buffalo, N.Y.\"\n, Point Vicente Light, Rancho Palos Verdes, California, Tree Point Light, Revillagigedo Channel, Alaska, Frank Schubert polishes the station's lens once a week\n, Harbour Town Lighthouse, Hilton Head, South Carolina, Lighthouse, Lackland Road Putt-Putt miniature golf course, Fort Worth, Texas, Lighthouse, Mulligan's miniature Golf and Games, Ogden, Utah, A decorative lighthouse, Falls Park pond, Pendleton, Indiana",
+        "classes": "masonry-gallery-free-to-use",
+        "files": [
+          "https://www.loc.gov/static/portals/free-to-use/public-domain/lighthouses/manifest.yaml"
+        ],
+        "id": "free-to-use-portal-content-masonry_gallery-1",
+        "masonry_gallery": [
+          {
+            "items": [
+              {
+                "alt": "Color photo shows a white tower and black lantern attached to a low building with a red roof and surrounded by green grass.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-1.jpg",
+                "link": "/resource/highsm.12127/",
+                "title": "Heceta Head Lighthouse, Pacific Ocean, Oregon"
+              },
+              {
+                "alt": "Color photo shows a  very tall tower with spiral bands in black and white. The base is red and surrounded by green grass.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-2.jpg",
+                "link": "/resource/highsm.44760/",
+                "title": "Cape Hatteras Lighthouse, Outer Banks, North Carolina"
+              },
+              {
+                "alt": "Black-and-white photo shows details of the lighting mechanism inside the glass lens.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-3.jpg",
+                "link": "/resource/hhh.nc0497.photos/?sp=24",
+                "title": "Bodie Island Lighthouse, Outer Banks, North Carolina. Lamp inside the lens"
+              },
+              {
+                "alt": "Map with a brown background for both land and water has a red starburst atop a vertical black bar to show lighthouse locations along the Atlantic Ocean coastline. The names of the lighthouses as well as cities, rivers, islands, and  bays, are printed in black.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-6.jpg",
+                "link": "/resource/g3721p.fi000169cr/",
+                "title": "A chart exhibiting the light houses and light vessels on the coast of the United States of America : from Maine to Virginia inclusive, 1848. Geography & Map Division\n"
+              },
+              {
+                "alt": "Black-and-white photo shows a tower with bands of black and white standing behind the keeper's house. A small boy is in the foreground\n",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-11.jpg",
+                "link": "/resource/ppmsca.09037/",
+                "title": "Fire Island Lighthouse, Atlantic Ocean, New York"
+              },
+              {
+                "alt": "Color print shows a lighthouse at night with its bright light shining in a stormy sea and a sailing ship in the background.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-33.jpg",
+                "link": "/resource/ihas.100005404.0/?sp=1",
+                "title": "\"The Lighthouse by the Sea,\" Sheet music cover, 1886. Music Division\n"
+              },
+              {
+                "alt": "Black-and-white photo shows a short, octagonal lighthouse that stands next to another tower with a large steamboat going by and the city across the body of water.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-43.jpg",
+                "link": "/resource/det.4a24366/",
+                "title": "\"Harbor Entrance and Lights, Buffalo, N.Y.\"\n"
+              },
+              {
+                "alt": "Black-and-white photo shows a man looking closely at the lens of a lighthouse.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-46.jpg",
+                "link": "/resource/cph.3c36378/",
+                "title": "Frank Schubert polishes the station's lens once a week\n"
+              },
+              {
+                "alt": "Color photo shows a tower with bands of red and white. Several boats are moored in the harbor in front of the tower, which is reflected in the water.",
+                "image": "/static/portals/free-to-use/public-domain/lighthouses/lighthouses-47.jpg",
+                "link": "/resource/mrg.10350/",
+                "title": "Harbour Town Lighthouse, Hilton Head, South Carolina"
+              }
+            ],
+            "layout": "unaligned"
+          }
+        ],
+        "type": "masonry_gallery"
+      }
+    ],
+    "description": [
+      "<p>This set of images for American lighthouses primarily from the 1800s and 1900s can help you pick out landmarks that you'd like to learn more about. Lighthouses can tell many stories-the lives of their keepers, the engineering feats involved in their construction, and their roles in rescues and preventing disasters. All pictures are from the Prints & Photographs Division unless otherwise credited. </p>\n<p>Browse more <a href=\"/free-to-use/\">content that is free to use and reuse</a>. </p>\n"
+    ],
+    "image_url": [
+      "/static/portals/free-to-use/public-domain/lighthouses/500_500.png"
+    ],
+    "link": "https://www.loc.gov/free-to-use/lighthouses/",
+    "pagination": "64 of 101",
+    "partof": [],
+    "previous_next_page": {
+      "label": "Set"
+    },
+    "slug": "lighthouses",
+    "title": "Lighthouses",
+    "url": "https://www.loc.gov/free-to-use/lighthouses/"
+  }
+}

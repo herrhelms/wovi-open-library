@@ -1,0 +1,50 @@
+{
+  "content": {
+    "active": true,
+    "components": [
+      {
+        "blurb": "Abraham Lincoln, Advertising Food, African American Heritage, African American Women Changemakers, Aircraft, American Revolution and Founding Washington, Arab American Heritage, Architecture & Design, Art of the Book, Artists & Photographers, Asian American Pacific Islander Heritage, Athletes, Autumn and Halloween, Baseball Cards, Bicycles, Birds, Birthdays, Bridges, Cars, Cats, Centennial Exposition 1876, Cherry Blossoms, Civil War Drawings, Classic Children's Books, Clocks & Calendars, Colors Tell the Story, Courthouses, Diners, Drive-Ins and Restaurants, Dinosaurs & Fossils, Disability Awareness, Discovery and Exploration, Dogs, Dragons, Families, Farm Life, Fashion, Fish & Fishing, Flags & Symbols, Football, Friendship, Games for Fun and Relaxation, Gardens, Genealogy, Get Into the Swim, Glasses, Gottlieb Jazz Photos, Hats, Hispanic Heritage, Historic Sites, Historical Travel Pictures, Holidays, Horses, Hotels, Motels & Inns, Ice Cream, Independence Day, Irish Americans, Japanese Fine Prints, Jewish American Heritage, John Margolies Roadside America Photograph Archive, Joy & Sorrow, Kitchens & Baths, LGBTQ+, Libraries, Lighthouses, Main Streets, Maps of Cities, Maritime Life and Coastal Cities, Motion Picture Theaters, Native American Heritage, Natural Disasters, Not an Ostrich, Nurses and Nursing, Older People, Portrait Photos from the 19th-Century, Poster Parade, Presidential Papers, 1780s-1920s, Presidential Portraits, Public Domain Films from the National Film Registry, Reading--Books, Maps, and More, Ride the Rails, Scientists & Inventors, Shoes, Skyscrapers, Statue of Liberty, Teachers & Students, Tennis, Thanksgiving in History, Travel America: Highsmith Archive, Travel Posters, U.S. Presidential Inaugurations, Veterans, Walking, Weddings, Where We Live, Winter, Women's History\n, Work in America, World War I Posters, Work Projects Administration (WPA) Posters, Writers and Writing, Your Favorites from the Library on Flickr",
+        "classes": "free-to-use",
+        "id": "free-to-use-portal-content-summary-1",
+        "results": [
+          {
+            "description": [
+              "<p>This set of images for American lighthouses primarily from the 1800s and 1900s can help you pick out landmarks that you'd like to learn more about. Lighthouses can tell many stories-the lives of their keepers, the engineering feats involved in their construction, and their roles in rescues and preventing disasters. All pictures are from the Prints & Photographs Division unless otherwise credited. </p>\n<p>Browse more <a href=\"/free-to-use/\">content that is free to use and reuse</a>. </p>\n"
+            ],
+            "image_url": [
+              "/static/portals/free-to-use/public-domain/lighthouses/500_500.png"
+            ],
+            "title": "Lighthouses",
+            "url": "https://www.loc.gov/free-to-use/lighthouses/"
+          },
+          {
+            "description": [
+              "<p>Commemorating and encouraging the study, observance and celebration of the vital role of women in American history.</p>\n<p>Visit the <a href='https://womenshistorymonth.gov/'>Women's\nHistory Month site</a>.</p>\n<p>Browse <a href='/free-to-use/'>more content that\nis free to use and reuse</a>.</p>\n"
+            ],
+            "image_url": [
+              "/static/portals/free-to-use/public-domain/womenshistory/500_500.png"
+            ],
+            "title": "Women's History\n",
+            "url": "https://www.loc.gov/free-to-use/womens-history/"
+          }
+        ],
+        "style": "gallery",
+        "summary": "children",
+        "type": "summary"
+      }
+    ],
+    "description": [
+      "More than 100 sets of rights-free images are ready for you to explore and add to your own projects. The topics range widely--from Classic Children’s Books and Disability Awareness to Dragons, Football, Jazz, and Shoes. With 25 to 50 historical photographs, posters, maps, and movies in each set.  Enjoy!\n"
+    ],
+    "image_url": [
+      "/static/portals/free-to-use/public-domain/african-american-heritage/500_500.png"
+    ],
+    "link": "https://www.loc.gov/free-to-use/",
+    "pagination": "1 of 1",
+    "partof": [],
+    "short_title": "Choose a Set",
+    "slug": "",
+    "title": "Free to Use and Reuse Sets",
+    "url": "https://www.loc.gov/free-to-use/"
+  }
+}
