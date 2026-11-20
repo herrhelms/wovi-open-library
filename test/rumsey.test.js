@@ -7,6 +7,7 @@ import { dirname, join } from 'node:path';
 import {
   LICENSE,
   NOTE,
+  SEARCH_TIMEOUT_MS,
   buildSearchUrl,
   group,
   homepage,
@@ -107,14 +108,28 @@ test('rumsey search builds the search URL', async () => {
   assert.ok(buildSearchUrl('moon', 1).includes('os=0'));
 });
 
+test('rumsey search passes the longer timeout', async () => {
+  let opts;
+  const fake = async (_url, requestOpts) => {
+    opts = requestOpts;
+    return fixture.search;
+  };
+  await search('moon', 1, { fetchJson: fake });
+  assert.equal(SEARCH_TIMEOUT_MS, 40000);
+  assert.equal(opts.timeoutMs, 40000);
+});
+
 test('rumsey resolveDownload uses the IIIF width', async () => {
   let requested = '';
-  const fake = async (url) => {
+  let opts;
+  const fake = async (url, requestOpts) => {
     requested = url;
+    opts = requestOpts;
     return fixture.info;
   };
   const resolved = await resolveDownload(FIRST_ID, { fetchJson: fake });
   assert.equal(requested, `${IIIF}/${FIRST_ID}/info.json`);
+  assert.equal(opts.timeoutMs, 20000);
   assert.equal(resolved.url, `${IIIF}/${FIRST_ID}/full/8007,/0/default.jpg`);
   assert.equal(resolved.filename, FIRST_ID);
 });
