@@ -155,7 +155,7 @@ The keys stay on the server. They are never sent to the browser.
   items (`cph`, `det`, `ppmsca`, `mrg`) come at about 1024 px. All other items
   (for example HABS/HAER/HALS `hhh`, maps, sheet music) give only the small
   web-size image from the set (about 300 px).
-  The IIIF results are cached in `data/loc/iiif-cache.json`.
+  The IIIF results are cached in `data/loc/iiif-cache-2.json`.
 - **National Gallery of Art**: there is no search API. The first NGA search
   downloads the open data CSV files (~175 MB) into `data/nga/` and builds an
   index. This takes a few minutes. The files are refreshed after 30 days.

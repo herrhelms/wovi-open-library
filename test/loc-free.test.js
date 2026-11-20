@@ -87,12 +87,12 @@ test('iiifCandidates five digit ids', () => {
 
 test('iiifCandidates prefixed ids', () => {
   assert.deepEqual(iiifCandidates('cph.3c36378'), [
-    `${P}cph:3c30000:3c36000:3c36300:3c36378v`,
     `${P}cph:3c30000:3c36000:3c36300:3c36378`,
+    `${P}cph:3c30000:3c36000:3c36300:3c36378v`,
   ]);
   assert.deepEqual(iiifCandidates('det.4a24366'), [
-    `${P}det:4a20000:4a24000:4a24300:4a24366v`,
     `${P}det:4a20000:4a24000:4a24300:4a24366`,
+    `${P}det:4a20000:4a24000:4a24300:4a24366v`,
   ]);
 });
 

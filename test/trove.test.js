@@ -11,6 +11,7 @@ import {
   keyEnv,
   name,
   normalize,
+  openLicenses,
   parseSearch,
   resolveDownload,
   search,
@@ -68,6 +69,7 @@ test('trove constants', () => {
   assert.equal(group, 'libraries');
   assert.equal(keyEnv, 'TROVE_KEY');
   assert.equal(trustResolvedUrl, true);
+  assert.equal(openLicenses, false);
 });
 
 test('trove buildSearchUrl has the documented parameters and no key', () => {

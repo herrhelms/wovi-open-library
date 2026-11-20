@@ -68,7 +68,8 @@ test('esa-hubble normalize makes an Item', () => {
   assert.equal(item.id, 'heic2017a');
   assert.equal(item.title, "Hubble's View of Jupiter and Europa in August 2020");
   assert.equal(item.thumb, entry.src);
-  assert.equal(item.preview, 'https://cdn.esahubble.org/archives/images/screen/heic2017a.jpg');
+  assert.equal(item.preview, 'https://cdn.esahubble.org/archives/images/large/heic2017a.jpg');
+  assert.equal(item.previewFallback, 'https://cdn.esahubble.org/archives/images/screen/heic2017a.jpg');
   assert.equal(item.full, null);
   assert.equal(item.pageUrl, 'https://esahubble.org/images/heic2017a/');
   assert.equal(item.license, 'CC BY 4.0');
@@ -77,10 +78,29 @@ test('esa-hubble normalize makes an Item', () => {
   assert.equal(item.height, 1375);
 });
 
+test('normalize uses publicationjpg for a width above 4000', () => {
+  const item = hubble.normalize({ id: 'abc123', title: 'Large', width: 6000, height: 4000 });
+  assert.equal(item.preview, 'https://cdn.esahubble.org/archives/images/publicationjpg/abc123.jpg');
+  assert.equal(item.previewFallback, 'https://cdn.esahubble.org/archives/images/screen/abc123.jpg');
+});
+
+test('normalize uses large for a width of 4000 or less', () => {
+  const item = eso.normalize({ id: 'eso42', title: 'Small', width: 3000, height: 2000 });
+  assert.equal(item.preview, 'https://cdn.eso.org/images/large/eso42.jpg');
+  assert.equal(item.previewFallback, 'https://cdn.eso.org/images/screen/eso42.jpg');
+});
+
+test('normalize uses screen when the width is missing', () => {
+  const item = eso.normalize({ id: 'eso43', title: 'Unknown' });
+  assert.equal(item.preview, 'https://cdn.eso.org/images/screen/eso43.jpg');
+  assert.equal(item.previewFallback, undefined);
+});
+
 test('eso normalize makes an Item', () => {
   const entry = parseImageList(esoHtml)[0];
   const item = eso.normalize(entry);
-  assert.equal(item.preview, 'https://cdn.eso.org/images/screen/eso1907a.jpg');
+  assert.equal(item.preview, 'https://cdn.eso.org/images/publicationjpg/eso1907a.jpg');
+  assert.equal(item.previewFallback, 'https://cdn.eso.org/images/screen/eso1907a.jpg');
   assert.ok(item.pageUrl.startsWith('https://www.eso.org/public/images/'));
   assert.equal(item.creator, 'ESO');
 });
