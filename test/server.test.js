@@ -389,6 +389,44 @@ test('GET /api/search upstream error', async () => {
   assert.equal(data.error, 'Upstream down');
 });
 
+test('GET /api/search sends retryAfterSeconds for a rate limit', async () => {
+  const message = 'Wikimedia Commons rate limit reached. Try again in a minute.';
+  const fake = fakeSource('fake', {
+    searchResult: () => {
+      const err = new Error(message);
+      err.code = 'RATE_LIMIT';
+      err.retryAfterSeconds = 12;
+      throw err;
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const res = await fetch(`${base}/api/search?source=fake&q=moon`);
+    assert.equal(res.status, 502);
+    assert.deepEqual(await res.json(), {
+      error: message,
+      code: 'RATE_LIMIT',
+      retryAfterSeconds: 12,
+    });
+  });
+});
+
+test('GET /api/search leaves out retryAfterSeconds without a number', async () => {
+  const fake = fakeSource('fake', {
+    searchResult: () => {
+      const err = new Error('Wikimedia Commons rate limit reached.');
+      err.code = 'RATE_LIMIT';
+      throw err;
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const res = await fetch(`${base}/api/search?source=fake&q=moon`);
+    assert.equal(res.status, 502);
+    const data = await res.json();
+    assert.equal(data.code, 'RATE_LIMIT');
+    assert.equal('retryAfterSeconds' in data, false);
+  });
+});
+
 test('GET /api/download blocks bad hosts and schemes', async () => {
   for (const url of [
     'https://evil.example.com/x.jpg',

@@ -619,6 +619,49 @@ export function shouldAutoLoad({
 }
 
 /**
+ * Delay before the next automatic retry, or null when no retry is done.
+ * `attempt` is the number of retries already done for this code (0 before the
+ * first retry). `random` is a number in [0, 1), as from `Math.random()`.
+ * @param {string|null|undefined} code
+ * @param {number|null|undefined} retryAfterSeconds
+ * @param {number} attempt
+ * @param {number} random
+ * @returns {number|null}
+ */
+export function retryDelay(code, retryAfterSeconds, attempt, random) {
+  const done = Number(attempt) || 0;
+  if (code === 'PREPARING') {
+    return done < 20 ? 15000 : null;
+  }
+  if (code === 'RATE_LIMIT') {
+    if (done >= 3) return null;
+    const seconds =
+      typeof retryAfterSeconds === 'number' &&
+      Number.isFinite(retryAfterSeconds) &&
+      retryAfterSeconds > 0
+        ? retryAfterSeconds
+        : 0;
+    const base = Math.max(seconds * 1000, 15000);
+    const jitter = Math.floor((Number(random) || 0) * 3000);
+    return base + jitter;
+  }
+  return null;
+}
+
+/**
+ * Error list text while a rate limit retry waits.
+ * @param {string|null|undefined} message
+ * @param {number} seconds
+ * @returns {string}
+ */
+export function rateLimitWaitText(message, seconds) {
+  if (typeof message === 'string' && message.startsWith('Wikimedia Commons')) {
+    return `Wikimedia Commons rate limit reached. Trying again in ${seconds} s.`;
+  }
+  return `Rate limit reached. Trying again in ${seconds} s.`;
+}
+
+/**
  * Wait for a number of milliseconds.
  * @param {number} ms
  * @returns {Promise<void>}

@@ -26,6 +26,7 @@ const {
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(readFileSync(join(here, '../../test/fixtures/dpla.json'), 'utf8'));
+const adapterJson = JSON.parse(readFileSync(join(here, 'adapter.json'), 'utf8'));
 
 const savedKey = process.env.DPLA_KEY;
 
@@ -46,6 +47,15 @@ test('dpla constants', () => {
   assert.equal(group, 'aggregators');
   assert.equal(keyEnv, 'DPLA_KEY');
   assert.equal(trustResolvedUrl, true);
+});
+
+test('dpla adaptor has no sign-up link and lists the key steps', () => {
+  assert.equal(adapterJson.key.signupUrl, null);
+  assert.deepEqual(adapterJson.key.steps, [
+    'Send: curl -X POST https://api.dp.la/v2/api_key/<your email>',
+    'DPLA sends the key by email.',
+    'Put DPLA_KEY=<key> in .env in the project root.',
+  ]);
 });
 
 test('dpla parseSearch reads docs and count', () => {

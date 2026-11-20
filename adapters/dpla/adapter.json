@@ -13,9 +13,10 @@
     "env": "DPLA_KEY",
     "required": true,
     "default": null,
-    "signupUrl": "https://api.dp.la/v2/api_key/<your email>",
+    "signupUrl": null,
     "steps": [
       "Send: curl -X POST https://api.dp.la/v2/api_key/<your email>",
+      "DPLA sends the key by email.",
       "Put DPLA_KEY=<key> in .env in the project root."
     ],
     "limits": null

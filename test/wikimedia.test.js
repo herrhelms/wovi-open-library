@@ -1,10 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { createLimiter, fetchCommonsJson } from '../lib/wikimedia.js';
+import {
+  createLimiter,
+  fetchCommonsJson,
+  resetCommonsGate,
+} from '../lib/wikimedia.js';
 import { HttpError } from '../lib/http.js';
 
 const URL_UNDER_TEST = 'https://commons.wikimedia.org/w/api.php?action=query';
+const MESSAGE = 'Wikimedia Commons rate limit reached. Try again in a minute.';
+
+const noLimiter = (fn) => fn();
 
 function http429(retryAfterSeconds) {
   const err = new HttpError('commons.wikimedia.org answered HTTP 429', {
@@ -16,7 +23,19 @@ function http429(retryAfterSeconds) {
   return err;
 }
 
-const noLimiter = (fn) => fn();
+function fakeClock(start = 1_000_000) {
+  let time = start;
+  const sleeps = [];
+  return {
+    now: () => time,
+    sleep: async (ms) => {
+      sleeps.push(ms);
+      time += ms;
+    },
+    sleeps,
+    time: () => time,
+  };
+}
 
 test('createLimiter(2) runs at most two tasks at once and in FIFO order', async () => {
   const run = createLimiter(2);
@@ -60,101 +79,136 @@ test('createLimiter(2) runs at most two tasks at once and in FIFO order', async 
   assert.equal(maxActive, 2);
 });
 
-test('fetchCommonsJson retries once after a 429 and sleeps 2000 ms by default', async () => {
+test('fetchCommonsJson waits Retry-After seconds after a 429', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const startTimes = [];
   let calls = 0;
-  const sleeps = [];
   const fetchJson = async () => {
     calls += 1;
+    startTimes.push(clock.now());
+    if (calls === 1) {
+      const at = clock.now();
+      throw Object.assign(http429(12), { at });
+    }
+    return { ok: true };
+  };
+
+  const result = await fetchCommonsJson(URL_UNDER_TEST, {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(calls, 2);
+  assert.equal(startTimes[1] - startTimes[0], 12_000);
+});
+
+test('fetchCommonsJson uses 5000 ms when Retry-After is missing', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const startTimes = [];
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    startTimes.push(clock.now());
     if (calls === 1) throw http429();
     return { ok: true };
   };
 
   const result = await fetchCommonsJson(URL_UNDER_TEST, {
     fetchJson,
-    sleep: async (ms) => {
-      sleeps.push(ms);
-    },
+    sleep: clock.sleep,
+    now: clock.now,
     limiter: noLimiter,
   });
 
   assert.deepEqual(result, { ok: true });
-  assert.equal(calls, 2);
-  assert.deepEqual(sleeps, [2000]);
+  assert.equal(startTimes[1] - startTimes[0], 5000);
 });
 
-test('fetchCommonsJson uses Retry-After seconds', async () => {
-  const sleeps = [];
+test('fetchCommonsJson caps the pause at 30 000 ms', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const startTimes = [];
   let calls = 0;
   const fetchJson = async () => {
     calls += 1;
-    if (calls === 1) throw http429(3);
-    return { ok: true };
-  };
-
-  const result = await fetchCommonsJson(URL_UNDER_TEST, {
-    fetchJson,
-    sleep: async (ms) => {
-      sleeps.push(ms);
-    },
-    limiter: noLimiter,
-  });
-
-  assert.deepEqual(result, { ok: true });
-  assert.equal(calls, 2);
-  assert.deepEqual(sleeps, [3000]);
-});
-
-test('fetchCommonsJson caps the wait at 5000 ms', async () => {
-  const sleeps = [];
-  let calls = 0;
-  const fetchJson = async () => {
-    calls += 1;
+    startTimes.push(clock.now());
     if (calls === 1) throw http429(60);
     return { ok: true };
   };
 
-  const result = await fetchCommonsJson(URL_UNDER_TEST, {
+  await fetchCommonsJson(URL_UNDER_TEST, {
     fetchJson,
-    sleep: async (ms) => {
-      sleeps.push(ms);
-    },
+    sleep: clock.sleep,
+    now: clock.now,
     limiter: noLimiter,
   });
 
-  assert.deepEqual(result, { ok: true });
-  assert.deepEqual(sleeps, [5000]);
+  assert.equal(startTimes[1] - startTimes[0], 30_000);
 });
 
-test('fetchCommonsJson gives up after a second 429', async () => {
+test('fetchCommonsJson gives up after three 429 answers', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
   let calls = 0;
-  let sleeps = 0;
   const fetchJson = async () => {
     calls += 1;
-    throw http429();
+    throw http429(1);
   };
 
   await assert.rejects(
     fetchCommonsJson(URL_UNDER_TEST, {
       fetchJson,
-      sleep: async () => {
-        sleeps += 1;
-      },
+      sleep: clock.sleep,
+      now: clock.now,
       limiter: noLimiter,
     }),
     (err) => {
       assert.equal(err.code, 'RATE_LIMIT');
-      assert.equal(err.message, 'Wikimedia Commons rate limit reached. Try again in a minute.');
+      assert.equal(err.message, MESSAGE);
+      assert.equal(typeof err.retryAfterSeconds, 'number');
+      assert.ok(err.retryAfterSeconds >= 5);
+      return true;
+    },
+  );
+
+  assert.equal(calls, 3);
+});
+
+test('fetchCommonsJson stops before the third fetch when the total wait is too long', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    throw http429(30);
+  };
+
+  await assert.rejects(
+    fetchCommonsJson(URL_UNDER_TEST, {
+      fetchJson,
+      sleep: clock.sleep,
+      now: clock.now,
+      limiter: noLimiter,
+    }),
+    (err) => {
+      assert.equal(err.code, 'RATE_LIMIT');
+      assert.equal(err.message, MESSAGE);
       return true;
     },
   );
 
   assert.equal(calls, 2);
-  assert.equal(sleeps, 1);
 });
 
 test('fetchCommonsJson rethrows other errors at once without sleeping', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
   let calls = 0;
-  let sleeps = 0;
   const original = new HttpError('commons.wikimedia.org answered HTTP 500', {
     status: 500,
     host: 'commons.wikimedia.org',
@@ -168,16 +222,118 @@ test('fetchCommonsJson rethrows other errors at once without sleeping', async ()
   await assert.rejects(
     fetchCommonsJson(URL_UNDER_TEST, {
       fetchJson,
-      sleep: async () => {
-        sleeps += 1;
-      },
+      sleep: clock.sleep,
+      now: clock.now,
       limiter: noLimiter,
     }),
     (err) => err === original,
   );
 
   assert.equal(calls, 1);
-  assert.equal(sleeps, 0);
+  assert.deepEqual(clock.sleeps, []);
+});
+
+test('fetchCommonsJson leaves at least 250 ms between two starts', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const startTimes = [];
+  const fetchJson = async () => {
+    startTimes.push(clock.now());
+    return { ok: true };
+  };
+
+  const deps = {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  };
+
+  await fetchCommonsJson(URL_UNDER_TEST, deps);
+  await fetchCommonsJson(URL_UNDER_TEST, deps);
+
+  assert.equal(startTimes.length, 2);
+  assert.ok(startTimes[1] - startTimes[0] >= 250);
+});
+
+test('a 429 pauses other queued requests', async () => {
+  resetCommonsGate();
+  const clock = fakeClock(5_000_000);
+  const limiter = createLimiter(2);
+  const startTimes = new Map();
+
+  let noteASleep = null;
+  const aSleeping = new Promise((resolve) => {
+    noteASleep = resolve;
+  });
+
+  const calls = { a: 0, b: 0, c: 0 };
+  const fetcher = (name) => async () => {
+    calls[name] += 1;
+    startTimes.set(`${name}${calls[name]}`, clock.now());
+    if (name === 'a' && calls.a === 1) throw http429(10);
+    return { ok: name };
+  };
+
+  const deps = (name) => ({
+    fetchJson: fetcher(name),
+    sleep: async (ms) => {
+      if (name === 'a') noteASleep();
+      await clock.sleep(ms);
+    },
+    now: clock.now,
+    limiter,
+  });
+
+  const a = fetchCommonsJson(URL_UNDER_TEST, deps('a'));
+  // A has sent its first request and is now paused for 10 s.
+  await aSleeping;
+  const b = fetchCommonsJson(URL_UNDER_TEST, deps('b'));
+  const c = fetchCommonsJson(URL_UNDER_TEST, deps('c'));
+
+  const [ra, rb, rc] = await Promise.all([a, b, c]);
+
+  assert.deepEqual(ra, { ok: 'a' });
+  assert.deepEqual(rb, { ok: 'b' });
+  assert.deepEqual(rc, { ok: 'c' });
+
+  const limitAt = startTimes.get('a1') + 10_000;
+  assert.ok(startTimes.get('b1') >= limitAt);
+  assert.ok(startTimes.get('c1') >= limitAt);
+  assert.ok(startTimes.get('a2') >= limitAt);
+});
+
+test('resetCommonsGate removes the pause of an old 429', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  let calls = 0;
+  const startTimes = [];
+  const fetchJson = async () => {
+    calls += 1;
+    startTimes.push(clock.now());
+    if (calls <= 3) throw http429(20);
+    return { ok: true };
+  };
+
+  await assert.rejects(
+    fetchCommonsJson(URL_UNDER_TEST, {
+      fetchJson,
+      sleep: clock.sleep,
+      now: clock.now,
+      limiter: noLimiter,
+    }),
+  );
+
+  resetCommonsGate();
+  const before = clock.now();
+  await fetchCommonsJson(URL_UNDER_TEST, {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  });
+
+  assert.equal(startTimes.at(-1), before);
 });
 
 test('a throwing task does not block the limiter', async () => {

@@ -15,7 +15,9 @@ import {
   itemKey,
   parseSavedSelection,
   pickColumn,
+  rateLimitWaitText,
   rememberLimited,
+  retryDelay,
   searchKey,
   serializeSelection,
   shouldAutoLoad,
@@ -30,8 +32,6 @@ const STORAGE_KEY = 'olf.sources';
 const OPEN_STORAGE_KEY = 'olf.openOnly';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
-const RETRY_DELAY = 15_000;
-const MAX_RETRIES = 20;
 const DOWNLOAD_DELAY = 800;
 
 // ---------- DOM ----------
@@ -155,6 +155,7 @@ function sourceState(id) {
       error: null,
       code: null,
       retries: 0,
+      rateLimitRetries: 0,
     };
     states.set(id, state);
   }
@@ -298,7 +299,11 @@ function renderErrors() {
   for (const [id, info] of errors) {
     if (!selected.has(id)) continue;
     const li = el('li', {}, [el('strong', { text: sourceName(id) })]);
-    li.append(document.createTextNode(` ${info.message}`));
+    const text =
+      typeof info.waitSeconds === 'number' && Number.isFinite(info.waitSeconds)
+        ? rateLimitWaitText(info.message, info.waitSeconds)
+        : info.message;
+    li.append(document.createTextNode(` ${text}`));
     errorListEl.append(li);
   }
 }
@@ -666,6 +671,9 @@ async function loadSource(id, page, token, gen) {
     if (!response.ok || !data || data.error) {
       const error = new Error(data?.error || `Search failed (HTTP ${response.status})`);
       error.code = data?.code ?? null;
+      error.retryAfterSeconds = Number.isFinite(data?.retryAfterSeconds)
+        ? data.retryAfterSeconds
+        : null;
       throw error;
     }
 
@@ -676,6 +684,7 @@ async function loadSource(id, page, token, gen) {
     state.hasMore = Boolean(data.hasMore);
     state.page = page;
     state.retries = 0;
+    state.rateLimitRetries = 0;
     errors.delete(id);
 
     if (Array.isArray(data.items)) addItems(id, data.items);
@@ -688,11 +697,35 @@ async function loadSource(id, page, token, gen) {
     state.error = error?.message || 'Search failed';
     state.code = error?.code ?? null;
     state.hasMore = false;
-    errors.set(id, { message: state.error, code: state.code });
+
+    const delay =
+      state.code === 'PREPARING'
+        ? retryDelay('PREPARING', null, state.retries, Math.random())
+        : state.code === 'RATE_LIMIT'
+          ? retryDelay(
+              'RATE_LIMIT',
+              error?.retryAfterSeconds ?? null,
+              state.rateLimitRetries,
+              Math.random(),
+            )
+          : null;
+
+    if (typeof delay === 'number' && state.code === 'RATE_LIMIT') {
+      errors.set(id, {
+        message: state.error,
+        code: state.code,
+        waitSeconds: Math.ceil(delay / 1000),
+      });
+    } else {
+      errors.set(id, { message: state.error, code: state.code });
+    }
     renderErrors();
     updateChip(id);
-    if (state.code === 'PREPARING' && state.retries < MAX_RETRIES) {
-      scheduleRetry(id, page, token, gen);
+
+    if (typeof delay === 'number') {
+      if (state.code === 'RATE_LIMIT') state.rateLimitRetries += 1;
+      else state.retries += 1;
+      scheduleRetry(id, page, token, gen, delay);
     }
   } finally {
     if (controllers.get(id) === controller) controllers.delete(id);
@@ -704,16 +737,14 @@ async function loadSource(id, page, token, gen) {
   }
 }
 
-function scheduleRetry(id, page, token, gen) {
-  const state = sourceState(id);
-  state.retries += 1;
+function scheduleRetry(id, page, token, gen, delay) {
   cancelRetry(id);
   const timer = setTimeout(() => {
     retryTimers.delete(id);
     if (!isValidToken(id, token, gen)) return;
     if (!selected.has(id)) return;
     loadSource(id, page, token, gen);
-  }, RETRY_DELAY);
+  }, delay);
   retryTimers.set(id, timer);
 }
 
@@ -731,6 +762,7 @@ function invalidateToken(id) {
 function startLoad(id, page, gen) {
   const state = sourceState(id);
   if (state.status === 'loading') return;
+  state.rateLimitRetries = 0;
   const token = newToken(id);
   loadSource(id, page, token, gen);
 }
