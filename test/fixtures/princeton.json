@@ -1,0 +1,175 @@
+{
+  "search": {
+    "took": 10,
+    "timed_out": false,
+    "_shards": {
+      "total": 5,
+      "successful": 5,
+      "skipped": 0,
+      "failed": 0
+    },
+    "hits": {
+      "total": 366,
+      "max_score": 58.771446,
+      "hits": [
+        {
+          "_index": "prod-10-15-2025",
+          "_id": "33432",
+          "_score": 58.771446,
+          "_source": {
+            "displaymaker": "Toshiko Takaezu, 1922–2011; born Pepe’ekeo, HI; died Honolulu, HI",
+            "objectnumber": "y1990-61",
+            "creditline": "Gift from members of the Class of 1969",
+            "displaydate": "1987–88",
+            "primaryimage": [
+              "https://media.artmuseum.princeton.edu/iiif/3/collection/y1990-61_1_Sl"
+            ],
+            "medium": "Stoneware",
+            "displaytitle": "Moon",
+            "objectid": 33432,
+            "dimensions": "h. 55.8 cm, diam. 55.5 cm (21 15/16 × 21 7/8 in.)"
+          },
+          "_type": "artobjects"
+        },
+        {
+          "_index": "prod-10-15-2025",
+          "_id": "52939",
+          "_score": 53.709328,
+          "_source": {
+            "displaymaker": null,
+            "objectnumber": "2007-28",
+            "creditline": "Museum purchase",
+            "displaydate": "1969",
+            "primaryimage": [
+              "https://media.artmuseum.princeton.edu/iiif/3/collection/INV16735"
+            ],
+            "medium": "Gelatin silver print",
+            "displaytitle": "Moon on television",
+            "objectid": 52939,
+            "dimensions": "image: 8 x 11.8 cm. (3 1/8 x 4 5/8 in.)\r\nsheet: 9 x 12.6 cm. (3 9/16 x 4 15/16 in.)"
+          },
+          "_type": "artobjects"
+        },
+        {
+          "_index": "prod-10-15-2025",
+          "_id": "10546",
+          "_score": 51.837704,
+          "_source": {
+            "displaymaker": "R. William Woiceske, American, 1887–1953",
+            "objectnumber": "x1969-210",
+            "creditline": "Gift of David H. McAlpin, Class of 1920, and Mrs. McAlpin, in memory of Prof. Clifton R. Hall",
+            "displaydate": null,
+            "primaryimage": [
+              "https://media.artmuseum.princeton.edu/iiif/3/collection/INV28951"
+            ],
+            "medium": "Etching and aquatint",
+            "displaytitle": "Moon Shadows",
+            "objectid": 10546,
+            "dimensions": "plate: 22.6 x 29.9 cm (8 7/8 x 11 3/4 in.)\r\nsheet: 31.7 x 38.3 cm (12 1/2 x 15 1/16 in.)"
+          },
+          "_type": "artobjects"
+        }
+      ]
+    },
+    "status": 200
+  },
+  "objects": {
+    "10546": {
+      "objectid": 10546,
+      "displaytitle": "Moon Shadows",
+      "displaymaker": "R. William Woiceske, American, 1887–1953",
+      "displaydate": null,
+      "primaryimage": [
+        "https://media.artmuseum.princeton.edu/iiif/3/collection/INV28951"
+      ],
+      "creditline": "Gift of David H. McAlpin, Class of 1920, and Mrs. McAlpin, in memory of Prof. Clifton R. Hall",
+      "dimensions": "plate: 22.6 x 29.9 cm (8 7/8 x 11 3/4 in.)\r\nsheet: 31.7 x 38.3 cm (12 1/2 x 15 1/16 in.)",
+      "medium": "Etching and aquatint",
+      "objectnumber": "x1969-210",
+      "restrictions": null,
+      "creditlinerepro": null,
+      "media": [
+        {
+          "id": 104529,
+          "uri": "https://media.artmuseum.princeton.edu/iiif/3/collection/INV28951",
+          "isprimary": 1,
+          "rank": 1,
+          "mediatypeid": 1,
+          "mediaviewtype": "(not assigned)",
+          "restrictions": null,
+          "caption": "Inventory Project"
+        }
+      ],
+      "nowebuse": "False",
+      "hasimage": "true"
+    },
+    "33432": {
+      "objectid": 33432,
+      "displaytitle": "Moon",
+      "displaymaker": "Toshiko Takaezu, 1922–2011; born Pepe’ekeo, HI; died Honolulu, HI",
+      "displaydate": "1987–88",
+      "primaryimage": [
+        "https://media.artmuseum.princeton.edu/iiif/3/collection/y1990-61_1_Sl"
+      ],
+      "creditline": "Gift from members of the Class of 1969",
+      "dimensions": "h. 55.8 cm, diam. 55.5 cm (21 15/16 × 21 7/8 in.)",
+      "medium": "Stoneware",
+      "objectnumber": "y1990-61",
+      "restrictions": "Restricted",
+      "creditlinerepro": "© Family of Toshiko Takaezu",
+      "media": [
+        {
+          "id": 7929,
+          "uri": "https://media.artmuseum.princeton.edu/iiif/3/collection/y1990-61_1_Sl",
+          "isprimary": 1,
+          "rank": 1,
+          "mediatypeid": 1,
+          "mediaviewtype": "(not assigned)",
+          "restrictions": "Restricted",
+          "caption": "Luna Digitization Project"
+        },
+        {
+          "id": 7930,
+          "uri": "https://media.artmuseum.princeton.edu/iiif/3/collection/y1990-61_2_SL",
+          "isprimary": 0,
+          "rank": 2,
+          "mediatypeid": 1,
+          "mediaviewtype": "(not assigned)",
+          "restrictions": "Restricted",
+          "caption": "Luna Digitization Project"
+        }
+      ],
+      "nowebuse": "False",
+      "hasimage": "true"
+    },
+    "122370": {
+      "objectid": 122370,
+      "displaytitle": "Young Indian Woman with Braids",
+      "displaymaker": "Karl Everton Moon, American, 1878–1948",
+      "displaydate": "ca. 1903–14",
+      "primaryimage": [
+        "https://media.artmuseum.princeton.edu/iiif/3/collection/PUAMSTU2016_11424"
+      ],
+      "creditline": "Gift of Sarah Garvey",
+      "dimensions": "49.5 × 39.4 cm (19 1/2 × 15 1/2 in.)\r\nframe: 76.8 × 66.4 × 3.8 cm (30 1/4 × 26 1/8 × 1 1/2 in.)",
+      "medium": "Platinum print with hand coloring",
+      "objectnumber": "2015-6748",
+      "restrictions": null,
+      "creditlinerepro": null,
+      "media": [
+        {
+          "id": 196673,
+          "uri": "https://media.artmuseum.princeton.edu/iiif/3/collection/PUAMSTU2016_11424",
+          "isprimary": 1,
+          "rank": 1,
+          "mediatypeid": 1,
+          "mediaviewtype": "(not assigned)",
+          "restrictions": null,
+          "caption": "PUAM photo"
+        }
+      ],
+      "nowebuse": "False",
+      "hasimage": "true"
+    }
+  }
+}
