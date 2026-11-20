@@ -1,0 +1,77 @@
+{
+  "meta": {
+    "pages": {
+      "current_page": 1,
+      "next_page": 2,
+      "prev_page": null,
+      "total_pages": 58,
+      "limit_value": 3,
+      "offset_value": 0,
+      "total_count": 173,
+      "first_page?": true,
+      "last_page?": false
+    }
+  },
+  "data": [
+    {
+      "id": "commonwealth:v405tb76c",
+      "type": "DigitalObject",
+      "attributes": {
+        "id": "commonwealth:v405tb76c",
+        "title_info_primary_tsi": "Full moon",
+        "genre_basic_ssim": ["Photographs"],
+        "date_tsim": ["[ca. 1850–1920]"],
+        "subject_topic_tsim": ["Moon", "Astronomy"],
+        "identifier_uri_ss": "https://ark.digitalcommonwealth.org/ark:/50959/v405tb76c",
+        "identifier_iiif_manifest_ss": "https://ark.digitalcommonwealth.org/ark:/50959/v405tb76c/manifest",
+        "rights_ss": "No known copyright restrictions.",
+        "license_ss": "No known restrictions on use.",
+        "reuse_allowed_ssi": "no restrictions",
+        "exemplary_image_ssi": "commonwealth:v405tb77n",
+        "institution_name_ssi": "Boston Public Library"
+      }
+    },
+    {
+      "id": "commonwealth:00002h08n",
+      "type": "DigitalObject",
+      "attributes": {
+        "id": "commonwealth:00002h08n",
+        "title_info_primary_tsi": "Full moon",
+        "genre_basic_ssim": ["Photographs"],
+        "date_tsim": ["[ca. 1879–1930]"],
+        "name_tsim": ["Bierstadt, Charles, 1819-1903", "Underwood & Underwood"],
+        "subject_topic_tsim": ["Moon"],
+        "identifier_uri_ss": "https://ark.digitalcommonwealth.org/ark:/50959/00002h08n",
+        "identifier_iiif_manifest_ss": "https://ark.digitalcommonwealth.org/ark:/50959/00002h08n/manifest",
+        "rights_ss": "No known copyright restrictions.",
+        "license_ss": "No known restrictions on use.",
+        "reuse_allowed_ssi": "no restrictions",
+        "exemplary_image_ssi": "commonwealth:tb09mn80q",
+        "institution_name_ssi": "Boston Public Library"
+      }
+    },
+    {
+      "id": "commonwealth:restricted0001",
+      "type": "DigitalObject",
+      "attributes": {
+        "id": "commonwealth:restricted0001",
+        "title_info_primary_tsi": "Restricted item",
+        "rights_ss": "All rights reserved.",
+        "reuse_allowed_ssi": "all rights reserved",
+        "exemplary_image_ssi": "commonwealth:restricted0001a",
+        "institution_name_ssi": "Boston Public Library"
+      }
+    },
+    {
+      "id": "commonwealth:noimage0001",
+      "type": "DigitalObject",
+      "attributes": {
+        "id": "commonwealth:noimage0001",
+        "title_info_primary_tsi": "Item without image",
+        "rights_ss": "No known copyright restrictions.",
+        "reuse_allowed_ssi": "no restrictions",
+        "institution_name_ssi": "Boston Public Library"
+      }
+    }
+  ]
+}
