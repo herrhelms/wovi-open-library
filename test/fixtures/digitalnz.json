@@ -1,0 +1,121 @@
+{
+  "search": {
+    "page": 1,
+    "per_page": 3,
+    "result_count": 2055,
+    "request_url": "https://api.digitalnz.org/v3/records.json?text=moon&and%5Bcategory%5D%5B%5D=Images&and%5Busage%5D%5B%5D=Use%20commercially&per_page=3&page=1&fields=id,title,large_thumbnail_url,thumbnail_url,object_url,landing_url,rights_url,usage,content_partner,creator,date",
+    "results": [
+      {
+        "id": 33835304,
+        "title": "\"Full Moon\" : Stereograph",
+        "content_partner": [
+          "Wairarapa Archive"
+        ],
+        "creator": [],
+        "usage": [
+          "Share",
+          "Modify",
+          "Use commercially"
+        ],
+        "date": [
+          ""
+        ],
+        "landing_url": "https://masterton.spydus.co.nz/cgi-bin/spydus.exe/ENQ/OPAC/ARCENQ?SETLVL=&RNI=523490",
+        "rights_url": [
+          "https://masterton.spydus.co.nz/cgi-bin/spydus.exe/MSGTRNGEN/OPAC/PICTUREWAIRARAPA"
+        ],
+        "object_url": null,
+        "thumbnail_url": "https://stspydusproduction.blob.core.windows.net/smartlive-mp-pub/a459bc2d-6640-4cf9-af07-8922efc9cc01_lt.jpg",
+        "large_thumbnail_url": "https://stspydusproduction.blob.core.windows.net/smartlive-mp-pub/a459bc2d-6640-4cf9-af07-8922efc9cc01_lt.jpg"
+      },
+      {
+        "id": 43346385,
+        "title": "Photograph of the full moon",
+        "content_partner": [
+          "Auckland Libraries"
+        ],
+        "creator": [
+          "New Zealand Graphic"
+        ],
+        "usage": [
+          "Share",
+          "Modify",
+          "Use commercially"
+        ],
+        "date": [
+          "1909-07-28T00:00:00Z",
+          "1900-01-01T00:00:00Z",
+          "1909-01-01T00:00:00Z"
+        ],
+        "landing_url": "https://kura.aucklandlibraries.govt.nz/digital/collection/photos/id/153842",
+        "rights_url": [],
+        "object_url": null,
+        "thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153842/default.jpg",
+        "large_thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153842/default.jpg"
+      },
+      {
+        "id": 43346387,
+        "title": "Photograph of a portion of the moon",
+        "content_partner": [
+          "Auckland Libraries"
+        ],
+        "creator": [
+          "New Zealand Graphic"
+        ],
+        "usage": [
+          "Share",
+          "Modify",
+          "Use commercially"
+        ],
+        "date": [
+          "1909-07-28T00:00:00Z",
+          "1900-01-01T00:00:00Z",
+          "1909-01-01T00:00:00Z"
+        ],
+        "landing_url": "https://kura.aucklandlibraries.govt.nz/digital/collection/photos/id/153843",
+        "rights_url": [],
+        "object_url": null,
+        "thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153843/default.jpg",
+        "large_thumbnail_url": "https://kura.aucklandlibraries.govt.nz/digital/api/singleitem/image/photos/153843/default.jpg"
+      },
+      {
+        "id": 90000001,
+        "title": "Moon chart with a full size image",
+        "content_partner": [
+          "Example Partner"
+        ],
+        "creator": [
+          "Example Maker"
+        ],
+        "date": [
+          "1909-07-28T00:00:00Z"
+        ],
+        "landing_url": "https://digitalnz.org/records/90000001",
+        "rights_url": [
+          "https://digitalnz.org/terms-of-use"
+        ],
+        "object_url": "https://example.org/images/90000001-full.jpg",
+        "thumbnail_url": "https://example.org/images/90000001-thumb.jpg",
+        "large_thumbnail_url": "https://example.org/images/90000001-large.jpg"
+      },
+      {
+        "id": 90000002,
+        "title": "Record without an image",
+        "content_partner": [
+          "Example Partner"
+        ],
+        "creator": [],
+        "date": [
+          ""
+        ],
+        "landing_url": "https://digitalnz.org/records/90000002",
+        "rights_url": [],
+        "object_url": null,
+        "thumbnail_url": null,
+        "large_thumbnail_url": null
+      }
+    ],
+    "facets": {}
+  },
+  "api_terms_of_use": "https://api.digitalnz.org/terms-of-use"
+}
