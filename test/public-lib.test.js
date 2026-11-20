@@ -2,18 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  columnCount,
   DEFAULT_GROUPS,
+  distribute,
   downloadUrl,
+  estimateCardHeight,
   firstLoaded,
   groupSources,
   imageCandidates,
   isSearchable,
   isUpgrade,
   isUsable,
+  itemKey,
   parseSavedSelection,
+  pickColumn,
   serializeSelection,
   shouldAutoLoad,
   subtitleText,
+  thumbCandidates,
   VIEWER_PROBE_TIMEOUT_MS,
   viewerPlan,
 } from '../public/lib.js';
@@ -364,4 +370,77 @@ test('downloadUrl keeps the existing behaviour', () => {
   const params = new URLSearchParams(other.split('?')[1]);
   assert.equal(params.get('url'), 'https://example.org/b.jpg');
   assert.equal(params.get('id'), '2');
+});
+
+test('columnCount counts columns for a window width', () => {
+  assert.equal(columnCount(1000, 240, 24), 3);
+  assert.equal(columnCount(504, 240, 24), 2);
+  assert.equal(columnCount(503, 240, 24), 1);
+  assert.equal(columnCount(240), 1);
+  assert.equal(columnCount(0, 240, 24), 1);
+  assert.equal(columnCount(NaN), 1);
+  assert.equal(columnCount(1000), 4);
+  assert.equal(columnCount(1000, 240, -5), 4);
+});
+
+test('pickColumn gives the first smallest index', () => {
+  assert.equal(pickColumn([10, 5, 5]), 1);
+  assert.equal(pickColumn([0, 0]), 0);
+  assert.equal(pickColumn([]), 0);
+  assert.equal(pickColumn(null), 0);
+});
+
+test('estimateCardHeight uses the image ratio and adds card text', () => {
+  assert.equal(estimateCardHeight({ width: 400, height: 200 }, 240), 192);
+  assert.equal(estimateCardHeight({ width: '400', height: '200' }, 240), 192);
+  assert.equal(estimateCardHeight({}, 240), 312);
+  assert.equal(estimateCardHeight({ width: 0, height: 100 }, 240), 312);
+  assert.equal(estimateCardHeight(null, 200), 272);
+});
+
+test('distribute fills the shortest column', () => {
+  assert.deepEqual(distribute([100, 50, 30, 40], 2), [0, 1, 1, 1]);
+  assert.deepEqual(distribute([100, 50, 30, 40], 2, 30), [0, 1, 1, 0]);
+  assert.deepEqual(distribute([], 3), []);
+  assert.deepEqual(distribute([10, 10, 10], 1), [0, 0, 0]);
+  assert.deepEqual(distribute([10, 10, 10], 0), [0, 0, 0]);
+  assert.deepEqual(distribute([5, 5, 5], 3), [0, 1, 2]);
+});
+
+test('thumbCandidates keeps non-empty URLs in order', () => {
+  assert.deepEqual(
+    thumbCandidates({ thumb: '/api/thumb/m1', thumbSource: 's', thumbFallback: 'f' }),
+    ['/api/thumb/m1', 's', 'f'],
+  );
+  assert.deepEqual(thumbCandidates({ thumb: 's', thumbSource: 's', thumbFallback: '' }), [
+    's',
+  ]);
+  assert.deepEqual(thumbCandidates({ thumb: 't', thumbFallback: 'f' }), ['t', 'f']);
+  assert.deepEqual(thumbCandidates(null), []);
+});
+
+test('itemKey prefers uid and falls back to source:id', () => {
+  assert.equal(itemKey({ uid: 'a:1', source: 'b', id: '2' }), 'a:1');
+  assert.equal(itemKey({ uid: '', source: 'b', id: '2' }), 'b:2');
+  assert.equal(itemKey({ source: 'b', id: 2 }), 'b:2');
+});
+
+test('viewerPlan uses the thumb candidates and drops thumb URLs', () => {
+  assert.deepEqual(
+    viewerPlan({ thumb: '/api/thumb/m1', thumbSource: 's', preview: 's', previewFallback: 'p' }),
+    { small: ['/api/thumb/m1', 's'], large: ['p'] },
+  );
+  assert.deepEqual(
+    viewerPlan({
+      thumb: '/api/thumb/m1',
+      thumbSource: 's',
+      thumbFallback: 'f',
+      preview: 'f',
+    }),
+    { small: ['/api/thumb/m1', 's', 'f'], large: ['f'] },
+  );
+  assert.deepEqual(viewerPlan({ thumb: 't', thumbSource: 't', preview: 'p' }), {
+    small: ['t'],
+    large: ['p'],
+  });
 });

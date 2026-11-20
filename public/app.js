@@ -4,17 +4,22 @@
  */
 import {
   DEFAULT_GROUPS,
+  columnCount,
+  distribute,
   downloadUrl,
   el,
+  estimateCardHeight,
   groupSources,
   isSearchable,
   isUsable,
   itemKey,
   parseSavedSelection,
+  pickColumn,
   serializeSelection,
   shouldAutoLoad,
   sleep,
   subtitleText,
+  thumbCandidates,
 } from './lib.js';
 import { openViewer } from './viewer.js';
 
@@ -67,9 +72,19 @@ const controllers = new Map();
 const retryTimers = new Map();
 const errors = new Map();
 const chipEls = new Map();
-const batches = [];
+/** @type {Array<{el:HTMLElement,item:object,checkbox:HTMLInputElement,img:HTMLImageElement,key:string,sourceId:string,mediaId:string|null}>} */
+const records = [];
 const displayedKeys = new Set();
+const displayedMedia = new Set();
 const cardsByKey = new Map();
+/** Search request token for each source id. */
+const requestTokens = new Map();
+/** mediaId values that already got a warm request. */
+const warmSent = new Set();
+let tokenCounter = 0;
+let masonryEl = null;
+let masonryCols = [];
+let resizeTimer = 0;
 /** @type {Map<string, object>} itemKey -> item */
 const selection = new Map();
 
@@ -151,12 +166,9 @@ function searchableSelected() {
 
 function sourceShownCount(id) {
   let count = 0;
-  for (const batch of batches) {
-    const items = batch.sourceItems.get(id);
-    if (!items) continue;
-    for (const record of items) {
-      if (!record.el.hidden) count += 1;
-    }
+  for (const record of records) {
+    if (record.sourceId !== id) continue;
+    if (!record.el.hidden) count += 1;
   }
   return count;
 }
@@ -317,17 +329,20 @@ function metaLine(item) {
   return parts.join(' · ');
 }
 
-function createCard(item, key) {
-  const article = el('article', { class: 'card', 'data-key': key });
+function createCard(item, key, sourceId, mediaId) {
+  const dataset = { uid: key, source: sourceId };
+  if (mediaId !== null) dataset.mediaId = mediaId;
+  const article = el('article', { class: 'card', dataset });
   const checkbox = el('input', {
     type: 'checkbox',
     'aria-label': `Select ${item.title || 'item'}`,
   });
   const checkWrap = el('label', { class: 'card-check' }, [checkbox]);
 
+  const candidates = thumbCandidates(item);
   const img = el('img', {
     class: 'card-media',
-    src: item.thumb,
+    src: candidates[0],
     alt: item.title || '',
     loading: 'lazy',
     decoding: 'async',
@@ -338,22 +353,32 @@ function createCard(item, key) {
     img.setAttribute('width', String(Math.round(width)));
     img.setAttribute('height', String(Math.round(height)));
   }
-  let fallbackTried = false;
+
+  let candidateIndex = 0;
   img.addEventListener('error', () => {
-    const fallback = item.thumbFallback;
-    if (
-      !fallbackTried &&
-      typeof fallback === 'string' &&
-      fallback !== '' &&
-      fallback !== img.src
-    ) {
-      fallbackTried = true;
-      img.src = fallback;
+    if (candidateIndex + 1 < candidates.length) {
+      candidateIndex += 1;
+      img.src = candidates[candidateIndex];
       return;
     }
     article.hidden = true;
     if (selection.delete(key)) updateSelectionUi();
     updateUi();
+  });
+
+  img.addEventListener('load', () => {
+    if (item.thumbCached === true) return;
+    if (typeof mediaId !== 'string' || mediaId === '') return;
+    if (img.src !== item.thumbSource) return;
+    if (warmSent.has(mediaId)) return;
+    warmSent.add(mediaId);
+    try {
+      Promise.resolve(
+        fetch(`/api/thumb/${mediaId}/warm`, { method: 'POST' }),
+      ).catch(() => {});
+    } catch {
+      // A warm request is a cache hint only; ignore all errors.
+    }
   });
 
   const bodyChildren = [
@@ -372,94 +397,116 @@ function createCard(item, key) {
   checkbox.addEventListener('change', () => toggleSelection(key, checkbox.checked));
   article.append(checkWrap, openButton);
 
-  return { el: article, item, checkbox, img };
+  return { el: article, item, checkbox, img, key, sourceId, mediaId };
 }
 
 function visibleRecords() {
-  const records = [];
-  for (const batch of batches) {
-    for (const child of batch.el.children) {
-      if (!child.classList.contains('card') || child.hidden) continue;
-      const record = cardsByKey.get(child.dataset.key);
-      if (record) records.push(record);
-    }
-  }
-  return records;
+  return records.filter((record) => !record.el.hidden);
 }
 
 function visibleItems() {
   return visibleRecords().map((record) => record.item);
 }
 
-function itemsOf(records) {
-  return records.map((record) => record.item);
+function itemsOf(list) {
+  return list.map((record) => record.item);
 }
 
 function openCard(key) {
-  const records = visibleRecords();
-  const index = records.findIndex((record) => `${record.item.source}:${record.item.id}` === key);
+  const shown = visibleRecords();
+  const index = shown.findIndex((record) => record.key === key);
   if (index < 0) return;
-  openViewer(itemsOf(records), index);
+  openViewer(itemsOf(shown), index);
 }
 
-// ---------- Batch handling ----------
-function createBatch() {
-  const batch = {
-    el: el('div', { class: 'batch' }),
-    sourceItems: new Map(),
-  };
-  batches.push(batch);
-  resultsEl.append(batch.el);
-  return batch;
+// ---------- Masonry grid ----------
+function masonryGap() {
+  if (!masonryEl) return 0;
+  const style = getComputedStyle(masonryEl);
+  const raw = style.columnGap || style.gap || '';
+  const value = Number.parseFloat(raw);
+  return Number.isFinite(value) && value >= 0 ? value : 0;
 }
 
-function addItems(batch, sourceId, items) {
-  let sourceItems = batch.sourceItems.get(sourceId);
-  if (!sourceItems) {
-    sourceItems = [];
-    batch.sourceItems.set(sourceId, sourceItems);
+function createMasonry() {
+  masonryEl = el('div', { class: 'masonry' });
+  masonryCols = [];
+  resultsEl.append(masonryEl);
+  const count = columnCount(resultsEl.clientWidth, 240, masonryGap());
+  for (let index = 0; index < count; index += 1) {
+    const column = el('div', { class: 'masonry-col' });
+    masonryCols.push(column);
+    masonryEl.append(column);
   }
+}
+
+function addItems(sourceId, items) {
+  if (!Array.isArray(items)) return;
+  const prepared = [];
 
   for (const item of items) {
-    if (!item || item.id === undefined || item.id === null || !item.thumb) continue;
+    if (!item) continue;
+    if (item.id === undefined || item.id === null) continue;
+    if (thumbCandidates(item).length === 0) continue;
     const key = itemKey(item);
     if (displayedKeys.has(key)) continue;
+    const mediaId =
+      typeof item.mediaId === 'string' && item.mediaId !== '' ? item.mediaId : null;
+    if (mediaId !== null && displayedMedia.has(mediaId)) continue;
     displayedKeys.add(key);
-    const record = createCard(item, key);
-    cardsByKey.set(key, record);
-    sourceItems.push(record);
+    if (mediaId !== null) displayedMedia.add(mediaId);
+    prepared.push({ item, key, mediaId });
+  }
+
+  if (prepared.length === 0) return;
+  if (!masonryEl || masonryCols.length === 0) createMasonry();
+
+  const heights = masonryCols.map((column) => column.offsetHeight);
+  const firstWidth = masonryCols[0]?.clientWidth ?? 0;
+  const columnWidth = firstWidth > 0 ? firstWidth : resultsEl.clientWidth;
+  const gap = masonryGap();
+
+  for (const entry of prepared) {
+    const columnIndex = pickColumn(heights);
+    const record = createCard(entry.item, entry.key, sourceId, entry.mediaId);
+    masonryCols[columnIndex].append(record.el);
+    records.push(record);
+    cardsByKey.set(record.key, record);
+    heights[columnIndex] += estimateCardHeight(entry.item, columnWidth) + gap;
   }
 }
 
-function reorderBatch(batch) {
-  const order = registry.map((source) => source.id);
-  let max = 0;
-  for (const items of batch.sourceItems.values()) {
-    if (items.length > max) max = items.length;
+function reflowMasonry() {
+  if (!masonryEl) return;
+  const gap = masonryGap();
+  const count = columnCount(resultsEl.clientWidth, 240, gap);
+  if (count === masonryCols.length) return;
+
+  const heights = records.map((record) => record.el.offsetHeight);
+  masonryEl.replaceChildren();
+  masonryCols = [];
+  for (let index = 0; index < count; index += 1) {
+    const column = el('div', { class: 'masonry-col' });
+    masonryCols.push(column);
+    masonryEl.append(column);
   }
 
-  const fragment = document.createDocumentFragment();
-  for (let index = 0; index < max; index += 1) {
-    for (const id of order) {
-      const items = batch.sourceItems.get(id);
-      if (items && items[index]) fragment.append(items[index].el);
-    }
-  }
-  batch.el.append(fragment);
+  const indexes = distribute(heights, count, gap);
+  records.forEach((record, index) => {
+    masonryCols[indexes[index]].append(record.el);
+  });
 }
 
 function removeSourceCards(id) {
-  for (const batch of batches) {
-    const items = batch.sourceItems.get(id);
-    if (!items) continue;
-    for (const record of items) {
-      const key = `${record.item.source}:${record.item.id}`;
-      record.el.remove();
-      displayedKeys.delete(key);
-      cardsByKey.delete(key);
-      selection.delete(key);
-    }
-    batch.sourceItems.delete(id);
+  for (let index = records.length - 1; index >= 0; index -= 1) {
+    const record = records[index];
+    if (record.sourceId !== id) continue;
+    records.splice(index, 1);
+    record.el.remove();
+    displayedKeys.delete(record.key);
+    if (record.mediaId !== null) displayedMedia.delete(record.mediaId);
+    cardsByKey.delete(record.key);
+    selection.delete(record.key);
   }
   updateSelectionUi();
 }
@@ -481,9 +528,15 @@ function cancelRetry(id) {
   retryTimers.delete(id);
 }
 
-async function loadSource(id, page, batch, gen) {
-  if (!batch || !batch.el.isConnected) return;
+function isValidToken(id, token, gen) {
+  if (gen !== generation) return false;
+  return requestTokens.get(id) === token;
+}
+
+async function loadSource(id, page, token, gen) {
+  if (!isValidToken(id, token, gen)) return;
   const state = sourceState(id);
+  if (state.status === 'loading') return;
   state.status = 'loading';
   state.error = null;
   state.code = null;
@@ -507,7 +560,7 @@ async function loadSource(id, page, batch, gen) {
       data = null;
     }
 
-    if (gen !== generation || !batch.el.isConnected) return;
+    if (!isValidToken(id, token, gen)) return;
     if (!response.ok || !data || data.error) {
       const error = new Error(data?.error || `Search failed (HTTP ${response.status})`);
       error.code = data?.code ?? null;
@@ -523,13 +576,12 @@ async function loadSource(id, page, batch, gen) {
     state.retries = 0;
     errors.delete(id);
 
-    if (Array.isArray(data.items)) addItems(batch, id, data.items);
-    reorderBatch(batch);
+    if (Array.isArray(data.items)) addItems(id, data.items);
     renderErrors();
     updateChip(id);
   } catch (error) {
     if (error?.name === 'AbortError') return;
-    if (gen !== generation || !batch.el.isConnected) return;
+    if (!isValidToken(id, token, gen)) return;
     state.status = 'error';
     state.error = error?.message || 'Search failed';
     state.code = error?.code ?? null;
@@ -538,7 +590,7 @@ async function loadSource(id, page, batch, gen) {
     renderErrors();
     updateChip(id);
     if (state.code === 'PREPARING' && state.retries < MAX_RETRIES) {
-      scheduleRetry(id, batch, page, gen);
+      scheduleRetry(id, page, token, gen);
     }
   } finally {
     if (controllers.get(id) === controller) controllers.delete(id);
@@ -550,16 +602,35 @@ async function loadSource(id, page, batch, gen) {
   }
 }
 
-function scheduleRetry(id, batch, page, gen) {
+function scheduleRetry(id, page, token, gen) {
   const state = sourceState(id);
   state.retries += 1;
   cancelRetry(id);
   const timer = setTimeout(() => {
     retryTimers.delete(id);
-    if (gen !== generation || !selected.has(id) || !batch.el.isConnected) return;
-    loadSource(id, page, batch, gen);
+    if (!isValidToken(id, token, gen)) return;
+    if (!selected.has(id)) return;
+    loadSource(id, page, token, gen);
   }, RETRY_DELAY);
   retryTimers.set(id, timer);
+}
+
+function newToken(id) {
+  tokenCounter += 1;
+  requestTokens.set(id, tokenCounter);
+  return tokenCounter;
+}
+
+function invalidateToken(id) {
+  tokenCounter += 1;
+  requestTokens.set(id, tokenCounter);
+}
+
+function startLoad(id, page, gen) {
+  const state = sourceState(id);
+  if (state.status === 'loading') return;
+  const token = newToken(id);
+  loadSource(id, page, token, gen);
 }
 
 function resetAutoLoad() {
@@ -571,15 +642,20 @@ function resetAutoLoad() {
 function resetSearchState() {
   abortAll();
   cancelAllRetries();
+  requestTokens.clear();
   resetAutoLoad();
   generation += 1;
   states.clear();
   errors.clear();
-  batches.length = 0;
+  records.length = 0;
   displayedKeys.clear();
+  displayedMedia.clear();
   cardsByKey.clear();
   selection.clear();
   resultsEl.replaceChildren();
+  masonryEl = null;
+  masonryCols = [];
+  createMasonry();
   errorListEl.replaceChildren();
   activeLoads = 0;
   hasAnswered = false;
@@ -603,10 +679,9 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
     return;
   }
 
-  const batch = createBatch();
   const gen = generation;
   for (const source of searchableSelected()) {
-    loadSource(source.id, 1, batch, gen);
+    startLoad(source.id, 1, gen);
   }
   updateUi();
 }
@@ -618,10 +693,9 @@ function loadMore() {
     .filter(({ state }) => state.hasMore && state.status !== 'error' && state.status !== 'loading');
   if (targets.length === 0) return false;
 
-  const batch = createBatch();
   const gen = generation;
   for (const { source, state } of targets) {
-    loadSource(source.id, state.page + 1, batch, gen);
+    startLoad(source.id, state.page + 1, gen);
   }
   updateUi();
   return true;
@@ -659,7 +733,10 @@ function autoLoad() {
 function canLoadMore() {
   if (!query || selected.size === 0) return false;
   if (activeLoads > 0 || !hasAnswered) return false;
-  if (batches.length === 0) return false;
+  const started =
+    Boolean(query) &&
+    searchableSelected().some((source) => sourceState(source.id).status !== 'idle');
+  if (!started) return false;
   for (const source of searchableSelected()) {
     const state = sourceState(source.id);
     if (state.hasMore && state.status !== 'error' && state.status !== 'loading') return true;
@@ -685,8 +762,7 @@ function toggleSource(id) {
     selected.add(id);
     resetAutoLoad();
     if (query) {
-      const batch = createBatch();
-      loadSource(id, 1, batch, generation);
+      startLoad(id, 1, generation);
     }
   }
   saveSelection();
@@ -697,6 +773,7 @@ function toggleSource(id) {
 }
 
 function abortSource(id) {
+  invalidateToken(id);
   const controller = controllers.get(id);
   if (controller) controller.abort();
   controllers.delete(id);
@@ -710,9 +787,8 @@ function setAll(isOn) {
     );
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
-      const batch = createBatch();
       const gen = generation;
-      for (const source of added) loadSource(source.id, 1, batch, gen);
+      for (const source of added) startLoad(source.id, 1, gen);
     }
   } else {
     for (const id of [...selected]) {
@@ -741,9 +817,8 @@ function setGroupAll(groupId, isOn) {
     const added = targets.filter((source) => !selected.has(source.id));
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
-      const batch = createBatch();
       const gen = generation;
-      for (const source of added) loadSource(source.id, 1, batch, gen);
+      for (const source of added) startLoad(source.id, 1, gen);
     }
   } else {
     for (const source of targets) {
@@ -899,9 +974,8 @@ function orderedSelection() {
   const items = [];
   const seen = new Set();
   for (const record of visibleRecords()) {
-    const key = `${record.item.source}:${record.item.id}`;
-    if (selection.has(key) && !seen.has(key)) {
-      seen.add(key);
+    if (selection.has(record.key) && !seen.has(record.key)) {
+      seen.add(record.key);
       items.push(record.item);
     }
   }
@@ -1049,6 +1123,17 @@ if (typeof IntersectionObserver === 'function') {
     { rootMargin: '800px' },
   );
   observer.observe(sentinelEl);
+}
+
+if (typeof ResizeObserver === 'function') {
+  const resizeObserver = new ResizeObserver(() => {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      resizeTimer = 0;
+      reflowMasonry();
+    }, 150);
+  });
+  resizeObserver.observe(resultsEl);
 }
 
 window.addEventListener('popstate', applyUrlState);

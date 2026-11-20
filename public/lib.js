@@ -76,24 +76,124 @@ export const VIEWER_PROBE_TIMEOUT_MS = 20000;
 
 /**
  * Split the image URLs of one item into the small (cached) and large groups.
+ * `small` is the grid candidate list. `large` keeps `preview` and
+ * `previewFallback`, without repeats and without the thumbnail URLs.
  * @param {object|null|undefined} item
  * @returns {{small: string[], large: string[]}}
  */
 export function viewerPlan(item) {
-  const small = [];
-  for (const value of [item?.thumb, item?.thumbFallback]) {
-    if (typeof value !== 'string' || value === '') continue;
-    if (!small.includes(value)) small.push(value);
-  }
+  const small = thumbCandidates(item);
 
   const large = [];
   for (const value of [item?.preview, item?.previewFallback]) {
     if (typeof value !== 'string' || value === '') continue;
-    if (value === item?.thumb || large.includes(value)) continue;
+    if (value === item?.thumb || value === item?.thumbSource) continue;
+    if (large.includes(value)) continue;
     large.push(value);
   }
 
   return { small, large };
+}
+
+/**
+ * Image URLs to try for a card, best first, without empty values or repeats.
+ * @param {object|null|undefined} item
+ * @returns {string[]}
+ */
+export function thumbCandidates(item) {
+  const list = [item?.thumb, item?.thumbSource, item?.thumbFallback];
+  const result = [];
+  for (const value of list) {
+    if (typeof value !== 'string' || value === '') continue;
+    if (result.includes(value)) continue;
+    result.push(value);
+  }
+  return result;
+}
+
+/**
+ * Number of masonry columns that fit into a container.
+ * A width that is not a finite number greater than 0 gives 1. A gap that is
+ * not a finite number >= 0 counts as 0.
+ * @param {number} containerWidth
+ * @param {number} [minColumnWidth]
+ * @param {number} [gap]
+ * @returns {number}
+ */
+export function columnCount(containerWidth, minColumnWidth = 240, gap = 0) {
+  const safeGap = typeof gap === 'number' && Number.isFinite(gap) && gap >= 0 ? gap : 0;
+  if (
+    typeof containerWidth !== 'number' ||
+    !Number.isFinite(containerWidth) ||
+    containerWidth <= 0
+  ) {
+    return 1;
+  }
+  const count = Math.floor((containerWidth + safeGap) / (minColumnWidth + safeGap));
+  return Math.max(1, count);
+}
+
+/**
+ * Index of the first column with the smallest height.
+ * An empty list or a value that is not an array gives 0.
+ * @param {number[]} heights
+ * @returns {number}
+ */
+export function pickColumn(heights) {
+  if (!Array.isArray(heights) || heights.length === 0) return 0;
+  let best = 0;
+  for (let index = 1; index < heights.length; index += 1) {
+    if (heights[index] < heights[best]) best = index;
+  }
+  return best;
+}
+
+/**
+ * Rough height of a card in a column of the given width.
+ * Uses the image aspect ratio when the item has a positive width and height,
+ * else a square image. Adds 72 px for the card text.
+ * @param {object|null|undefined} item
+ * @param {number} columnWidth
+ * @returns {number}
+ */
+export function estimateCardHeight(item, columnWidth) {
+  const width = Number(item?.width);
+  const height = Number(item?.height);
+  if (
+    Number.isFinite(width) &&
+    Number.isFinite(height) &&
+    width > 0 &&
+    height > 0
+  ) {
+    return (columnWidth * height) / width + 72;
+  }
+  return columnWidth + 72;
+}
+
+/**
+ * Put cards into columns, shortest column first.
+ * Returns one column index for each height, in input order.
+ * A column count below 1 counts as 1.
+ * @param {number[]} heights
+ * @param {number} columnCount
+ * @param {number} [gap]
+ * @returns {number[]}
+ */
+export function distribute(heights, columnCount, gap = 0) {
+  const list = Array.isArray(heights) ? heights : [];
+  const count =
+    typeof columnCount === 'number' && Number.isFinite(columnCount) && columnCount >= 1
+      ? Math.floor(columnCount)
+      : 1;
+  const safeGap = typeof gap === 'number' && Number.isFinite(gap) && gap >= 0 ? gap : 0;
+  const columnHeights = new Array(count).fill(0);
+  const result = [];
+  for (let index = 0; index < list.length; index += 1) {
+    const column = pickColumn(columnHeights);
+    result.push(column);
+    columnHeights[column] += list[index] + safeGap;
+  }
+  return result;
 }
 
 /**
@@ -350,11 +450,13 @@ export function downloadUrl(item, url) {
 
 /**
  * Stable identity of one item across sources.
+ * Uses `uid` when it is a non-empty string, else `source:id`.
  * @param {object} item
  * @returns {string}
  */
 export function itemKey(item) {
-  return `${item.source}:${item.id}`;
+  if (typeof item?.uid === 'string' && item.uid !== '') return item.uid;
+  return `${item?.source}:${item?.id}`;
 }
 
 /**
