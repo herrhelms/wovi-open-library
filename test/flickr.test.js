@@ -41,6 +41,9 @@ test('flickr buildSearchUrl sets the documented parameters', () => {
 
   const extras = url.searchParams.get('extras');
   assert.ok(extras.includes('url_o'));
+  assert.ok(extras.includes('url_w'));
+  assert.ok(extras.includes('url_n'));
+  assert.ok(extras.includes('url_h'));
   assert.ok(extras.includes('owner_name'));
 });
 
@@ -77,8 +80,8 @@ test('flickr normalize uses all sizes when present', () => {
   assert.equal(item.creator, raw.ownername);
   assert.equal(item.date, '1910-01-01');
   assert.equal(item.description, 'Text with HTML');
-  assert.equal(item.thumb, raw.url_q);
-  assert.equal(item.preview, raw.url_b);
+  assert.equal(item.thumb, raw.url_w);
+  assert.equal(item.preview, raw.url_h);
   assert.equal(item.full, raw.url_o);
   assert.equal(item.width, raw.width_o);
   assert.equal(item.height, raw.height_o);
@@ -91,11 +94,26 @@ test('flickr normalize falls back to url_b when url_o and url_k are missing', ()
   const raw = fixture.search.photos.photo[1];
   const item = commons.normalize(raw);
 
+  assert.equal(item.thumb, raw.url_q);
+  assert.equal(item.preview, raw.url_b);
   assert.equal(item.full, raw.url_b);
   assert.equal(item.width, raw.width_b);
   assert.equal(item.height, raw.height_b);
   assert.equal(item.license, 'CC0');
   assert.equal(item.licenseUrl, FLICKR_LICENSES[9].url);
+});
+
+test('flickr normalize treats empty size URLs as absent', () => {
+  const raw = {
+    ...fixture.search.photos.photo[0],
+    url_w: '',
+    url_n: '',
+    url_h: '',
+  };
+  const item = commons.normalize(raw);
+
+  assert.equal(item.thumb, raw.url_q);
+  assert.equal(item.preview, raw.url_b);
 });
 
 test('flickr normalize returns null without image URLs', () => {

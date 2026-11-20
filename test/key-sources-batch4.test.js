@@ -164,7 +164,8 @@ test('pixabay normalize makes an Item with scaled size', () => {
   assert.equal(item.id, String(raw.id));
   assert.equal(item.title, 'moon, night sky, crescent');
   assert.equal(item.creator, raw.user);
-  assert.equal(item.thumb, raw.webformatURL);
+  assert.equal(item.thumb, raw.webformatURL.replace('_640', '_340'));
+  assert.equal(item.thumbFallback, raw.webformatURL);
   assert.equal(item.preview, raw.largeImageURL);
   assert.equal(item.full, raw.largeImageURL);
   assert.equal(item.width, 1280);
@@ -184,6 +185,28 @@ test('pixabay normalize scales the second record too', () => {
 test('pixabay normalize returns null without image URLs', () => {
   assert.equal(pixabay.normalize(fixtures.pixabay.hits[2]), null);
   assert.equal(pixabay.normalize({ id: 1, tags: 'x' }), null);
+});
+
+test('pixabay normalize changes _640 to _340 and keeps the fallback', () => {
+  const item = pixabay.normalize({
+    id: 1,
+    tags: 'x',
+    webformatURL: 'https://pixabay.com/get/abc_640.jpg',
+    largeImageURL: 'https://pixabay.com/get/abc_1280.jpg',
+  });
+  assert.equal(item.thumb, 'https://pixabay.com/get/abc_340.jpg');
+  assert.equal(item.thumbFallback, 'https://pixabay.com/get/abc_640.jpg');
+});
+
+test('pixabay normalize keeps webformatURL without _640 and sets no fallback', () => {
+  const item = pixabay.normalize({
+    id: 2,
+    tags: 'y',
+    webformatURL: 'https://pixabay.com/get/abc.jpg',
+    largeImageURL: 'https://pixabay.com/get/abc_1280.jpg',
+  });
+  assert.equal(item.thumb, 'https://pixabay.com/get/abc.jpg');
+  assert.equal('thumbFallback' in item, false);
 });
 
 test('pixabay parseSearch hasMore uses totalHits and the page size', () => {
@@ -242,7 +265,11 @@ test('unsplash normalize makes an Item', () => {
   assert.equal(item.creator, raw.user.name);
   assert.equal(item.date, '2020-03-14');
   assert.equal(item.thumb, raw.urls.small);
-  assert.equal(item.preview, raw.urls.regular);
+  assert.equal(
+    item.preview,
+    `${raw.urls.raw}&w=1600&fm=jpg&q=85`,
+  );
+  assert.equal(item.previewFallback, raw.urls.regular);
   assert.equal(item.full, raw.urls.full);
   assert.equal(item.width, raw.width);
   assert.equal(item.height, raw.height);
@@ -262,6 +289,49 @@ test('unsplash normalize falls back to alt_description and null date', () => {
 test('unsplash normalize returns null without urls.full', () => {
   assert.equal(unsplash.normalize(fixtures.unsplash.results[2]), null);
   assert.equal(unsplash.normalize({ id: 'x', urls: { regular: 'https://x/y.jpg' } }), null);
+});
+
+test('unsplash normalize adds the viewer size to urls.raw', () => {
+  const withQuery = unsplash.normalize({
+    id: 'p1',
+    urls: {
+      raw: 'https://images.unsplash.com/photo-1?ixid=x',
+      full: 'https://images.unsplash.com/photo-1',
+      regular: 'https://images.unsplash.com/photo-1?w=1080',
+    },
+  });
+  assert.equal(
+    withQuery.preview,
+    'https://images.unsplash.com/photo-1?ixid=x&w=1600&fm=jpg&q=85',
+  );
+  assert.equal(withQuery.previewFallback, 'https://images.unsplash.com/photo-1?w=1080');
+
+  const withoutQuery = unsplash.normalize({
+    id: 'p2',
+    urls: {
+      raw: 'https://images.unsplash.com/photo-2',
+      full: 'https://images.unsplash.com/photo-2',
+      regular: 'https://images.unsplash.com/photo-2?w=1080',
+    },
+  });
+  assert.equal(
+    withoutQuery.preview,
+    'https://images.unsplash.com/photo-2?w=1600&fm=jpg&q=85',
+  );
+  assert.equal(withoutQuery.previewFallback, 'https://images.unsplash.com/photo-2?w=1080');
+});
+
+test('unsplash normalize uses urls.regular without raw and sets no fallback', () => {
+  const item = unsplash.normalize({
+    id: 'p3',
+    urls: {
+      full: 'https://images.unsplash.com/photo-3',
+      regular: 'https://images.unsplash.com/photo-3?w=1080',
+      small: 'https://images.unsplash.com/photo-3?w=400',
+    },
+  });
+  assert.equal(item.preview, 'https://images.unsplash.com/photo-3?w=1080');
+  assert.equal('previewFallback' in item, false);
 });
 
 test('unsplash parseSearch reads total and total_pages', () => {
