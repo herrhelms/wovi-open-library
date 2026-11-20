@@ -6,6 +6,8 @@ import { dirname, join } from 'node:path';
 
 import {
   createDjangoplicitySource,
+  SEARCH_TIMEOUT_MS,
+  ITEM_TIMEOUT_MS,
   parseFormats,
   parseImageList,
   parseTotal,
@@ -154,6 +156,28 @@ test('parseFormats makes relative hrefs absolute', () => {
   const formats = parseFormats(html, 'https://www.eso.org');
   assert.equal(formats[0].url, 'https://www.eso.org/media/archives/images/original/x.tif');
   assert.equal(formats[0].label, 'Fullsize Original');
+});
+
+test('search uses the longer timeout', async () => {
+  let options;
+  const fake = async (_url, opts) => {
+    options = opts;
+    return { status: 200, text: async () => hubbleHtml };
+  };
+  await hubble.search('moon', 1, { fetch: fake });
+  assert.equal(SEARCH_TIMEOUT_MS, 45000);
+  assert.equal(options.timeoutMs, 45000);
+});
+
+test('resolveDownload uses the item timeout', async () => {
+  let options;
+  const fake = async (_url, opts) => {
+    options = opts;
+    return { status: 200, text: async () => hubbleItemHtml };
+  };
+  await hubble.resolveDownload('heic2017a', { fetch: fake });
+  assert.equal(ITEM_TIMEOUT_MS, 30000);
+  assert.equal(options.timeoutMs, 30000);
 });
 
 test('resolveDownload rejects a bad id without a request', async () => {
