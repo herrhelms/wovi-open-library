@@ -102,6 +102,64 @@ test('rijksmuseum normalize makes an Item', () => {
   assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/mark/1.0/');
 });
 
+test('rijksmuseum normalize marks "niet downloadbaar" as In copyright (hand-made from a live record)', () => {
+  const { object, visualItem, digitalObject } = fixture.appel;
+  const item = normalize({ object, visualItem, digitalObject });
+
+  assert.deepEqual(
+    digitalObject.referred_to_by.map((entry) => entry.content),
+    ['niet downloadbaar', 'zichtbaar'],
+  );
+  assert.equal(item.license, 'In copyright');
+  assert.equal(item.licenseUrl, 'https://rightsstatements.org/vocab/InC/1.0/');
+});
+
+test('rijksmuseum normalize marks "downloadbaar" as Public domain', () => {
+  const item = normalize({
+    object: fixture.object,
+    visualItem: fixture.visualItem,
+    digitalObject: {
+      ...fixture.digitalObject,
+      referred_to_by: [
+        { type: 'LinguisticObject', content: 'downloadbaar' },
+        { type: 'LinguisticObject', content: 'zichtbaar' },
+      ],
+    },
+  });
+  assert.equal(item.license, 'Public domain');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/mark/1.0/');
+});
+
+test('rijksmuseum normalize marks a missing referred_to_by as Public domain', () => {
+  const digitalObject = { ...fixture.digitalObject };
+  delete digitalObject.referred_to_by;
+  const item = normalize({
+    object: fixture.object,
+    visualItem: fixture.visualItem,
+    digitalObject,
+  });
+  assert.equal(item.license, 'Public domain');
+  assert.equal(item.licenseUrl, 'https://creativecommons.org/publicdomain/mark/1.0/');
+});
+
+test('rijksmuseum normalize reads an InC rights statement', () => {
+  const item = normalize({
+    object: fixture.object,
+    visualItem: fixture.visualItem,
+    digitalObject: {
+      ...fixture.digitalObject,
+      referred_to_by: [
+        {
+          type: 'LinguisticObject',
+          content: 'https://rightsstatements.org/vocab/InC/1.0/',
+        },
+      ],
+    },
+  });
+  assert.equal(item.license, 'In copyright');
+  assert.equal(item.licenseUrl, 'https://rightsstatements.org/vocab/InC/1.0/');
+});
+
 test('rijksmuseum normalize returns null without an access point', () => {
   assert.equal(
     normalize({
