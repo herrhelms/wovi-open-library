@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtemp, readFile, rm, stat, utimes, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, readdir, rm, stat, utimes, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -28,6 +28,23 @@ const HIGHSM_BASE =
 
 async function makeTempDir() {
   return mkdtemp(join(tmpdir(), 'olf-loc-'));
+}
+
+const liveSources = [];
+
+function makeSource(options) {
+  const source = createLocSource(options);
+  liveSources.push(source);
+  return source;
+}
+
+async function cleanupDir(dir) {
+  const sources = liveSources.splice(0);
+  for (const source of sources) {
+    await source.refreshDone();
+    await source.flushCache();
+  }
+  await rm(dir, { recursive: true, force: true });
 }
 
 function waitFor(predicate, timeoutMs = 5000) {
@@ -136,7 +153,7 @@ test('first search prepares once, then searches the index', async () => {
   const dir = await makeTempDir();
   try {
     const fake = makeFetchJson({ otherSetError: () => httpError(500) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -160,7 +177,7 @@ test('first search prepares once, then searches the index', async () => {
     assert.equal(saved.sets[0].title, 'Lighthouses');
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -168,7 +185,7 @@ test('a fresh saved index is used without network requests', async () => {
   const dir = await makeTempDir();
   try {
     const first = makeFetchJson({ otherSetError: () => httpError(500) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: first.fetchJson,
       retryDelayMs: 0,
@@ -178,7 +195,7 @@ test('a fresh saved index is used without network requests', async () => {
     await source.flushCache();
 
     const calls = [];
-    const second = createLocSource({
+    const second = makeSource({
       dataDir: dir,
       fetchJson: async (url) => {
         calls.push(url);
@@ -192,7 +209,7 @@ test('a fresh saved index is used without network requests', async () => {
     assert.deepEqual(calls, []);
     await second.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -200,7 +217,7 @@ test('an old saved index is fetched again', async () => {
   const dir = await makeTempDir();
   try {
     const first = makeFetchJson({ otherSetError: () => httpError(500) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: first.fetchJson,
       retryDelayMs: 0,
@@ -212,7 +229,7 @@ test('an old saved index is fetched again', async () => {
     await utimes(join(dir, 'free-to-use.json'), old, old);
 
     const second = makeFetchJson({ otherSetError: () => httpError(500) });
-    const next = createLocSource({
+    const next = makeSource({
       dataDir: dir,
       fetchJson: second.fetchJson,
       retryDelayMs: 0,
@@ -221,7 +238,7 @@ test('an old saved index is fetched again', async () => {
     await waitFor(() => next.status() === 'ready');
     assert.ok(second.state.setListCalls >= 1);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -229,7 +246,7 @@ test('a blocked set list gives BLOCKED once and starts again later', async () =>
   const dir = await makeTempDir();
   try {
     const fake = makeFetchJson({ setListError: httpError(403) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       retryDelayMs: 0,
@@ -247,7 +264,7 @@ test('a blocked set list gives BLOCKED once and starts again later', async () =>
     await expectPreparing(source.search('lighthouse', 1));
     await waitFor(() => source.status() === 'idle');
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -257,7 +274,7 @@ test('a non-JSON HTML set list counts as blocked', async () => {
     const fake = makeFetchJson({
       setListError: httpError(200, 'NOT_JSON', '<html>Just a moment...</html>'),
     });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       retryDelayMs: 0,
@@ -267,7 +284,7 @@ test('a non-JSON HTML set list counts as blocked', async () => {
     await waitFor(() => source.status() === 'idle');
     await assert.rejects(source.search('lighthouse', 1), { code: 'BLOCKED' });
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -278,7 +295,7 @@ test('a network error on the set list is retried one time', async () => {
       setListError: (n) => (n === 1 ? httpError(null, 'NETWORK') : null),
       otherSetError: () => httpError(500),
     });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       retryDelayMs: 0,
@@ -288,7 +305,7 @@ test('a network error on the set list is retried one time', async () => {
     await waitFor(() => source.status() === 'ready');
     assert.equal(fake.state.setListCalls, 2);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -296,7 +313,7 @@ test('an HTTP error on the set list fails without retry', async () => {
   const dir = await makeTempDir();
   try {
     const fake = makeFetchJson({ setListError: httpError(500) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       retryDelayMs: 0,
@@ -315,7 +332,7 @@ test('an HTTP error on the set list fails without retry', async () => {
     });
     assert.equal(fake.state.setListCalls, 1);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -330,7 +347,7 @@ test('all sets failing gives PREPARE_FAILED', async () => {
       },
     });
 
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       retryDelayMs: 0,
@@ -344,7 +361,7 @@ test('all sets failing gives PREPARE_FAILED', async () => {
       return true;
     });
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -355,7 +372,7 @@ test('IIIF resolution, caching and failures', async () => {
     const { probe, bases } = makeProbe({
       throwFor: (base) => base.includes('mrg'),
     });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: probe,
@@ -414,7 +431,7 @@ test('IIIF resolution, caching and failures', async () => {
     assert.equal(Object.hasOwn(cache, 'mrg.10350'), false);
 
     const cachedProbes = [];
-    const second = createLocSource({
+    const second = makeSource({
       dataDir: dir,
       fetchJson: async () => {
         throw new Error('must not fetch');
@@ -430,7 +447,7 @@ test('IIIF resolution, caching and failures', async () => {
     assert.equal(cached.items[0].width, 3500);
     assert.deepEqual(cachedProbes, []);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -438,7 +455,7 @@ test('the index items are not changed by IIIF resolution', async () => {
   const dir = await makeTempDir();
   try {
     const fake = makeFetchJson({ otherSetError: () => httpError(500) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -456,7 +473,7 @@ test('the index items are not changed by IIIF resolution', async () => {
     assert.equal(second.items[0].full, second.items[0].thumb);
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -506,7 +523,7 @@ test('probeIiif reads info.json', async () => {
 test('flushCache does nothing without a pending write', async () => {
   const dir = await makeTempDir();
   try {
-    const source = createLocSource({ dataDir: dir, fetchJson: async () => ({}) });
+    const source = makeSource({ dataDir: dir, fetchJson: async () => ({}) });
     await source.flushCache();
     let exists = true;
     try {
@@ -516,7 +533,54 @@ test('flushCache does nothing without a pending write', async () => {
     }
     assert.equal(exists, false);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
+  }
+});
+
+test('flushCache waits for a running cache write', async () => {
+  const dir = await makeTempDir();
+  let release = () => {};
+  try {
+    const fake = makeFetchJson({ otherSetError: () => httpError(500) });
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    let started = 0;
+    const source = makeSource({
+      dataDir: dir,
+      fetchJson: fake.fetchJson,
+      probeIiif: async () => ({ width: 3500, height: 4225 }),
+      retryDelayMs: 0,
+      writeFile: async (path, data) => {
+        started += 1;
+        await gate;
+        await writeFile(path, data);
+      },
+    });
+
+    await expectPreparing(source.search('heceta', 1));
+    await waitFor(() => source.status() === 'ready');
+    const result = await source.search('heceta', 1);
+    assert.equal(result.items[0].width, 3500);
+
+    const flushing = source.flushCache();
+    await waitFor(() => started > 0);
+    const secondFlush = source.flushCache();
+    release();
+    await Promise.all([flushing, secondFlush]);
+
+    const cache = JSON.parse(await readFile(join(dir, 'iiif-cache-2.json'), 'utf8'));
+    assert.deepEqual(cache['highsm.12127'], {
+      base: HIGHSM_BASE,
+      width: 3500,
+      height: 4225,
+    });
+    const files = await readdir(dir);
+    assert.equal(files.includes('iiif-cache-2.json'), true);
+    assert.equal(files.filter((name) => name.endsWith('.tmp')).length, 0);
+  } finally {
+    release();
+    await cleanupDir(dir);
   }
 });
 
@@ -536,7 +600,7 @@ test('the cache ignores bad entries', async () => {
 
     const fake = makeFetchJson({ otherSetError: () => httpError(500) });
     const probes = [];
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async (base) => {
@@ -552,7 +616,7 @@ test('the cache ignores bad entries', async () => {
     assert.equal(result.items[0].width, 3500);
     assert.deepEqual(probes, []);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -572,7 +636,7 @@ test('a probe time-out caches null in memory only', async () => {
       }
       return null;
     }
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: probe,
@@ -602,7 +666,7 @@ test('a probe time-out caches null in memory only', async () => {
     assert.equal(Object.hasOwn(cache, 'mrg.10350'), false);
 
     const again = [];
-    const second = createLocSource({
+    const second = makeSource({
       dataDir: dir,
       fetchJson: async () => {
         throw new Error('must not fetch');
@@ -618,7 +682,7 @@ test('a probe time-out caches null in memory only', async () => {
     assert.ok(again.some((base) => base.includes('mrg:10300:10350')));
     await second.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -638,7 +702,7 @@ test('a time-out followed by a size is cached and written', async () => {
       if (base === `${HIGHSM_BASE}v`) return { width: 848, height: 1024 };
       return null;
     }
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: probe,
@@ -663,7 +727,7 @@ test('a time-out followed by a size is cached and written', async () => {
       height: 1024,
     });
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -672,7 +736,7 @@ test('a network error during a probe is not cached', async () => {
   try {
     const fake = makeFetchJson({ otherSetError: () => httpError(500) });
     const bases = [];
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async (base) => {
@@ -705,7 +769,7 @@ test('a network error during a probe is not cached', async () => {
     }
     assert.equal(cache === null || !Object.hasOwn(cache, 'highsm.12127'), true);
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -725,7 +789,7 @@ test('a failed set writes the reason to stderr', async () => {
         return undefined;
       },
     });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -739,7 +803,7 @@ test('a failed set writes the reason to stderr', async () => {
     assert.match(output, /\[loc\] set failed: Lighthouses: test answered HTTP 403/);
   } finally {
     process.stderr.write = original;
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -785,7 +849,7 @@ test('a full read saves the failed sets', async () => {
   const dir = await makeTempDir();
   try {
     const fake = makeFetchJson({ otherSetError: () => httpError(500) });
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -803,7 +867,7 @@ test('a full read saves the failed sets', async () => {
     ]);
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -819,7 +883,7 @@ test('an old index with failed sets refreshes only those sets', async () => {
     const before = await stat(join(dir, 'free-to-use.json'));
 
     const fake = onlyFailedSetFetch();
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -844,7 +908,7 @@ test('an old index with failed sets refreshes only those sets', async () => {
     assert.deepEqual(fake.calls, [`${LIGHTHOUSES_SET_URL}?fo=json`]);
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -858,7 +922,7 @@ test('a young index with failed sets is not refreshed', async () => {
     });
 
     const fake = onlyFailedSetFetch();
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -872,7 +936,7 @@ test('a young index with failed sets is not refreshed', async () => {
     assert.deepEqual(fake.calls, []);
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -888,7 +952,7 @@ test('a failed refresh leaves the index file unchanged', async () => {
     const before = await stat(file);
 
     const calls = [];
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: async (url) => {
         calls.push(url);
@@ -911,7 +975,7 @@ test('a failed refresh leaves the index file unchanged', async () => {
     assert.ok(result.items.some((item) => item.id === 'highsm.12127'));
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -921,7 +985,7 @@ test('an old index without a failed key fetches the missing sets', async () => {
     await writeSavedIndex(dir, { sets: [LIGHTHOUSES_SET], failed: undefined });
 
     const fake = makeFetchJson();
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -944,7 +1008,7 @@ test('an old index without a failed key fetches the missing sets', async () => {
     assert.deepEqual(saved.failed, []);
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -957,7 +1021,7 @@ test('an old index with all sets only rewrites the format', async () => {
     });
 
     const fake = makeFetchJson();
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -975,7 +1039,7 @@ test('an old index with all sets only rewrites the format', async () => {
     await source.flushCache();
 
     const nextFake = makeFetchJson();
-    const next = createLocSource({
+    const next = makeSource({
       dataDir: dir,
       fetchJson: nextFake.fetchJson,
       probeIiif: async () => null,
@@ -987,7 +1051,7 @@ test('an old index with all sets only rewrites the format', async () => {
     assert.deepEqual(nextFake.calls, []);
     await next.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -997,7 +1061,7 @@ test('an old index with no failed sets is not refreshed', async () => {
     await writeSavedIndex(dir, { sets: [LIGHTHOUSES_SET], failed: [] });
 
     const fake = makeFetchJson();
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: fake.fetchJson,
       probeIiif: async () => null,
@@ -1010,14 +1074,14 @@ test('an old index with no failed sets is not refreshed', async () => {
     assert.deepEqual(fake.calls, []);
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
 test('refreshDone resolves at once without a refresh', async () => {
   const dir = await makeTempDir();
   try {
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: async () => {
         throw new Error('must not fetch');
@@ -1025,7 +1089,7 @@ test('refreshDone resolves at once without a refresh', async () => {
     });
     await source.refreshDone();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
 
@@ -1042,7 +1106,7 @@ test('the failed set refresh does not block a search', async () => {
       release = resolve;
     });
     const calls = [];
-    const source = createLocSource({
+    const source = makeSource({
       dataDir: dir,
       fetchJson: async (url) => {
         calls.push(url);
@@ -1067,6 +1131,6 @@ test('the failed set refresh does not block a search', async () => {
     await source.refreshDone();
     await source.flushCache();
   } finally {
-    await rm(dir, { recursive: true, force: true });
+    await cleanupDir(dir);
   }
 });
