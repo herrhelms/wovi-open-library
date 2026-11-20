@@ -1,0 +1,81 @@
+{
+  "search": {
+    "photos": {
+      "page": 1,
+      "pages": 3,
+      "perpage": 24,
+      "total": "57",
+      "photo": [
+        {
+          "id": "2914376402",
+          "owner": "8623220@N02",
+          "secret": "abc123",
+          "server": "3290",
+          "farm": 4,
+          "title": "Moon over the bay",
+          "license": "7",
+          "ownername": "State Library of New South Wales",
+          "datetaken": "1910-01-01 00:00:00",
+          "datetakengranularity": 0,
+          "description": { "_content": "Text with <b>HTML</b>" },
+          "url_q": "https://live.staticflickr.com/3290/2914376402_abc123_q.jpg",
+          "height_q": 150,
+          "width_q": 150,
+          "url_z": "https://live.staticflickr.com/3290/2914376402_abc123_z.jpg",
+          "height_z": 480,
+          "width_z": 640,
+          "url_b": "https://live.staticflickr.com/3290/2914376402_abc123_b.jpg",
+          "height_b": 768,
+          "width_b": 1024,
+          "url_k": "https://live.staticflickr.com/3290/2914376402_abc123_k.jpg",
+          "height_k": 1536,
+          "width_k": 2048,
+          "url_o": "https://live.staticflickr.com/3290/2914376402_abc123_o.jpg",
+          "height_o": 3000,
+          "width_o": 4000
+        },
+        {
+          "id": "51234567890",
+          "owner": "12345678@N00",
+          "secret": "def456",
+          "server": "65535",
+          "farm": 66,
+          "title": "Harbour at dusk",
+          "license": "9",
+          "ownername": "A Photographer",
+          "datetaken": "2019-06-12 18:30:00",
+          "datetakengranularity": 0,
+          "description": { "_content": "A quiet evening on the water." },
+          "url_q": "https://live.staticflickr.com/65535/51234567890_def456_q.jpg",
+          "height_q": 150,
+          "width_q": 150,
+          "url_z": "https://live.staticflickr.com/65535/51234567890_def456_z.jpg",
+          "height_z": 480,
+          "width_z": 720,
+          "url_b": "https://live.staticflickr.com/65535/51234567890_def456_b.jpg",
+          "height_b": 768,
+          "width_b": 1152
+        },
+        {
+          "id": "98765432101",
+          "owner": "87654321@N00",
+          "secret": "ghi789",
+          "server": "1234",
+          "farm": 2,
+          "title": "No image available",
+          "license": "4",
+          "ownername": "Some User",
+          "datetaken": "2020-02-29 09:15:00",
+          "datetakengranularity": 0,
+          "description": { "_content": "" }
+        }
+      ]
+    },
+    "stat": "ok"
+  },
+  "fail": {
+    "stat": "fail",
+    "code": 100,
+    "message": "Invalid API Key (Key has invalid format)"
+  }
+}
