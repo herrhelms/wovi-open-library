@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 
 import {
   columnCount,
+  countActive,
   DEFAULT_GROUPS,
   distribute,
   downloadUrl,
   estimateCardHeight,
+  filterAdapters,
   firstLoaded,
   groupSources,
   imageCandidates,
@@ -14,6 +16,7 @@ import {
   isUpgrade,
   isUsable,
   itemKey,
+  keyStatus,
   parseSavedSelection,
   pickColumn,
   rememberLimited,
@@ -479,4 +482,81 @@ test('rememberLimited returns nothing and uses the default max', () => {
   }
   assert.equal(map.size, 10);
   assert.deepEqual([...before.keys()], ['x']);
+});
+
+test('keyStatus reports an adaptor without a key', () => {
+  assert.deepEqual(keyStatus({ key: null }), { kind: 'none', text: 'No key needed' });
+  assert.deepEqual(keyStatus({}), { kind: 'none', text: 'No key needed' });
+});
+
+test('keyStatus reports a configured key as set', () => {
+  assert.deepEqual(
+    keyStatus({ key: { env: 'A', required: true, configured: true } }),
+    { kind: 'set', text: 'Key set' },
+  );
+  assert.equal(
+    keyStatus({ key: { env: 'A', required: false, configured: true, default: 'DEMO_KEY' } })
+      .kind,
+    'set',
+  );
+});
+
+test('keyStatus reports a missing required key', () => {
+  assert.deepEqual(
+    keyStatus({ key: { env: 'A', required: true, configured: false } }),
+    { kind: 'missing', text: 'Key required, not set' },
+  );
+});
+
+test('keyStatus reports an optional key without a demo key', () => {
+  assert.deepEqual(
+    keyStatus({ key: { env: 'A', required: false, configured: false, default: null } }),
+    { kind: 'optional', text: 'Optional key not set' },
+  );
+});
+
+test('keyStatus names the demo key for an optional key', () => {
+  assert.deepEqual(
+    keyStatus({
+      key: { env: 'A', required: false, configured: false, default: 'DEMO_KEY' },
+    }),
+    { kind: 'optional', text: 'Optional key not set, uses demo key' },
+  );
+});
+
+test('filterAdapters returns a copy for an empty text', () => {
+  const list = [
+    { id: 'dpla', name: 'DPLA', description: 'Digital Public Library of America' },
+    { id: 'esa-hubble', name: 'Hubble', description: 'Art Museum collection' },
+    { id: 'nasa', name: 'NASA', description: null },
+  ];
+  const all = filterAdapters(list, '');
+  assert.deepEqual(all, list);
+  assert.notEqual(all, list);
+  assert.deepEqual(filterAdapters(list, '  '), list);
+  assert.deepEqual(
+    filterAdapters(list, 'DPLA').map((entry) => entry.name),
+    ['DPLA'],
+  );
+  assert.deepEqual(
+    filterAdapters(list, 'esa-').map((entry) => entry.id),
+    ['esa-hubble'],
+  );
+  assert.deepEqual(
+    filterAdapters(list, 'museum').map((entry) => entry.id),
+    ['esa-hubble'],
+  );
+  assert.deepEqual(filterAdapters(list, 'zzz'), []);
+});
+
+test('filterAdapters rejects a value that is not an array', () => {
+  assert.deepEqual(filterAdapters(null, 'x'), []);
+  assert.deepEqual(filterAdapters(undefined, ''), []);
+});
+
+test('countActive counts enabled adaptors', () => {
+  assert.equal(countActive([{ enabled: true }, { enabled: false }, { enabled: true }]), 2);
+  assert.equal(countActive([]), 0);
+  assert.equal(countActive(undefined), 0);
+  assert.equal(countActive([{}, { enabled: 'true' }]), 0);
 });
