@@ -170,6 +170,18 @@ The keys stay on the server. They are never sent to the browser.
 Paris Musées' own API (GraphQL) needs `PARIS_MUSEES_TOKEN`. It is planned. Today
 Paris Musées comes through Wikimedia Commons.
 
+## Root certificates
+
+The app adds two public root certificates from `certs/` to the default list of
+Node at start: "SSL.com TLS RSA Root CA 2022" and "HARICA TLS RSA Root CA
+2021". Node 26 does not have them, so the TLS check fails without them. The
+hosts that need them are `data.getty.edu`, `kulturarvsdata.se` and
+`data.artmuseum.princeton.edu`. Certificate checks stay enabled.
+
+The Commons-based sources share a limit of 2 requests at the same time. On
+HTTP 429 the app waits (the `Retry-After` seconds, else 2 s, at most 5 s) and
+tries one more time.
+
 ## Downloads
 
 The server streams files through `/api/download`. Only hosts of the libraries
@@ -189,6 +201,8 @@ server.js            HTTP server, static files and API routes
 lib/
   env.js             .env loader
   http.js            fetch with timeout and User-Agent
+  tls.js             adds two public root certificates
+  wikimedia.js       Commons request limiter and 429 retry
   csv.js             streaming CSV parser
   download.js        download stream and host allow list
   sources/
