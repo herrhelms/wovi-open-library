@@ -10,6 +10,7 @@ import {
   clearCache,
   normalize,
   parseBindings,
+  regexEscape,
   search,
   sparqlString,
 } from '../lib/sources/getty.js';
@@ -72,11 +73,23 @@ test('getty sparqlString escapes special characters', () => {
   assert.equal(sparqlString('a\nb'), 'a\\nb');
 });
 
-test('getty buildQuery uses one FILTER term for each word', () => {
+test('getty regexEscape escapes regular expression characters', () => {
+  assert.equal(regexEscape('st.'), 'st\\.');
+  assert.equal(regexEscape('c++'), 'c\\+\\+');
+  assert.equal(regexEscape('a(b)'), 'a\\(b\\)');
+  assert.equal(regexEscape('a\\b'), 'a\\\\b');
+  assert.equal(regexEscape('owl'), 'owl');
+});
+
+test('getty buildQuery matches word starts for each word', () => {
+  const term = (word, escaped = word) =>
+    `CONTAINS(LCASE(?t), "${word}") && ` +
+    `REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])${escaped}", "i")`;
+
   const query = buildQuery('Swan  MOON', 1);
-  assert.ok(query.includes('CONTAINS(LCASE(?t), "swan")'));
-  assert.ok(query.includes('CONTAINS(LCASE(?t), "moon")'));
-  assert.ok(query.includes('CONTAINS(LCASE(?t), "swan") && CONTAINS(LCASE(?t), "moon")'));
+  assert.ok(query.includes(term('swan')));
+  assert.ok(query.includes(term('moon')));
+  assert.ok(query.includes(`${term('swan')} && ${term('moon')}`));
   assert.ok(query.includes('LIMIT 25 OFFSET 0'));
   assert.ok(query.includes('crm:P138i_has_representation'));
 });
@@ -89,11 +102,42 @@ test('getty buildQuery escapes quotes in words', () => {
   const query = buildQuery('say "hi"', 1);
   assert.ok(
     query.includes(
-      'CONTAINS(LCASE(?t), "say") && CONTAINS(LCASE(?t), "\\"hi\\"")',
+      'CONTAINS(LCASE(?t), "say") && REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])say", "i") && ' +
+        'CONTAINS(LCASE(?t), "\\"hi\\"") && ' +
+        'REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])\\"hi\\"", "i")',
     ),
   );
   // the quotes around each literal stay unescaped; the quotes inside do not
   assert.ok(!query.includes('"hi"'));
+});
+
+test('getty buildQuery escapes regex characters in words', () => {
+  assert.ok(
+    buildQuery('st.', 1).includes(
+      'REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])st\\\\.", "i")',
+    ),
+  );
+  assert.ok(
+    buildQuery('c++', 1).includes(
+      'REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])c\\\\+\\\\+", "i")',
+    ),
+  );
+  assert.ok(
+    buildQuery('a(b', 1).includes(
+      'REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])a\\\\(b", "i")',
+    ),
+  );
+  const backslash = buildQuery('a\\b', 1);
+  assert.ok(backslash.includes('CONTAINS(LCASE(?t), "a\\\\b")'));
+  assert.ok(
+    backslash.includes('REGEX(?t, "(^|[^\\\\p{L}\\\\p{N}])a\\\\\\\\b", "i")'),
+  );
+});
+
+test('getty buildQuery has no filter for an empty query', () => {
+  const query = buildQuery('', 1);
+  assert.ok(!query.includes('FILTER'));
+  assert.ok(!query.includes('REGEX'));
 });
 
 test('getty buildSearchUrl encodes the query', () => {
@@ -287,6 +331,20 @@ test('getty search caches objects', async () => {
   clearCache();
   await search('swan moon', 1, { fetchJson: fake.fetchJson });
   assert.equal(fake.objectHeaders.length, firstObjectCalls * 2);
+});
+
+test('getty search uses the 30s SPARQL timeout', async () => {
+  clearCache();
+  const calls = [];
+  const fake = async (url, opts = {}) => {
+    calls.push({ url, opts });
+    if (url.startsWith(SPARQL_URL)) return fixture.sparql;
+    const uuid = url.slice(url.lastIndexOf('/') + 1);
+    return fixture.objects[uuid];
+  };
+
+  await search('owl', 1, { fetchJson: fake });
+  assert.equal(calls[0].opts.timeoutMs, 30000);
 });
 
 test('getty search uses 24 items and sets hasMore for 25 bindings', async () => {
