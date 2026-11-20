@@ -15,7 +15,7 @@ import {
   cacheSet,
   firstString,
 } from '../lib/util.js';
-import { sources, getSource } from '../lib/sources/index.js';
+import { GROUPS, sources, getSource } from '../lib/sources/index.js';
 
 test('PROJECT_ROOT contains package.json', () => {
   assert.equal(typeof PROJECT_ROOT, 'string');
@@ -172,33 +172,72 @@ test('fetchJson reports a timeout', async () => {
 test('sources registry', () => {
   const ids = [
     'commons',
-    'europeana',
+    'openverse',
+    'flickr-commons',
+    'flickr-cc',
     'archive',
-    'loc',
+    'europeana',
+    'dpla',
+    'met',
     'smithsonian',
     'rijksmuseum',
-    'met',
-    'nypl',
-    'nasa',
     'nga',
+    'aic',
     'cleveland',
-    'smk',
+    'getty',
     'mia',
+    'smk',
+    'paris-musees',
+    'walters',
+    'brooklyn',
+    'auckland',
+    'loc',
+    'nypl',
+    'british-library',
+    'gallica',
+    'trove',
+    'nara',
+    'nationaal-archief',
+    'bundesarchiv',
+    'eth-library',
+    'slq',
+    'nasa',
+    'esa-hubble',
+    'esa-webb',
+    'eso',
     'wellcome',
-    'openverse',
+    'bhl',
+    'noaa',
+    'inaturalist',
   ];
-  assert.equal(sources.length, 15);
+  assert.equal(sources.length, 38);
   assert.deepEqual(
     sources.map((source) => source.id),
     ids,
   );
+  assert.equal(new Set(ids).size, ids.length);
   assert.equal(getSource('met').name, 'The Met');
   assert.equal(getSource('x'), null);
+
+  const groupIds = ['aggregators', 'museums', 'libraries', 'science'];
+  assert.deepEqual(
+    GROUPS.map((group) => group.id),
+    groupIds,
+  );
+  assert.equal(GROUPS[0].label, 'Open-licence aggregators');
+  assert.equal(GROUPS[1].label, 'Museums and galleries');
+  assert.equal(GROUPS[2].label, 'Libraries and archives');
+  assert.equal(GROUPS[3].label, 'Science, nature and medicine');
+
   for (const source of sources) {
-    assert.equal(typeof source.search, 'function');
-    assert.equal(typeof source.normalize, 'function');
-    assert.equal(typeof source.name, 'string');
-    assert.equal(typeof source.homepage, 'string');
+    assert.equal(typeof source.search, 'function', source.id);
+    assert.equal(typeof source.normalize, 'function', source.id);
+    assert.equal(typeof source.name, 'string', source.id);
+    assert.equal(typeof source.homepage, 'string', source.id);
+    assert.ok(groupIds.includes(source.group), `${source.id} group ${source.group}`);
     assert.ok(source.keyEnv === null || typeof source.keyEnv === 'string');
   }
+
+  assert.equal(getSource('europeana').keyOptional, true);
+  assert.equal(getSource('smithsonian').keyOptional, true);
 });

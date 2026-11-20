@@ -49,11 +49,12 @@ function rawRequest(port, path, method = 'GET') {
 }
 
 function makeSources(upstreamBase) {
-  const makeStub = (id, keyEnv = null) => ({
+  const makeStub = (id, keyEnv = null, extra = {}) => ({
     id,
     name: id,
     homepage: `https://example.org/${id}`,
     keyEnv,
+    ...extra,
     async search() {
       throw new Error(`${id}: not implemented`);
     },
@@ -75,13 +76,26 @@ function makeSources(upstreamBase) {
   };
 
   const keyed = makeStub('keyed', 'TEST_KEY_X');
+  const optional = makeStub('optional', 'TEST_OPTIONAL_KEY', { keyOptional: true });
+
+  const missingCalls = { search: 0 };
+  const needkey = makeStub('needkey', 'TEST_MISSING_KEY');
+  needkey.search = async () => {
+    missingCalls.search += 1;
+    return { total: 0, hasMore: false, items: [] };
+  };
+  const resolveCalls = { count: 0 };
+  needkey.resolveDownload = async () => {
+    resolveCalls.count += 1;
+    return { url: `${upstreamBase}/x.jpg` };
+  };
 
   const met = makeStub('met');
 
   const nasa = makeStub('nasa');
   nasa.resolveDownload = async () => ({ url: `${upstreamBase}/x.jpg` });
 
-  const europeana = makeStub('europeana', 'EUROPEANA_KEY');
+  const europeana = makeStub('europeana', 'EUROPEANA_KEY', { keyOptional: true });
   europeana.trustResolvedUrl = true;
   europeana.resolveDownload = async (id) => ({ url: `${upstreamBase}/image/${id}` });
 
@@ -89,7 +103,20 @@ function makeSources(upstreamBase) {
   openverse.trustResolvedUrl = true;
   openverse.resolveDownload = async (id) => ({ url: `${upstreamBase}/x.jpg` });
 
-  return [ok, bad, keyed, met, nasa, europeana, openverse];
+  return {
+    sources: [ok, bad, keyed, optional, needkey, met, nasa, europeana, openverse],
+    missingCalls,
+    resolveCalls,
+  };
+}
+
+const GROUPS_FIXTURE = [
+  { id: 'aggregators', label: 'Open-licence aggregators' },
+  { id: 'museums', label: 'Museums and galleries' },
+];
+
+function makeSourceList(upstreamBase) {
+  return makeSources(upstreamBase).sources;
 }
 
 async function createFixture() {
@@ -134,7 +161,7 @@ async function createFixture() {
 
   const server = createServer({
     publicDir,
-    sourcesOverride: makeSources(upstreamBase),
+    sourcesOverride: makeSourceList(upstreamBase),
   });
   const port = await listen(server);
   const base = `http://127.0.0.1:${port}`;
@@ -171,6 +198,14 @@ test('isAllowedHost', () => {
   assert.equal(isAllowedHost('1.api.artsmia.org'), true);
   assert.equal(isAllowedHost('iiif.wellcomecollection.org'), true);
   assert.equal(isAllowedHost('evilsmk.dk'), false);
+  assert.equal(isAllowedHost('inaturalist-open-data.s3.amazonaws.com'), true);
+  assert.equal(isAllowedHost('evil.s3.amazonaws.com'), false);
+  assert.equal(isAllowedHost('amazonaws.com'), false);
+  assert.equal(isAllowedHost('media.getty.edu'), true);
+  assert.equal(isAllowedHost('cdn.esahubble.org'), true);
+  assert.equal(isAllowedHost('cdn.eso.org'), true);
+  assert.equal(isAllowedHost('live.staticflickr.com'), true);
+  assert.equal(isAllowedHost('www.artic.edu'), false);
   assert.equal(isAllowedHost('127.0.0.1'), false);
   assert.equal(isAllowedHost('localhost'), false);
   assert.equal(isAllowedHost(''), false);
@@ -211,15 +246,51 @@ test('GET /api/sources', async () => {
     assert.ok(!text.includes('secret-value'));
     const data = JSON.parse(text);
     assert.ok(Array.isArray(data));
-    assert.equal(data.length, 7);
+    assert.equal(data.length, 9);
     const keyed = data.find((entry) => entry.id === 'keyed');
     assert.equal(keyed.needsKey, true);
     assert.equal(keyed.keyConfigured, true);
+    assert.equal(keyed.keyEnv, 'TEST_KEY_X');
+    assert.equal(keyed.group, null);
     const ok = data.find((entry) => entry.id === 'ok');
     assert.equal(ok.needsKey, false);
     assert.equal(ok.keyConfigured, true);
+    assert.equal(ok.keyEnv, null);
+    const optional = data.find((entry) => entry.id === 'optional');
+    assert.equal(optional.needsKey, false);
+    assert.equal(optional.keyEnv, null);
+    const needkey = data.find((entry) => entry.id === 'needkey');
+    assert.equal(needkey.needsKey, true);
+    assert.equal(needkey.keyConfigured, false);
+    assert.equal(needkey.keyEnv, 'TEST_MISSING_KEY');
   } finally {
     delete process.env.TEST_KEY_X;
+  }
+});
+
+test('GET /api/sources sends group', async () => {
+  const sources = makeSourceList(fixture.upstreamBase).map((source) =>
+    source.id === 'ok' ? { ...source, group: 'museums' } : source,
+  );
+  await withServer(sources, async (base) => {
+    const data = await (await fetch(`${base}/api/sources`)).json();
+    assert.equal(data.find((entry) => entry.id === 'ok').group, 'museums');
+  });
+});
+
+test('GET /api/groups', async () => {
+  const server = createServer({
+    publicDir: fixture.publicDir,
+    sourcesOverride: makeSourceList(fixture.upstreamBase),
+    groupsOverride: GROUPS_FIXTURE,
+  });
+  const port = await listen(server);
+  try {
+    const res = await fetch(`http://127.0.0.1:${port}/api/groups`);
+    assert.equal(res.status, 200);
+    assert.deepEqual(await res.json(), GROUPS_FIXTURE);
+  } finally {
+    await close(server);
   }
 });
 
@@ -247,6 +318,31 @@ test('GET /api/search success and page fallback', async () => {
   const fallback = await fetch(`${fixture.base}/api/search?source=ok&q=moon&page=abc`);
   assert.equal(fallback.status, 200);
   assert.equal((await fallback.json()).page, 1);
+});
+
+test('GET /api/search needs a key', async () => {
+  const built = makeSources(fixture.upstreamBase);
+  delete process.env.TEST_MISSING_KEY;
+  await withServer(built.sources, async (base) => {
+    const res = await fetch(`${base}/api/search?source=needkey&q=moon`);
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.code, 'NEEDS_KEY');
+    assert.equal(data.error, 'needkey needs TEST_MISSING_KEY in .env');
+  });
+  assert.equal(built.missingCalls.search, 0);
+});
+
+test('GET /api/download needs a key', async () => {
+  const built = makeSources(fixture.upstreamBase);
+  delete process.env.TEST_MISSING_KEY;
+  await withServer(built.sources, async (base) => {
+    const res = await fetch(`${base}/api/download?source=needkey&id=1`);
+    assert.equal(res.status, 400);
+    const data = await res.json();
+    assert.equal(data.code, 'NEEDS_KEY');
+  });
+  assert.equal(built.resolveCalls.count, 0);
 });
 
 test('GET /api/search upstream error', async () => {
@@ -301,7 +397,7 @@ test('GET /api/download europeana ignores url and streams', async () => {
 });
 
 test('GET /api/download europeana rejects non-images', async () => {
-  const sources = makeSources(fixture.upstreamBase).map((source) =>
+  const sources = makeSourceList(fixture.upstreamBase).map((source) =>
     source.id === 'europeana'
       ? {
           ...source,
@@ -323,7 +419,7 @@ test('GET /api/download europeana rejects non-images', async () => {
 });
 
 test('GET /api/download europeana follows redirects', async () => {
-  const sources = makeSources(fixture.upstreamBase).map((source) =>
+  const sources = makeSourceList(fixture.upstreamBase).map((source) =>
     source.id === 'europeana'
       ? {
           ...source,
@@ -404,7 +500,7 @@ test('GET /api/download openverse ignores url and streams', async () => {
 });
 
 test('GET /api/download does not hard-code the europeana id', async () => {
-  const sources = makeSources(fixture.upstreamBase).map((source) =>
+  const sources = makeSourceList(fixture.upstreamBase).map((source) =>
     source.id === 'europeana'
       ? { ...source, trustResolvedUrl: undefined }
       : source,
@@ -418,7 +514,7 @@ test('GET /api/download does not hard-code the europeana id', async () => {
 });
 
 test('GET /api/download accepts a missing Content-Type with an image extension', async () => {
-  const sources = makeSources(fixture.upstreamBase).map((source) =>
+  const sources = makeSourceList(fixture.upstreamBase).map((source) =>
     source.id === 'openverse'
       ? {
           ...source,
@@ -436,7 +532,7 @@ test('GET /api/download accepts a missing Content-Type with an image extension',
 });
 
 test('GET /api/download rejects a missing Content-Type without a known extension', async () => {
-  const sources = makeSources(fixture.upstreamBase).map((source) =>
+  const sources = makeSourceList(fixture.upstreamBase).map((source) =>
     source.id === 'openverse'
       ? {
           ...source,
