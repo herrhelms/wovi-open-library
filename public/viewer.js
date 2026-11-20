@@ -2,7 +2,7 @@
  * Full-screen viewer dialog for Open Library Fetch.
  * One dialog instance is created on first use and then reused.
  */
-import { downloadUrl, el } from './lib.js';
+import { downloadUrl, el, imageCandidates } from './lib.js';
 
 const COPY_RESET_MS = 1500;
 
@@ -170,9 +170,7 @@ function probeImage(src) {
  */
 async function loadImage(item) {
   const token = ++loadToken;
-  const candidates = [item.preview, item.thumb].filter(
-    (src, index, list) => typeof src === 'string' && src !== '' && list.indexOf(src) === index,
-  );
+  const candidates = imageCandidates(item);
 
   dom.image.hidden = true;
   dom.image.classList.remove('is-empty');
@@ -210,7 +208,7 @@ function preloadNext() {
   if (!state) return;
   const nextItem = state.list[state.index + 1];
   if (!nextItem) return;
-  const src = nextItem.preview || nextItem.thumb;
+  const src = imageCandidates(nextItem)[0];
   if (typeof src === 'string' && src !== '') {
     const preload = new Image();
     preload.src = src;

@@ -337,6 +337,47 @@ h1 {
   white-space: nowrap;
 }
 
+.chip-no-licence {
+  border-style: dashed;
+  border-color: var(--rule);
+  color: var(--ink-muted);
+  background-color: transparent;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.chip-no-licence:hover {
+  border-color: var(--rule);
+  color: var(--ink-muted);
+  background-color: transparent;
+}
+
+.chip-no-licence .chip-name {
+  color: var(--ink-muted);
+}
+
+.open-only-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.open-only-label input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.open-only-label:hover {
+  color: var(--ink);
+}
+
 .spinner {
   display: inline-block;
   width: 0.7rem;

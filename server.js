@@ -7,6 +7,7 @@ import { extname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import { PROJECT_ROOT, loadEnv } from './lib/env.js';
+import { isOpenLicense } from './lib/license.js';
 import { GROUPS, sources as registrySources } from './lib/sources/index.js';
 import { extFromContentType, openRemote, safeFilename } from './lib/download.js';
 
@@ -84,6 +85,7 @@ async function handleSources(res, sourceList) {
       needsKey,
       keyConfigured,
       keyEnv,
+      openLicenses: source.openLicenses !== false,
     };
   });
   sendJson(res, 200, data);
@@ -113,15 +115,46 @@ async function handleSearch(url, res, sourceList) {
   }
 
   const page = parsePage(url.searchParams.get('page'));
+  const openOnly = url.searchParams.get('open') === '1';
 
-  try {
-    const result = await source.search(q, page);
+  if (openOnly && source.openLicenses === false) {
     sendJson(res, 200, {
       source: source.id,
       page,
-      total: result?.total ?? null,
+      total: 0,
+      hasMore: false,
+      items: [],
+      excluded: 'open',
+    });
+    return;
+  }
+
+  try {
+    const result = openOnly
+      ? await source.search(q, page, { openOnly: true })
+      : await source.search(q, page);
+
+    let items = Array.isArray(result?.items) ? result.items : [];
+    for (const item of items) {
+      if (!item || typeof item !== 'object') continue;
+      if (typeof item.open !== 'boolean') {
+        item.open = isOpenLicense(item.license, item.licenseUrl);
+      }
+    }
+
+    let total = result?.total ?? null;
+    if (openOnly) {
+      const kept = items.filter((item) => item?.open === true);
+      if (kept.length !== items.length) total = null;
+      items = kept;
+    }
+
+    sendJson(res, 200, {
+      source: source.id,
+      page,
+      total,
       hasMore: Boolean(result?.hasMore),
-      items: Array.isArray(result?.items) ? result.items : [],
+      items,
     });
   } catch (err) {
     const message = err?.message ?? 'Search failed';
