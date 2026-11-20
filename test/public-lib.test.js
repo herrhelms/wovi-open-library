@@ -5,6 +5,8 @@ import {
   DEFAULT_GROUPS,
   downloadUrl,
   groupSources,
+  imageCandidates,
+  isSearchable,
   isUsable,
   parseSavedSelection,
   serializeSelection,
@@ -34,6 +36,25 @@ test('isUsable', () => {
   assert.equal(isUsable({ needsKey: false }), true);
   assert.equal(isUsable({ needsKey: true, keyConfigured: true }), true);
   assert.equal(isUsable({ needsKey: true, keyConfigured: false }), false);
+});
+
+test('isSearchable', () => {
+  assert.equal(isSearchable({ needsKey: false }, true), true);
+  assert.equal(isSearchable({ openLicenses: false }, true), false);
+  assert.equal(isSearchable({ openLicenses: false }, false), true);
+  assert.equal(isSearchable({ needsKey: true, keyConfigured: false }, false), false);
+});
+
+test('imageCandidates', () => {
+  assert.deepEqual(
+    imageCandidates({ preview: 'a', previewFallback: 'b', thumb: 'c', thumbFallback: 'd' }),
+    ['a', 'b', 'c', 'd'],
+  );
+  assert.deepEqual(
+    imageCandidates({ preview: 'a', thumb: 'a', thumbFallback: '' }),
+    ['a'],
+  );
+  assert.deepEqual(imageCandidates({ preview: null, thumb: 'c' }), ['c']);
 });
 
 test('groupSources keeps group order and source order, drops empty groups', () => {

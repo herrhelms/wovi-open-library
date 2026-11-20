@@ -255,6 +255,30 @@ The Commons-based sources share a limit of 2 requests at the same time. On
 HTTP 429 the app waits (the `Retry-After` seconds, else 2 s, at most 5 s) and
 tries one more time.
 
+## Open licences only
+
+The search has a filter "Open licences only". It is OFF by default. When it is
+ON, the app sends `open=1` to `/api/search`. The server removes the items whose
+licence is not open. This lowers the number of results and can make `total`
+unknown, because a source gives the total before the filter runs. When the item
+count changes, `total` is `null` and the status line shows only the number of
+results shown.
+
+The rule is in `lib/license.js`. An item is open when its licence label or URL
+says one of these:
+
+- public domain, CC0 or Public Domain Mark (`pdm`)
+- a Creative Commons licence, also NC and ND (`creativecommons.org/licenses/`)
+- rightsstatements.org `NoC-*` or `NKC/`, "no known copyright restrictions"
+- Pixabay, Pexels or Unsplash licence
+
+An item is not open when its licence is "In copyright" (rightsstatements
+`InC*`), "Copyright not evaluated" (`CNE`), "Undetermined" (`UND`), or when the
+text is unknown (for example "See item page").
+
+Trove and Harvard have no usable licence data. The app does not search them
+when the filter is ON, and their chips are disabled.
+
 ## Downloads
 
 The server streams files through `/api/download`. Only hosts of the libraries

@@ -44,6 +44,34 @@ export function isUsable(source) {
 }
 
 /**
+ * A source can be searched, also with the open licence filter.
+ * @param {object} source
+ * @param {boolean} [openOnly]
+ * @returns {boolean}
+ */
+export function isSearchable(source, openOnly) {
+  if (!isUsable(source)) return false;
+  if (openOnly === true && source?.openLicenses === false) return false;
+  return true;
+}
+
+/**
+ * Image URLs to try for one item, best first, without duplicates.
+ * @param {object} item
+ * @returns {string[]}
+ */
+export function imageCandidates(item) {
+  const list = [item?.preview, item?.previewFallback, item?.thumb, item?.thumbFallback];
+  const result = [];
+  for (const value of list) {
+    if (typeof value !== 'string' || value === '') continue;
+    if (result.includes(value)) continue;
+    result.push(value);
+  }
+  return result;
+}
+
+/**
  * Build the display rows for the source bar.
  * Empty groups are left out. Sources with an unknown group id go to "Other".
  * @param {object[]} registry

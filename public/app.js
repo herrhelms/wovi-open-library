@@ -7,6 +7,7 @@ import {
   downloadUrl,
   el,
   groupSources,
+  isSearchable,
   isUsable,
   itemKey,
   parseSavedSelection,
@@ -18,6 +19,9 @@ import {
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
+const OPEN_STORAGE_KEY = 'olf.openOnly';
+const OPEN_DISABLED_TEXT =
+  'No licence data. Not searched with Open licences only.';
 const RETRY_DELAY = 15_000;
 const MAX_RETRIES = 20;
 const DOWNLOAD_DELAY = 800;
@@ -28,6 +32,7 @@ const searchInput = document.getElementById('search-input');
 const groupsEl = document.getElementById('source-groups');
 const allButton = document.getElementById('sources-all');
 const noneButton = document.getElementById('sources-none');
+const openOnlyInput = document.getElementById('open-only');
 const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
@@ -47,6 +52,7 @@ let registry = [];
 let registryById = new Map();
 let groups = DEFAULT_GROUPS;
 let selected = new Set();
+let openOnly = false;
 let query = '';
 let generation = 0;
 let activeLoads = 0;
@@ -84,6 +90,26 @@ function saveSelection() {
   }
 }
 
+function loadSavedOpenOnly() {
+  try {
+    return localStorage.getItem(OPEN_STORAGE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveOpenOnly() {
+  try {
+    localStorage.setItem(OPEN_STORAGE_KEY, openOnly ? '1' : '0');
+  } catch {
+    // Storage may be blocked or full; the filter still works for this session.
+  }
+}
+
+function applyOpenOnlyUi() {
+  if (openOnlyInput) openOnlyInput.checked = openOnly;
+}
+
 function defaultSelection() {
   return registry.filter(isUsable).map((source) => source.id);
 }
@@ -115,6 +141,12 @@ function sourceState(id) {
 
 function sourceName(id) {
   return registryById.get(id)?.name ?? id;
+}
+
+function searchableSelected() {
+  return registry.filter(
+    (source) => selected.has(source.id) && isSearchable(source, openOnly),
+  );
 }
 
 function sourceShownCount(id) {
@@ -162,6 +194,16 @@ function createChip(source) {
       }),
     );
     // Keep the status element for layout consistency but never fill it.
+    chipEls.set(source.id, { button, statusEl, usable: false });
+    return button;
+  }
+
+  if (openOnly && source.openLicenses === false) {
+    button.classList.add('chip-no-licence');
+    button.removeAttribute('aria-pressed');
+    button.setAttribute('aria-disabled', 'true');
+    button.title = OPEN_DISABLED_TEXT;
+    button.append(el('span', { class: 'visually-hidden', text: OPEN_DISABLED_TEXT }));
     chipEls.set(source.id, { button, statusEl, usable: false });
     return button;
   }
@@ -296,7 +338,19 @@ function createCard(item, key) {
     img.setAttribute('width', String(Math.round(width)));
     img.setAttribute('height', String(Math.round(height)));
   }
+  let fallbackTried = false;
   img.addEventListener('error', () => {
+    const fallback = item.thumbFallback;
+    if (
+      !fallbackTried &&
+      typeof fallback === 'string' &&
+      fallback !== '' &&
+      fallback !== img.src
+    ) {
+      fallbackTried = true;
+      img.src = fallback;
+      return;
+    }
     article.hidden = true;
     if (selection.delete(key)) updateSelectionUi();
     updateUi();
@@ -442,6 +496,7 @@ async function loadSource(id, page, batch, gen) {
 
   try {
     const params = new URLSearchParams({ source: id, q: query, page: String(page) });
+    if (openOnly) params.set('open', '1');
     const response = await fetch(`/api/search?${params.toString()}`, {
       signal: controller.signal,
     });
@@ -550,8 +605,7 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
 
   const batch = createBatch();
   const gen = generation;
-  for (const source of registry) {
-    if (!selected.has(source.id)) continue;
+  for (const source of searchableSelected()) {
     loadSource(source.id, 1, batch, gen);
   }
   updateUi();
@@ -559,8 +613,7 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
 
 function loadMore() {
   if (!canLoadMore()) return false;
-  const targets = registry
-    .filter((source) => selected.has(source.id))
+  const targets = searchableSelected()
     .map((source) => ({ source, state: sourceState(source.id) }))
     .filter(({ state }) => state.hasMore && state.status !== 'error' && state.status !== 'loading');
   if (targets.length === 0) return false;
@@ -607,8 +660,8 @@ function canLoadMore() {
   if (!query || selected.size === 0) return false;
   if (activeLoads > 0 || !hasAnswered) return false;
   if (batches.length === 0) return false;
-  for (const id of selected) {
-    const state = sourceState(id);
+  for (const source of searchableSelected()) {
+    const state = sourceState(source.id);
     if (state.hasMore && state.status !== 'error' && state.status !== 'loading') return true;
   }
   return false;
@@ -617,7 +670,7 @@ function canLoadMore() {
 // ---------- Source toggles ----------
 function toggleSource(id) {
   const source = registryById.get(id);
-  if (!source || !isUsable(source)) return;
+  if (!source || !isSearchable(source, openOnly)) return;
   if (selected.has(id)) {
     selected.delete(id);
     abortSource(id);
@@ -653,7 +706,7 @@ function setAll(isOn) {
   resetAutoLoad();
   if (isOn) {
     const added = registry.filter(
-      (source) => isUsable(source) && !selected.has(source.id),
+      (source) => isSearchable(source, openOnly) && !selected.has(source.id),
     );
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
@@ -683,7 +736,7 @@ function setGroupAll(groupId, isOn) {
   const row = groupSources(registry, groups).find((entry) => entry.id === groupId);
   if (!row) return;
   resetAutoLoad();
-  const targets = row.sources.filter(isUsable);
+  const targets = row.sources.filter((source) => isSearchable(source, openOnly));
   if (isOn) {
     const added = targets.filter((source) => !selected.has(source.id));
     for (const source of added) selected.add(source.id);
@@ -722,13 +775,19 @@ function updateStatus() {
     return;
   }
 
+  const searchable = searchableSelected();
+  if (searchable.length === 0) {
+    statusLineEl.textContent = 'Select at least one source.';
+    return;
+  }
+
   let loading = 0;
   let finished = 0;
   let knownTotal = 0;
   let totalsComplete = true;
 
-  for (const id of selected) {
-    const state = sourceState(id);
+  for (const source of searchable) {
+    const state = sourceState(source.id);
     if (state.status === 'loading') loading += 1;
     if (state.status === 'done') {
       finished += 1;
@@ -743,7 +802,7 @@ function updateStatus() {
   }
 
   if (loading > 0) {
-    const count = selected.size;
+    const count = searchable.length;
     statusLineEl.textContent = `Searching ${count} source${count === 1 ? '' : 's'}…`;
     return;
   }
@@ -755,7 +814,7 @@ function updateStatus() {
   }
 
   const shown = visibleItems().length;
-  const allFinished = finished === selected.size;
+  const allFinished = finished === searchable.length;
 
   if (allFinished && shown === 0) {
     statusLineEl.textContent = `No results for "${query}".`;
@@ -786,6 +845,7 @@ function updateUrl(mode) {
   const params = new URLSearchParams();
   if (query) params.set('q', query);
   params.set('sources', registry.map((source) => source.id).filter((id) => selected.has(id)).join(','));
+  if (openOnly) params.set('open', '1');
   const url = `${location.pathname}?${params.toString()}`;
   try {
     if (mode === 'push') history.pushState(null, '', url);
@@ -797,6 +857,13 @@ function updateUrl(mode) {
 
 function applyUrlState() {
   const params = new URLSearchParams(location.search);
+  if (params.has('q') || params.has('sources')) {
+    openOnly = params.get('open') === '1';
+  } else {
+    openOnly = loadSavedOpenOnly();
+  }
+  applyOpenOnlyUi();
+
   const sourceParam = params.get('sources');
   if (sourceParam !== null) {
     selected = new Set(knownIds(sourceParam.split(',').filter(Boolean)));
@@ -944,6 +1011,16 @@ searchForm.addEventListener('submit', (event) => {
 
 allButton.addEventListener('click', () => setAll(true));
 noneButton.addEventListener('click', () => setAll(false));
+if (openOnlyInput) {
+  openOnlyInput.addEventListener('change', () => {
+    openOnly = openOnlyInput.checked;
+    saveOpenOnly();
+    updateUrl('replace');
+    renderChips();
+    updateUi();
+    if (query) runSearch(query, { urlMode: 'replace' });
+  });
+}
 loadMoreButton.addEventListener('click', () => {
   resetAutoLoad();
   loadMore();

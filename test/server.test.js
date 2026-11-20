@@ -558,3 +558,143 @@ test('GET /api/download rejects a missing Content-Type without a known extension
     assert.match((await res.json()).error, /not an image/);
   });
 });
+
+function fakeSource(id, { searchResult, openLicenses, ...rest } = {}) {
+  const calls = [];
+  const source = {
+    id,
+    name: id,
+    homepage: `https://example.org/${id}`,
+    async search(q, page, deps) {
+      calls.push({ q, page, deps, args: arguments.length });
+      const result =
+        typeof searchResult === 'function'
+          ? searchResult(q, page, deps)
+          : searchResult;
+      return result ?? { total: 0, hasMore: false, items: [] };
+    },
+    ...rest,
+  };
+  if (openLicenses !== undefined) source.openLicenses = openLicenses;
+  return { source, calls };
+}
+
+test('GET /api/sources sends openLicenses', async () => {
+  const plain = fakeSource('plain');
+  const limited = fakeSource('limited', { openLicenses: false });
+  await withServer([plain.source, limited.source], async (base) => {
+    const data = await (await fetch(`${base}/api/sources`)).json();
+    assert.equal(data.find((entry) => entry.id === 'plain').openLicenses, true);
+    assert.equal(data.find((entry) => entry.id === 'limited').openLicenses, false);
+  });
+});
+
+test('GET /api/search sets open without the filter', async () => {
+  const fake = fakeSource('fake', {
+    searchResult: {
+      total: 2,
+      hasMore: true,
+      items: [
+        { id: '1', license: 'CC0', licenseUrl: null },
+        { id: '2', license: 'In Copyright', licenseUrl: null },
+      ],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=fake&q=moon`)).json();
+    assert.deepEqual(data.items.map((item) => item.open), [true, false]);
+    assert.equal(data.total, 2);
+    assert.equal(data.hasMore, true);
+    assert.equal(fake.calls.length, 1);
+    assert.equal(fake.calls[0].args <= 2 || fake.calls[0].deps?.openOnly !== true, true);
+  });
+});
+
+test('GET /api/search keeps open set by the module', async () => {
+  const fake = fakeSource('fake', {
+    searchResult: {
+      total: 1,
+      hasMore: false,
+      items: [{ id: '1', license: 'CC0', open: false }],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=fake&q=moon`)).json();
+    assert.equal(data.items[0].open, false);
+  });
+});
+
+test('GET /api/search filters with open=1', async () => {
+  const fake = fakeSource('fake', {
+    searchResult: {
+      total: 3,
+      hasMore: true,
+      items: [
+        { id: '1', license: 'CC0' },
+        { id: '2', license: 'In Copyright' },
+        { id: '3', license: 'CC BY 4.0' },
+      ],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=fake&q=moon&open=1`)).json();
+    assert.equal(fake.calls.length, 1);
+    assert.equal(fake.calls[0].deps.openOnly, true);
+    assert.deepEqual(data.items.map((item) => item.id), ['1', '3']);
+    assert.equal(data.total, null);
+    assert.equal(data.hasMore, true);
+  });
+});
+
+test('GET /api/search keeps total with open=1 when nothing is removed', async () => {
+  const fake = fakeSource('fake', {
+    searchResult: {
+      total: 2,
+      hasMore: false,
+      items: [
+        { id: '1', license: 'CC0' },
+        { id: '2', license: 'Public domain' },
+      ],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=fake&q=moon&open=1`)).json();
+    assert.equal(data.total, 2);
+  });
+});
+
+test('GET /api/search skips a source without licence data with open=1', async () => {
+  const fake = fakeSource('limited', {
+    openLicenses: false,
+    searchResult: { total: 5, hasMore: true, items: [{ id: '1', license: 'CC0' }] },
+  });
+  await withServer([fake.source], async (base) => {
+    const res = await fetch(`${base}/api/search?source=limited&q=moon&open=1`);
+    assert.equal(res.status, 200);
+    const data = await res.json();
+    assert.equal(data.total, 0);
+    assert.equal(data.hasMore, false);
+    assert.deepEqual(data.items, []);
+    assert.equal(data.excluded, 'open');
+    assert.equal(fake.calls.length, 0);
+  });
+});
+
+test('GET /api/search treats open=0 like no filter', async () => {
+  const fake = fakeSource('fake', {
+    searchResult: {
+      total: 2,
+      hasMore: false,
+      items: [
+        { id: '1', license: 'CC0' },
+        { id: '2', license: 'In Copyright' },
+      ],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const data = await (await fetch(`${base}/api/search?source=fake&q=moon&open=0`)).json();
+    assert.equal(fake.calls[0].deps, undefined);
+    assert.deepEqual(data.items.map((item) => item.open), [true, false]);
+    assert.equal(data.total, 2);
+  });
+});
