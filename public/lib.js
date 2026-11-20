@@ -460,6 +460,36 @@ export function itemKey(item) {
 }
 
 /**
+ * Key for one search in the browser card cache.
+ * The open-licence filter is part of the key, so both variants stay separate.
+ * @param {boolean} openOnly
+ * @param {string} query
+ * @returns {string}
+ */
+export function searchKey(openOnly, query) {
+  return `${openOnly ? 1 : 0}|${query}`;
+}
+
+/**
+ * Set a key in a map and keep the map at or below `max` entries.
+ * An existing key is removed first, so that it becomes the newest entry.
+ * The oldest keys are removed first. Only the given map changes.
+ * @param {Map<string, unknown>} map
+ * @param {string} key
+ * @param {unknown} value
+ * @param {number} [max]
+ * @returns {void}
+ */
+export function rememberLimited(map, key, value, max = 10) {
+  if (map.has(key)) map.delete(key);
+  map.set(key, value);
+  while (map.size > max) {
+    const oldest = map.keys().next().value;
+    map.delete(oldest);
+  }
+}
+
+/**
  * Create a DOM element.
  * `attrs` supports `class`, `text`, `dataset`, regular attributes and
  * `on<Event>` listener functions. `children` may contain nodes or strings.
