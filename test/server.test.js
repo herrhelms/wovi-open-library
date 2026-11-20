@@ -160,9 +160,21 @@ async function createFixture() {
   const upstreamPort = await listen(upstream);
   const upstreamBase = `http://127.0.0.1:${upstreamPort}`;
 
+  const thumbCacheDir = join(root, 'thumb-cache');
+  const thumbFetchCalls = [];
+  const thumbFetch = async (url) => {
+    thumbFetchCalls.push(url);
+    return new Response(IMAGE_BYTES, {
+      status: 200,
+      headers: { 'content-type': 'image/jpeg' },
+    });
+  };
+
   const server = createServer({
     publicDir,
     sourcesOverride: makeSourceList(upstreamBase),
+    thumbCacheDir,
+    thumbFetch,
   });
   const port = await listen(server);
   const base = `http://127.0.0.1:${port}`;
@@ -175,6 +187,9 @@ async function createFixture() {
     server,
     port,
     base,
+    thumbCacheDir,
+    thumbFetch,
+    thumbFetchCalls,
     async cleanup() {
       await close(server);
       await close(upstream);
@@ -301,6 +316,8 @@ test('GET /api/groups', async () => {
     publicDir: fixture.publicDir,
     sourcesOverride: makeSourceList(fixture.upstreamBase),
     groupsOverride: GROUPS_FIXTURE,
+    thumbCacheDir: fixture.thumbCacheDir,
+    thumbFetch: fixture.thumbFetch,
   });
   const port = await listen(server);
   try {
@@ -423,7 +440,12 @@ test('GET /api/download europeana rejects non-images', async () => {
         }
       : source,
   );
-  const server = createServer({ publicDir: fixture.publicDir, sourcesOverride: sources });
+  const server = createServer({
+    publicDir: fixture.publicDir,
+    sourcesOverride: sources,
+    thumbCacheDir: fixture.thumbCacheDir,
+    thumbFetch: fixture.thumbFetch,
+  });
   const port = await listen(server);
   try {
     const res = await fetch(
@@ -445,7 +467,12 @@ test('GET /api/download europeana follows redirects', async () => {
         }
       : source,
   );
-  const server = createServer({ publicDir: fixture.publicDir, sourcesOverride: sources });
+  const server = createServer({
+    publicDir: fixture.publicDir,
+    sourcesOverride: sources,
+    thumbCacheDir: fixture.thumbCacheDir,
+    thumbFetch: fixture.thumbFetch,
+  });
   const port = await listen(server);
   try {
     const res = await fetch(
@@ -490,8 +517,14 @@ test('POST is not allowed', async () => {
   assert.equal(res.status, 405);
 });
 
-async function withServer(sources, fn) {
-  const server = createServer({ publicDir: fixture.publicDir, sourcesOverride: sources });
+async function withServer(sources, fn, extra = {}) {
+  const server = createServer({
+    publicDir: fixture.publicDir,
+    sourcesOverride: sources,
+    thumbCacheDir: fixture.thumbCacheDir,
+    thumbFetch: fixture.thumbFetch,
+    ...extra,
+  });
   const port = await listen(server);
   try {
     await fn(`http://127.0.0.1:${port}`, port);
@@ -753,6 +786,8 @@ test('GET /api/search expires the cache after the TTL', async () => {
     sourcesOverride: [fake.source],
     searchCacheTtlMs: 1000,
     now: () => clock,
+    thumbCacheDir: fixture.thumbCacheDir,
+    thumbFetch: fixture.thumbFetch,
   });
   const port = await listen(server);
   const base = `http://127.0.0.1:${port}`;
@@ -872,4 +907,100 @@ test('GET /api/search excluded answer has no cache header', async () => {
     assert.equal(res.headers.get('x-search-cache'), null);
     assert.equal(fake.calls.length, 0);
   });
+});
+
+function validMediaId(seed) {
+  return mediaIdFor(`https://img.example/${seed}.jpg`);
+}
+
+async function waitForThumb(base, mediaId, deadline = 2000) {
+  const start = Date.now();
+  while (Date.now() - start < deadline) {
+    const res = await fetch(`${base}/api/thumb/${mediaId}`);
+    if (res.ok) return res;
+    await res.arrayBuffer();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+  }
+  return fetch(`${base}/api/thumb/${mediaId}`);
+}
+
+test('POST /api/thumb warm for an unregistered ID is 404', async () => {
+  const id = validMediaId('unregistered');
+  const res = await fetch(`${fixture.base}/api/thumb/${id}/warm`, { method: 'POST' });
+  assert.equal(res.status, 404);
+  assert.equal(typeof (await res.json()).error, 'string');
+  assert.equal(fixture.thumbFetchCalls.length, 0);
+});
+
+test('thumb routes validate the media ID', async () => {
+  const badWarm = await fetch(`${fixture.base}/api/thumb/bad/warm`, { method: 'POST' });
+  assert.equal(badWarm.status, 400);
+  const badGet = await fetch(`${fixture.base}/api/thumb/bad`);
+  assert.equal(badGet.status, 400);
+  const unknown = validMediaId('unknown-route');
+  const missing = await fetch(`${fixture.base}/api/thumb/${unknown}`);
+  assert.equal(missing.status, 404);
+  const warmGet = await fetch(`${fixture.base}/api/thumb/${unknown}/warm`);
+  assert.equal(warmGet.status, 405);
+});
+
+test('thumb warm stores the image and serves it', async () => {
+  const thumb = 'https://img.example/a.jpg';
+  const id = mediaIdFor(thumb);
+  const fake = fakeSource('thumbed', {
+    searchResult: {
+      total: 1,
+      hasMore: false,
+      items: [
+        {
+          id: '1',
+          license: 'CC0',
+          thumb,
+          preview: thumb,
+          previewFallback: thumb,
+          thumbFallback: thumb,
+          full: thumb,
+        },
+      ],
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const before = await (await fetch(`${base}/api/search?source=thumbed&q=moon`)).json();
+    assert.equal(before.items[0].thumb, thumb);
+    assert.equal(before.items[0].thumbCached, false);
+    assert.equal(before.items[0].thumbSource, thumb);
+    assert.equal(before.items[0].preview, thumb);
+
+    const warm = await fetch(`${base}/api/thumb/${id}/warm`, { method: 'POST' });
+    assert.equal(warm.status, 202);
+    await warm.json();
+
+    const served = await waitForThumb(base, id);
+    assert.equal(served.status, 200);
+    assert.equal(served.headers.get('content-type'), 'image/jpeg');
+    assert.equal(served.headers.get('cache-control'), 'public, max-age=31536000, immutable');
+    assert.equal(served.headers.get('x-content-type-options'), 'nosniff');
+    assert.equal(served.headers.get('content-length'), String(IMAGE_BYTES.length));
+    assert.deepEqual(Buffer.from(await served.arrayBuffer()), IMAGE_BYTES);
+
+    const head = await fetch(`${base}/api/thumb/${id}`, { method: 'HEAD' });
+    assert.equal(head.status, 200);
+    assert.equal(head.headers.get('content-length'), String(IMAGE_BYTES.length));
+    assert.equal((await head.arrayBuffer()).byteLength, 0);
+
+    const again = await fetch(`${base}/api/thumb/${id}/warm`, { method: 'POST' });
+    assert.equal(again.status, 204);
+    assert.equal((await again.arrayBuffer()).byteLength, 0);
+
+    const after = await (await fetch(`${base}/api/search?source=thumbed&q=moon`)).json();
+    assert.equal(after.items[0].thumb, `/api/thumb/${id}`);
+    assert.equal(after.items[0].thumbCached, true);
+    assert.equal(after.items[0].thumbSource, thumb);
+    assert.equal(after.items[0].preview, thumb);
+  });
+});
+
+test('POST on other routes stays 405', async () => {
+  const res = await fetch(`${fixture.base}/api/sources`, { method: 'POST' });
+  assert.equal(res.status, 405);
 });
