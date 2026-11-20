@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "getty",
+  "name": "Getty Museum",
+  "homepage": "https://www.getty.edu/art/collection/",
+  "group": "museums",
+  "order": 200,
+  "description": "Getty Museum collection images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Search by title words only (SPARQL); one search takes about 8 seconds."
+  ]
+}

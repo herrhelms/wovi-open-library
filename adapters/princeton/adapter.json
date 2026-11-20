@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "princeton",
+  "name": "Princeton University Art Museum",
+  "homepage": "https://artmuseum.princeton.edu",
+  "group": "museums",
+  "order": 270,
+  "description": "Princeton University Art Museum images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Only objects whose primary image is not restricted.",
+    "One search needs one request for each object (24), so it is slower."
+  ]
+}

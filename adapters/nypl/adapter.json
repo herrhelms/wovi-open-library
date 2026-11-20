@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "nypl",
+  "name": "New York Public Library",
+  "homepage": "https://digitalcollections.nypl.org",
+  "group": "libraries",
+  "order": 300,
+  "description": "New York Public Library digital collections.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": {
+    "env": "NYPL_TOKEN",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://api.repo.nypl.org/",
+    "steps": [
+      "Get one at https://api.repo.nypl.org/.",
+      "Put NYPL_TOKEN=<token> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": "https://api.repo.nypl.org/",
+  "notes": []
+}

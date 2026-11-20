@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "inaturalist",
+  "name": "iNaturalist",
+  "homepage": "https://www.inaturalist.org",
+  "group": "science",
+  "order": 490,
+  "description": "iNaturalist nature photos.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Max 60 requests in each minute; only CC0, CC BY and CC BY-SA photos."
+  ]
+}

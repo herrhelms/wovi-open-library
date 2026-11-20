@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "pixabay",
+  "name": "Pixabay",
+  "homepage": "https://pixabay.com",
+  "group": "aggregators",
+  "order": 110,
+  "description": "Pixabay free stock photos.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": {
+    "env": "PIXABAY_KEY",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://pixabay.com/api/docs/",
+    "steps": [
+      "Get one at https://pixabay.com/api/docs/.",
+      "Put PIXABAY_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": "https://pixabay.com/api/docs/",
+  "notes": [
+    "Max 1280 px (the original needs special approval).",
+    "Built from the public API documentation; not yet tested live (no key yet)."
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "id": "eso",
+  "name": "ESO",
+  "homepage": "https://www.eso.org",
+  "group": "science",
+  "order": 450,
+  "description": "ESO space images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "\"Download full resolution\" gives the largest JPEG of the item page (\"Large JPEG\", else \"Publication JPEG\", else \"Screensize JPEG\").",
+    "The TIFF originals are not offered."
+  ],
+  "base": "djangoplicity",
+  "options": {
+    "origin": "https://www.eso.org",
+    "imagesPath": "/public/images/",
+    "cdn": "https://cdn.eso.org/images/",
+    "creator": "ESO"
+  }
+}

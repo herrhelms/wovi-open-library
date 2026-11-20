@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "rijksmuseum",
+  "name": "Rijksmuseum",
+  "homepage": "https://www.rijksmuseum.nl",
+  "group": "museums",
+  "order": 160,
+  "description": "Rijksmuseum collection images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "12 items for each page (each item needs 3 requests)."
+  ]
+}

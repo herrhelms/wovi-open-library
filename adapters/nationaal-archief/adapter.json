@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "nationaal-archief",
+  "name": "Nationaal Archief (Netherlands) (via Wikimedia Commons)",
+  "homepage": "https://www.nationaalarchief.nl",
+  "group": "libraries",
+  "order": 350,
+  "description": "Nationaal Archief images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_Nationaal_Archief\""
+  }
+}

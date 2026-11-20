@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "rumsey",
+  "name": "David Rumsey Map Collection",
+  "homepage": "https://www.davidrumsey.com",
+  "group": "libraries",
+  "order": 410,
+  "description": "David Rumsey Map Collection maps and images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "License CC BY-NC-SA 3.0 — NON-COMMERCIAL. It is the only non-commercial source.",
+    "The viewer shows a note.",
+    "\"Download full resolution\" gets the full width from the IIIF server and can take some seconds."
+  ]
+}

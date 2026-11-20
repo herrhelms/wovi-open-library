@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "wellcome",
+  "name": "Wellcome Collection",
+  "homepage": "https://wellcomecollection.org",
+  "group": "science",
+  "order": 460,
+  "description": "Wellcome Collection images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": []
+}

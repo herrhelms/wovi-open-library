@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "harvard",
+  "name": "Harvard Art Museums",
+  "homepage": "https://harvardartmuseums.org",
+  "group": "museums",
+  "order": 280,
+  "description": "Harvard Art Museums images.",
+  "defaultEnabled": true,
+  "openLicenses": false,
+  "trustResolvedUrl": false,
+  "key": {
+    "env": "HARVARD_KEY",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://harvardartmuseums.org/collections/api",
+    "steps": [
+      "Get one at https://harvardartmuseums.org/collections/api.",
+      "Put HARVARD_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": "https://harvardartmuseums.org/collections/api",
+  "notes": [
+    "Harvard has no usable licence data.",
+    "Built from the public API documentation; not yet tested live (no key yet)."
+  ]
+}

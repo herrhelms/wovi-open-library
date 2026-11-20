@@ -1,0 +1,8 @@
+{
+  "schema": 1,
+  "id": "code-id-mismatch",
+  "name": "Code ID Mismatch",
+  "homepage": "https://example.org/code-id-mismatch",
+  "group": "alpha",
+  "description": "The code exports a different id than adapter.json."
+}

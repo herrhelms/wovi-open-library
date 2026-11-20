@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "paris-musees",
+  "name": "Paris Musées (via Wikimedia Commons)",
+  "homepage": "https://www.parismusees.paris.fr",
+  "group": "museums",
+  "order": 230,
+  "description": "Paris Musées images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_Paris_Musées\""
+  }
+}

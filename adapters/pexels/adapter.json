@@ -1,0 +1,27 @@
+{
+  "schema": 1,
+  "id": "pexels",
+  "name": "Pexels",
+  "homepage": "https://www.pexels.com",
+  "group": "aggregators",
+  "order": 120,
+  "description": "Pexels free stock photos.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": {
+    "env": "PEXELS_KEY",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://www.pexels.com/api/",
+    "steps": [
+      "Get one at https://www.pexels.com/api/.",
+      "Put PEXELS_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": "https://www.pexels.com/api/",
+  "notes": [
+    "Built from the public API documentation; not yet tested live (no key yet)."
+  ]
+}

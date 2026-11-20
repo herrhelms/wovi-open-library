@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "digital-commonwealth",
+  "name": "Digital Commonwealth (Massachusetts)",
+  "homepage": "https://www.digitalcommonwealth.org",
+  "group": "libraries",
+  "order": 400,
+  "description": "Digital Commonwealth images from Massachusetts collections.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Only items marked \"no restrictions\"."
+  ]
+}

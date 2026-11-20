@@ -4,12 +4,14 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-import { subsetQuery, createCommonsSubset } from '../lib/sources/commons-subset.js';
-import { parseSearch as commonsParseSearch, buildSearchUrl as commonsBuildSearchUrl } from '../lib/sources/commons.js';
-import * as britishLibrary from '../lib/sources/british-library.js';
-import * as gallica from '../lib/sources/gallica.js';
-import * as noaa from '../lib/sources/noaa.js';
-import * as bhl from '../lib/sources/bhl.js';
+import { subsetQuery, createCommonsSubset } from '../lib/bases/commons-subset.js';
+import { parseSearch as commonsParseSearch, buildSearchUrl as commonsBuildSearchUrl } from '../lib/bases/commons.js';
+import { getSource } from '../lib/sources/index.js';
+
+const britishLibrary = getSource('british-library');
+const gallica = getSource('gallica');
+const noaa = getSource('noaa');
+const bhl = getSource('bhl');
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(readFileSync(join(here, 'fixtures/commons.json'), 'utf8'));
@@ -47,7 +49,7 @@ for (const entry of modules) {
     assert.equal(module.id, id);
     assert.equal(module.group, group);
     assert.equal(module.keyEnv, null);
-    assert.equal(module.filter, filter);
+    assert.equal(module.config.options.filter, filter);
     assert.ok(module.name.endsWith(' (via Wikimedia Commons)'));
     assert.equal(typeof module.homepage, 'string');
     assert.ok(module.homepage.startsWith('https://'));

@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "id": "europeana",
+  "name": "Europeana",
+  "homepage": "https://www.europeana.eu",
+  "group": "aggregators",
+  "order": 60,
+  "description": "Europeana: open-licence images from European institutions.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": {
+    "env": "EUROPEANA_KEY",
+    "required": false,
+    "default": "api2demo",
+    "signupUrl": "https://pro.europeana.eu/page/get-api",
+    "steps": [
+      "The default key is api2demo.",
+      "A personal key is available at https://pro.europeana.eu/page/get-api.",
+      "Put EUROPEANA_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": null,
+  "notes": []
+}

@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "met",
+  "name": "The Met",
+  "homepage": "https://www.metmuseum.org",
+  "group": "museums",
+  "order": 140,
+  "description": "The Metropolitan Museum of Art collection.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "The search can return objects that are not public domain. The app removes them, so a page can have fewer than 24 items."
+  ]
+}

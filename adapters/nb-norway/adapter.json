@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "nb-norway",
+  "name": "National Library of Norway",
+  "homepage": "https://www.nb.no",
+  "group": "libraries",
+  "order": 390,
+  "description": "National Library of Norway images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": []
+}

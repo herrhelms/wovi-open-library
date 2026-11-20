@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "walters",
+  "name": "Walters Art Museum (via Wikimedia Commons)",
+  "homepage": "https://art.thewalters.org",
+  "group": "museums",
+  "order": 240,
+  "description": "Walters Art Museum images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Media contributed by the Walters Art Museum\""
+  }
+}

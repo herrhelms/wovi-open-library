@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "dpla",
+  "name": "DPLA",
+  "homepage": "https://dp.la",
+  "group": "aggregators",
+  "order": 70,
+  "description": "Digital Public Library of America: items from US libraries, archives and museums.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": {
+    "env": "DPLA_KEY",
+    "required": true,
+    "default": null,
+    "signupUrl": "https://api.dp.la/v2/api_key/<your email>",
+    "steps": [
+      "Send: curl -X POST https://api.dp.la/v2/api_key/<your email>",
+      "Put DPLA_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": null,
+  "notes": [
+    "Often only a thumbnail; the viewer links to the partner page.",
+    "Built from the public API documentation; not yet tested live (no key yet)."
+  ]
+}

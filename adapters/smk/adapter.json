@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "smk",
+  "name": "SMK – National Gallery of Denmark",
+  "homepage": "https://open.smk.dk",
+  "group": "museums",
+  "order": 220,
+  "description": "SMK, the National Gallery of Denmark, open images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": []
+}

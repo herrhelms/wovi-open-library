@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "aic",
+  "name": "Art Institute of Chicago",
+  "homepage": "https://www.artic.edu/collection",
+  "group": "museums",
+  "order": 180,
+  "description": "Art Institute of Chicago collection images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "The AIC image server answers this server with a Cloudflare challenge. The browser loads the images directly.",
+    "\"Download full resolution\" opens the image (max 3000 px wide) from artic.edu in a new tab.",
+    "\"Download selected\" skips AIC items."
+  ]
+}

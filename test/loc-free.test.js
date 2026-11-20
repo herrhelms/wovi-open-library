@@ -16,7 +16,7 @@ import {
   parseSet,
   buildIndex,
   searchIndex,
-} from '../lib/sources/loc-free.js';
+} from '../lib/bases/loc-free.js';
 
 const P = IIIF_PREFIX;
 

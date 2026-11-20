@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "nara",
+  "name": "US National Archives (via Wikimedia Commons)",
+  "homepage": "https://www.archives.gov",
+  "group": "libraries",
+  "order": 340,
+  "description": "US National Archives images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_the_National_Archives_and_Records_Administration\""
+  }
+}

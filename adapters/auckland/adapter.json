@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "auckland",
+  "name": "Auckland Museum (via Wikimedia Commons)",
+  "homepage": "https://www.aucklandmuseum.com",
+  "group": "museums",
+  "order": 260,
+  "description": "Auckland Museum images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_Auckland_Museum\""
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "id": "nasa",
+  "name": "NASA Image Library",
+  "homepage": "https://images.nasa.gov",
+  "group": "science",
+  "order": 420,
+  "description": "NASA Image Library images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": []
+}

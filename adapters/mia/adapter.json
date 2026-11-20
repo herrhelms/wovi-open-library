@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "mia",
+  "name": "Minneapolis Institute of Art",
+  "homepage": "https://collections.artsmia.org",
+  "group": "museums",
+  "order": 210,
+  "description": "Minneapolis Institute of Art collection images.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "The image server sends no Content-Type; the download proxy gets the type from the file extension."
+  ]
+}

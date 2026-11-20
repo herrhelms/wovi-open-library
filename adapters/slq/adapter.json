@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "slq",
+  "name": "State Library of Queensland (via Wikimedia Commons)",
+  "homepage": "https://www.slq.qld.gov.au",
+  "group": "libraries",
+  "order": 380,
+  "description": "State Library of Queensland images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_the_State_Library_of_Queensland\""
+  }
+}

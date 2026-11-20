@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "id": "british-library",
+  "name": "British Library (via Wikimedia Commons)",
+  "homepage": "https://www.bl.uk",
+  "group": "libraries",
+  "order": 310,
+  "description": "British Library Mechanical Curator images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Searched through Wikimedia Commons with a category or source filter.",
+    "The item page is the Commons file page."
+  ],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_the_British_Library_Mechanical_Curator_collection\""
+  }
+}

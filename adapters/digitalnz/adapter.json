@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "id": "digitalnz",
+  "name": "DigitalNZ",
+  "homepage": "https://digitalnz.org",
+  "group": "aggregators",
+  "order": 100,
+  "description": "DigitalNZ: images from New Zealand collections.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": true,
+  "key": {
+    "env": "DIGITALNZ_KEY",
+    "required": false,
+    "default": null,
+    "signupUrl": "https://digitalnz.org/developers",
+    "steps": [
+      "The API works without it now. On HTTP 401/403 the app asks for it.",
+      "Get one at https://digitalnz.org/developers.",
+      "Put DIGITALNZ_KEY=<key> in .env in the project root."
+    ],
+    "limits": null
+  },
+  "docsUrl": "https://digitalnz.org/developers",
+  "notes": [
+    "Some records give only a thumbnail; the viewer then shows a note."
+  ]
+}

@@ -4,15 +4,17 @@ import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
-import * as parisMusees from '../lib/sources/paris-musees.js';
-import * as walters from '../lib/sources/walters.js';
-import * as brooklyn from '../lib/sources/brooklyn.js';
-import * as auckland from '../lib/sources/auckland.js';
-import * as nara from '../lib/sources/nara.js';
-import * as nationaalArchief from '../lib/sources/nationaal-archief.js';
-import * as bundesarchiv from '../lib/sources/bundesarchiv.js';
-import * as ethLibrary from '../lib/sources/eth-library.js';
-import * as slq from '../lib/sources/slq.js';
+import { getSource } from '../lib/sources/index.js';
+
+const parisMusees = getSource('paris-musees');
+const walters = getSource('walters');
+const brooklyn = getSource('brooklyn');
+const auckland = getSource('auckland');
+const nara = getSource('nara');
+const nationaalArchief = getSource('nationaal-archief');
+const bundesarchiv = getSource('bundesarchiv');
+const ethLibrary = getSource('eth-library');
+const slq = getSource('slq');
 
 const here = dirname(fileURLToPath(import.meta.url));
 const fixture = JSON.parse(
@@ -103,7 +105,7 @@ for (const entry of modules) {
     assert.equal(module.homepage, homepage);
     assert.equal(module.group, group);
     assert.equal(module.keyEnv, null);
-    assert.equal(module.filter, filter);
+    assert.equal(module.config.options.filter, filter);
   });
 
   test(`${id} builds the Commons search URL with the filter`, () => {
