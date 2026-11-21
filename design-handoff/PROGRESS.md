@@ -35,13 +35,14 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 
 ## Decisions and deviations
 
-- **Masonry (step 6).** The design says CSS `columns`. The user asked for a wall where infinite loading only adds cards and never moves existing ones. CSS columns re-balance on each append. Keep the JS column masonry and match the look: min column width 250 px, gap 20 px, tile styles from the reference. To be confirmed by the user before step 6.
+- **Masonry (step 6), decided by the user:** not CSS `columns` (they re-balance on each append; the user wants a wall where infinite loading only adds cards). Use native `display: grid-lanes` with `grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))` and `gap: 20px` inside `@supports (display: grid-lanes)` (Safari 26.4+ today), and keep the JS column masonry as the fallback for other browsers.
 - **Dark mode.** The design is light only (no dark tokens). Step 1 removes the old `prefers-color-scheme: dark` block. The detail stage stays dark by design.
 - **Fonts.** Geist + Geist Mono from Google Fonts, the same way the reference and the old app load fonts. (Self-hosting the OFL font files is possible later if no third-party request is wanted.)
 - **Screenshots.** Playwright is not installed; use `agent-browser` for 1440×1000 and 390×844 shots.
 - **Code changes** are written by Hermes (project workflow); Claude plans, checks and ticks this file.
 - **Repo and Sponsors URLs (step 11):** `https://github.com/herrhelms/wovi-open-library` and `https://github.com/sponsors/herrhelms`. Push to the public repo only when the redesign is done.
-- **Open questions for later steps:** Explore / Collections routes (step 2), "More like this" data (step 8: no data source exists today).
+- **Explore / Collections (step 2), decided by the user:** nav entries only for now. Explore = the search page (`/`, `aria-current="page"`). Collections has no route: it shows as a disabled entry (no dead link). "Saved n" shows the real count from `localStorage`; its page comes in step 10.
+- **Open question for later steps:** "More like this" data (step 8: no data source exists today).
 
 ## Steps (HANDOFF §3)
 
