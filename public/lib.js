@@ -463,6 +463,140 @@ export function itemKey(item) {
 }
 
 /**
+ * Lower-case licence text and URL together, for the licence helpers.
+ * @param {string} license
+ * @param {string} licenseUrl
+ * @returns {string}
+ */
+function licenceHaystack(license, licenseUrl) {
+  const text = typeof license === 'string' ? license.toLowerCase() : '';
+  const url = typeof licenseUrl === 'string' ? licenseUrl.toLowerCase() : '';
+  return `${text} ${url}`;
+}
+
+/**
+ * Whether the licence text or URL is a public domain / CC0 statement.
+ * @param {string} haystack lower-case licence text and URL
+ * @returns {boolean}
+ */
+function isPublicDomain(haystack) {
+  return (
+    haystack.includes('public domain') ||
+    haystack.includes('publicdomain/mark') ||
+    haystack.includes('no known copyright') ||
+    haystack.includes('publicdomain/zero') ||
+    /(^|[^a-z0-9])pdm([^a-z0-9]|$)/.test(haystack) ||
+    /(^|[^a-z0-9])cc0([^a-z0-9]|$)/.test(haystack)
+  );
+}
+
+/**
+ * Whether the licence text or URL names the CC BY family.
+ * @param {string} haystack lower-case licence text and URL
+ * @returns {boolean}
+ */
+function isCcBy(haystack) {
+  return (
+    /by[-_ ]?nc/.test(haystack) ||
+    /by[-_ ]?nd/.test(haystack) ||
+    /by[-_ ]?sa/.test(haystack) ||
+    /(^|[^a-z0-9])by([^a-z0-9]|$)/.test(haystack)
+  );
+}
+
+/**
+ * Short meaning of a licence, from its text and URL together.
+ * `open` is kept for the caller's "Rights reserved" case; it does not change
+ * the result.
+ * @param {string} license
+ * @param {string} licenseUrl
+ * @param {boolean} [open]
+ * @returns {string}
+ */
+export function licenceMeaning(license, licenseUrl, open) {
+  const haystack = licenceHaystack(license, licenseUrl);
+  if (isPublicDomain(haystack)) return 'no restrictions';
+  if (/by[-_ ]?nc/.test(haystack)) return 'credit, non-commercial';
+  if (/by[-_ ]?nd/.test(haystack)) return 'credit, no changes';
+  if (/by[-_ ]?sa/.test(haystack)) return 'credit & share alike';
+  if (/(^|[^a-z0-9])by([^a-z0-9]|$)/.test(haystack)) return 'credit required';
+  return 'check with source';
+}
+
+/**
+ * Whether a licence requires attribution (the CC BY family).
+ * Public domain, CC0, unknown and empty licences do not.
+ * @param {string} license
+ * @param {string} licenseUrl
+ * @returns {boolean}
+ */
+export function needsAttribution(license, licenseUrl) {
+  const haystack = licenceHaystack(license, licenseUrl);
+  if (isPublicDomain(haystack)) return false;
+  return isCcBy(haystack);
+}
+
+/**
+ * Attribution line for one item. An empty creator and its comma are left out;
+ * an empty title becomes "Untitled". All values are trimmed.
+ * @param {{title?:string, creator?:string, source?:string, license?:string}} item
+ * @returns {string}
+ */
+export function attributionText({ title, creator, source, license } = {}) {
+  const clean = (value) => (typeof value === 'string' ? value.trim() : '');
+  const name = clean(creator);
+  const parts = [`\u201c${clean(title) || 'Untitled'}\u201d`];
+  if (name !== '') parts.push(name);
+  parts.push(`via ${clean(source)}`, clean(license));
+  return parts.filter((part) => part !== '').join(', ');
+}
+
+/**
+ * Range of filmstrip items around the current index, `end` exclusive.
+ * Bad input gives `{ start: 0, end: 0 }`.
+ * @param {number} index
+ * @param {number} length
+ * @param {number} [radius]
+ * @returns {{start:number, end:number}}
+ */
+export function filmstripRange(index, length, radius = 4) {
+  if (!Number.isInteger(index) || !Number.isInteger(length)) {
+    return { start: 0, end: 0 };
+  }
+  if (index < 0 || index >= length) return { start: 0, end: 0 };
+  const span = Number.isInteger(radius) && radius >= 0 ? radius : 0;
+  return {
+    start: Math.max(0, index - span),
+    end: Math.min(length, index + span + 1),
+  };
+}
+
+/**
+ * Query string of one search with the `i` parameter set to `uid`.
+ * An empty or non-string `uid` removes `i`. Other parameters keep their order.
+ * @param {string} search
+ * @param {string} uid
+ * @returns {string}
+ */
+export function withItemParam(search, uid) {
+  const source = typeof search === 'string' ? search : '';
+  const params = new URLSearchParams(source.startsWith('?') ? source.slice(1) : source);
+  if (typeof uid === 'string' && uid !== '') params.set('i', uid);
+  else params.delete('i');
+  const value = params.toString();
+  return value === '' ? '' : `?${value}`;
+}
+
+/**
+ * Query string of one search without the `i` parameter.
+ * @param {string} search
+ * @returns {string}
+ */
+export function searchWithoutItem(search) {
+  return withItemParam(search, '');
+}
+
+/**
  * Key for one search in the browser card cache.
  * The open-licence filter is part of the key, so both variants stay separate.
  * @param {boolean} openOnly
