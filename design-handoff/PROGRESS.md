@@ -38,6 +38,7 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 - **Masonry (step 6), decided by the user:** not CSS `columns` (they re-balance on each append; the user wants a wall where infinite loading only adds cards). Use native `display: grid-lanes` with `grid-template-columns: repeat(auto-fill, minmax(250px, 1fr))` and `gap: 20px` inside `@supports (display: grid-lanes)` (Safari 26.4+ today), and keep the JS column masonry as the fallback for other browsers.
 - **Dark mode.** The design is light only (no dark tokens). Step 1 removes the old `prefers-color-scheme: dark` block. The detail stage stays dark by design.
 - **Fonts.** Geist + Geist Mono from Google Fonts, the same way the reference and the old app load fonts. (Self-hosting the OFL font files is possible later if no third-party request is wanted.)
+- **Non-token colours in the reference** (steps 4–6) mapped to the nearest token: `#C9C9C2` → `--wovi-ph-4`, `#CFCFC8` → `--wovi-ph-2`, `#E2E2DC` → `--wovi-line`, `#D4D4CE` → `--wovi-line-strong`, `rgba(251,251,249,.9)` → `color-mix(--wovi-panel 90%)`. The tile scrim gradient stays as specified.
 - **Screenshots.** Playwright is not installed; use `agent-browser` for 1440×1000 and 390×844 shots.
 - **Code changes** are written by Hermes (project workflow); Claude plans, checks and ticks this file.
 - **Repo and Sponsors URLs (step 11):** `https://github.com/herrhelms/wovi-open-library` and `https://github.com/sponsors/herrhelms`. Push to the public repo only when the redesign is done.
@@ -48,11 +49,11 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 
 - [x] 1. Tokens + fonts — `public/tokens.css` (copy of `design/tokens.css` without `@import`), Geist + Geist Mono `<link>` in `index.html`, old variables in `styles.css` now point to WOVI tokens, dark mode and old hex/rgba values removed (`styles.css`, `viewer.css`, `settings.css`). Deferred: the viewer stage stays light until step 8 (dark text on it would fail contrast now).
 - [x] 2. App shell + header — `index.html` (sticky `.app-header`, logo link, `nav` Explore / Collections (disabled) / Saved n (disabled until step 10) / Sources = old Adaptors button), `.page` container (1600 / 32 px), visually hidden h1 until step 5; `styles.css` (`.ghost`, logo, nav); `savedCount()` in `lib.js` + `storage` listener. Note: nav items are 40 px tall (components.md: min-height 40, border-box); the reference renders them 56 px because it has no `box-sizing: border-box`, so its header is 85 px vs. 69 px here.
-- [ ] 3. Search bar
-- [ ] 4. Sources fieldset
-- [ ] 5. Results header + source bar
-- [ ] 6. Masonry wall + infinite loading
-- [ ] 7. Back-to-top button
+- [x] 3. Search bar — `.sbox` label with icon, 28 px input, `⌘K` / `Ctrl K` hint (`shortcutLabel`, `isShortcut`), placeholder with the real source count, green 76 px Search button; `.button-primary` = components Primary. Phone (< 600 px): 60 px field, 20 px input (no token, commented), full-width button (package 74).
+- [x] 4. Sources fieldset — collapsible `<fieldset>` (state in `wovi:sources-open:v1`), `{on} of {total} on`, top-3 summary, open-licence `role="switch"` (still stored in `olf.openOnly`), All/None, grouped chips sorted by hits; chip states on / loading / off / zero / KEY / error ("limit", "wait", "error"). `#error-list` kept below the fieldset (restyled).
+- [x] 5. Results header + source bar — h1 `{query} · {total} images`, `from {n} of {total} sources`, source bar + legend, empty block with "Show sources". Sort / orientation / colour dropdowns not built (`SHOW_RESULT_FILTERS = false`): no data or API exists.
+- [x] 6. Masonry wall + infinite loading — `display: grid-lanes` behind `@supports`, JS column masonry as fallback (250 / 20 px; 160 / 12 px under 600 px); tiles with scrim overlay, title, Download button, and a Select toggle (keeps the existing multi-select, not in the design); meta row with licence tag; square placeholder until the image size is known (package 74); 5 skeletons after the wall; load row "Pulling more from …" / "That's everything from {n} sources."; selection bar restyled. Save button deferred to step 10. Only the JS fallback was checked (Chrome); grid-lanes needs a check in Safari 26.4+.
+- [x] 7. Back-to-top button — appears after 600 px, moves up above the selection bar, focuses the search field.
 - [ ] 8. Detail view
 - [ ] 9. Sources modal
 - [ ] 10. Saves (new)
