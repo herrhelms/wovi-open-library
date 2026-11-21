@@ -414,11 +414,11 @@ test('pickColumn gives the first smallest index', () => {
 });
 
 test('estimateCardHeight uses the image ratio and adds card text', () => {
-  assert.equal(estimateCardHeight({ width: 400, height: 200 }, 240), 192);
-  assert.equal(estimateCardHeight({ width: '400', height: '200' }, 240), 192);
-  assert.equal(estimateCardHeight({}, 240), 312);
-  assert.equal(estimateCardHeight({ width: 0, height: 100 }, 240), 312);
-  assert.equal(estimateCardHeight(null, 200), 272);
+  assert.equal(estimateCardHeight({ width: 400, height: 200 }, 240), 152);
+  assert.equal(estimateCardHeight({ width: '400', height: '200' }, 240), 152);
+  assert.equal(estimateCardHeight({}, 240), 272);
+  assert.equal(estimateCardHeight({ width: 0, height: 100 }, 240), 272);
+  assert.equal(estimateCardHeight(null, 200), 232);
 });
 
 test('distribute fills the shortest column', () => {

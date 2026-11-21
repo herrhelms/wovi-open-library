@@ -316,6 +316,27 @@ h1 {
   background: var(--wovi-green-hover);
 }
 
+/* Phone search: field on its own row, button full width below. Placed after the
+   desktop rules so the mobile values win. */
+@media (max-width: 600px) {
+  /* The field may shrink below its 520 px basis once it has a row of its own. */
+  .sbox {
+    flex-basis: 100%;
+    min-width: 0;
+    min-height: 60px;
+  }
+
+  /* The design asks for 20 px input text on phones; there is no 20 px token. */
+  .search-input {
+    font-size: 20px;
+  }
+
+  .search-submit {
+    flex-basis: 100%;
+    min-height: 60px;
+  }
+}
+
 .button-primary {
   display: inline-flex;
   align-items: center;
@@ -1469,6 +1490,30 @@ body:has(.selection-bar:not([hidden])) .site-main {
 }
 
 /* ---------- Narrow screens ---------- */
+
+/* Keep flex and grid children from forcing the page wider than the viewport
+   (checked at 390 px: header, sources fieldset, results header, source legend,
+   selection bar). Desktop layout is untouched. */
+@media (max-width: 600px) {
+  .app-header-inner,
+  .sources-head,
+  .sources-tools,
+  .results-header,
+  .source-legend,
+  .load-row,
+  .selection-bar,
+  .selection-actions {
+    min-width: 0;
+  }
+
+  .results-sub,
+  .status-line,
+  .no-results-text,
+  .empty-text,
+  .source-legend li {
+    overflow-wrap: anywhere;
+  }
+}
 
 @media (max-width: 480px) {
   .site-main {
