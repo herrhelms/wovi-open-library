@@ -16,7 +16,7 @@
 }
 
 #adaptors-dialog::backdrop {
-  background-color: rgba(12, 11, 10, 0.62);
+  background-color: var(--wovi-scrim);
 }
 
 #adaptors-dialog[open] {
@@ -262,7 +262,7 @@
 }
 
 .adaptor-detail code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 0.82em;
   padding: 0 var(--space-1);
   border: 1px solid var(--rule);
