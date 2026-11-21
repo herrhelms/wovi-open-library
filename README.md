@@ -1,321 +1,217 @@
-# 🔭 WOVI 
-Welcome to a **world of visual inspiration**
+# 🔭 WOVI — World of Visual Inspiration
 
-###	Design Handoff (remove from here later)
-Unzip this **into the root of your project repo**. You get:
+**Search 51 open image libraries at once — museums, archives, libraries and science collections — in one calm, image-first wall. Open any image in a detail view and download the highest resolution the source offers.**
 
-```
-.claude/skills/wovi-design/SKILL.md     ← design rules, auto-loaded by Claude Code
-.claude/skills/wovi-implement/SKILL.md  ← step-by-step build workflow
-design-handoff/
-  HANDOFF.md                            ← start here: plan, new behaviour, acceptance checklist
-  design/tokens.css · tokens.json       ← colours, type, radii, spacing, motion
-  design/components.md                  ← every component, states, a11y
-  design/screens/01-search.md           ← search, collapsible sources, masonry wall
-  design/screens/02-detail.md           ← detail viewer
-  design/screens/03-sources.md          ← sources modal (old "Adaptors")
-  design/screens/04-first-save.md       ← localStorage saves + first-save notice
-  reference/01-search.html … 04-…html   ← the design, runnable in a browser (double-click)
-  reference/wovi-preview.js             ← viewer for the reference files only, never ship it
-```
+WOVI runs on your own computer: a small Node.js server talks to the library APIs, and your browser shows the results. No account, no build step, no dependencies.
 
-(If your repo already has a `.claude/skills` folder, the two skill folders just sit beside the others.)
+![Search results for “botanical illustration” in WOVI](docs/images/search.png)
 
-## Kick-off prompt for Claude Code
+> [!IMPORTANT]
+> WOVI is a personal research tool, provided **as is**. It is not affiliated with any of the libraries it searches. You are responsible for following each source's terms of use and each image's licence. See [Disclaimer](#disclaimer).
 
-```
-Read design-handoff/HANDOFF.md and use the wovi-implement and wovi-design skills.
-Start with §2: map this codebase and write the findings to design-handoff/PROGRESS.md.
-Then do step 1 (tokens + fonts) and stop so I can check it.
-```
+---
 
-Then each next session: `Continue the WOVI redesign with the next unchecked step.`
+## Contents
 
-# Product:
-A local web app that searches >=51 open image libraries in one grid and downloads the highest available resolution of each image.
+- [Features](#features)
+- [Quick start](#quick-start)
+- [The `.env` file](#the-env-file)
+- [Sources](#sources)
+- [Good to know](#good-to-know)
+- [Development](#development)
+- [Disclaimer](#disclaimer)
+- [Licence](#licence)
+- [Feedback and support](#feedback-and-support)
 
-## Sources
+## Features
 
-### Open-licence aggregators
+- **One search, 51 sources.** Results arrive as each source answers and are added to a masonry wall that never reshuffles.
+- **Sources you control.** Turn sources on or off per search, or permanently in the Sources window. See hits per source at a glance.
+- **Open licences only.** One switch hides everything that is not public domain or openly licensed.
+- **Detail view.** Dark stage, Fit / Actual size (drag to pan), filmstrip, keyboard ← → / F / Esc, licence meaning ("credit & share alike") and a ready-to-copy attribution line.
+- **Full-resolution downloads.** Single images or a selection; TIFF masters where a source offers them.
+- **Saves stay in your browser.** Bookmark images and find them on the Saved page. Saves live only in `localStorage` — they are never sent anywhere. Export them as JSON.
+- **Accessible.** Real buttons and links, visible focus, ⌘K / Ctrl K to search, reduced-motion support, works down to phone width.
 
-- Wikimedia Commons
-- Openverse
-- Flickr Commons
-- Flickr (open licenses)
-- Internet Archive
-- Europeana
-- DPLA
-- Japan Search
-- Swedish heritage (K-samsök)
-- DigitalNZ
-- Pixabay
-- Pexels
-- Unsplash
+![Detail view in WOVI](docs/images/detail.png)
 
-### Museums and galleries
+## Quick start
 
-- The Met
-- Smithsonian Open Access
-- Rijksmuseum
-- National Gallery of Art
-- Art Institute of Chicago
-- Cleveland Museum of Art
-- Getty Museum
-- Minneapolis Institute of Art
-- SMK – National Gallery of Denmark
-- Paris Musées
-- Walters Art Museum
-- Brooklyn Museum
-- Auckland Museum
-- Princeton University Art Museum
-- Harvard Art Museums
+**You need:** [Node.js](https://nodejs.org/) **26 or newer**. That's all — there is nothing to `npm install`.
 
-### Libraries and archives
-
-- Library of Congress (Free to Use)
-- New York Public Library
-- British Library
-- Gallica (BnF)
-- Trove (National Library of Australia)
-- US National Archives
-- Nationaal Archief (Netherlands)
-- German Federal Archive
-- ETH Library Zurich
-- State Library of Queensland
-- National Library of Norway
-- Digital Commonwealth (Massachusetts)
-- David Rumsey Map Collection
-
-### Science, nature and medicine
-
-- NASA Image Library
-- ESA/Hubble
-- ESA/Webb
-- ESO
-- Wellcome Collection
-- Biodiversity Heritage Library
-- NOAA Photo Library
-- iNaturalist
-- GBIF
-- Natural History Museum, London
-
-## Requirements
-
-- Node.js 26
-
-There are no runtime dependencies. You do not need `npm install`.
-
-## Start
-
-```
+```bash
+git clone https://github.com/herrhelms/wovi-open-library.git
+cd wovi-open-library
+cp .env.example .env      # optional: add API keys (see below)
 npm start
 ```
 
-Then open <http://127.0.0.1:5173/> (the port comes from `PORT` in `.env`).
+Open **<http://127.0.0.1:5173/>** and search.
 
-## Configuration
+- 42 of the 51 sources work **without any key**. Add keys later to unlock the rest.
+- The server only listens on `127.0.0.1` (your own machine).
+- Stop it with <kbd>Ctrl</kbd>+<kbd>C</kbd>. Use another port with `PORT=8080 npm start`.
 
-Put a `.env` file in the project root:
+## The `.env` file
 
+API keys go into a file named `.env` in the project folder. The repository ships a template:
+
+```bash
+cp .env.example .env
 ```
-NYPL_TOKEN=...
-EUROPEANA_KEY=api2demo
-SMITHSONIAN_KEY=DEMO_KEY
-FLICKR_KEY=...
-DPLA_KEY=...
-TROVE_KEY=...
-PIXABAY_KEY=...
-PEXELS_KEY=...
-UNSPLASH_KEY=...
-HARVARD_KEY=...
-DIGITALNZ_KEY=...
+
+Then open `.env` in a text editor, paste the keys you have, save, and **restart the server** (`Ctrl+C`, then `npm start`).
+
+- Every key is optional. A source without its key shows a **KEY** tag and is skipped; everything else keeps working.
+- Keys stay on your machine. The server uses them; the browser never sees them.
+- `.env` is listed in `.gitignore`, so it is never committed. Don't paste keys anywhere else.
+- Format: one `NAME=value` per line, no spaces around `=`. Lines starting with `#` are comments. Quotes are optional.
+- Check the result in the app: **Sources** (top right) → each source shows *No key needed*, *Key set*, *Key optional* or *Key missing*. **Set up key** shows the steps for that source.
+
+### Keys
+
+| Variable | Sources | Needed? | Where to get it |
+|---|---|---|---|
+| `FLICKR_KEY` | Flickr Commons, Flickr (open licences) | Yes | [flickr.com/services/apps/create](https://www.flickr.com/services/apps/create/) — create an app, use the **Key** |
+| `DPLA_KEY` | DPLA | Yes | Run `curl -X POST https://api.dp.la/v2/api_key/you@example.com` — the key arrives by e-mail |
+| `NYPL_TOKEN` | New York Public Library | Yes | [api.repo.nypl.org](https://api.repo.nypl.org/) — sign up, copy the **token** |
+| `HARVARD_KEY` | Harvard Art Museums | Yes | [harvardartmuseums.org/collections/api](https://harvardartmuseums.org/collections/api) |
+| `TROVE_KEY` | Trove (National Library of Australia) | Yes | [trove.nla.gov.au](https://trove.nla.gov.au) → sign in → Profile → API |
+| `PIXABAY_KEY` | Pixabay | Yes | [pixabay.com/api/docs](https://pixabay.com/api/docs/) — shown when you are logged in |
+| `PEXELS_KEY` | Pexels | Yes | [pexels.com/api](https://www.pexels.com/api/) |
+| `UNSPLASH_KEY` | Unsplash | Yes | [unsplash.com/developers](https://unsplash.com/developers) — create an app, use the **Access Key** |
+| `EUROPEANA_KEY` | Europeana | Optional | Uses the shared demo key `api2demo` when empty. Personal key: [pro.europeana.eu/page/get-api](https://pro.europeana.eu/page/get-api) |
+| `SMITHSONIAN_KEY` | Smithsonian Open Access | Optional, recommended | Uses `DEMO_KEY` when empty — only ~30 requests per hour. Personal key: [api.data.gov/signup](https://api.data.gov/signup/) |
+| `DIGITALNZ_KEY` | DigitalNZ | Optional | Works without a key today. [digitalnz.org/developers](https://digitalnz.org/developers) |
+| `PORT` | — | Optional | Port of the local server. Default `5173` |
+
+> [!NOTE]
+> Flickr, DPLA, Trove, Pixabay, Pexels, Unsplash and Harvard were built from their public API documentation and are marked *untested* in the app until someone runs them with a real key. Reports are welcome.
+
+### A filled-in example
+
+```dotenv
 PORT=5173
+FLICKR_KEY=0123456789abcdef0123456789abcdef
+SMITHSONIAN_KEY=your-api-data-gov-key
+EUROPEANA_KEY=
 ```
 
-- Each adaptor's key information is in `adapters/<id>/adapter.json` and in the
-  Adaptors window of the app.
-- `PORT` — default `5173`.
+Empty values count as "not set".
 
-Flickr Commons, Flickr (open licenses), DPLA, Trove, Pixabay, Pexels, Unsplash
-and Harvard Art Museums are built from the public API documentation. They are
-NOT yet tested live (no key yet).
+## Sources
 
-Without a key the chip shows "needs key" and the app sends no request.
+✓ = no key needed · 🔑 = key needed · (½) = optional key
 
-The keys stay on the server. They are never sent to the browser.
+**Open-licence aggregators** — Wikimedia Commons ✓ · Openverse ✓ · Flickr Commons 🔑 · Flickr (open licences) 🔑 · Internet Archive ✓ · Europeana (½) · DPLA 🔑 · Japan Search ✓ · Swedish heritage (K-samsök) ✓ · DigitalNZ (½) · Pixabay 🔑 · Pexels 🔑 · Unsplash 🔑
 
-## Known limits
+**Museums and galleries** — The Met ✓ · Smithsonian Open Access (½) · Rijksmuseum ✓ · National Gallery of Art ✓ · Art Institute of Chicago ✓ · Cleveland Museum of Art ✓ · Getty Museum ✓ · Minneapolis Institute of Art ✓ · SMK – National Gallery of Denmark ✓ · Paris Musées ✓ · Walters Art Museum ✓ · Brooklyn Museum ✓ · Auckland Museum ✓ · Princeton University Art Museum ✓ · Harvard Art Museums 🔑
 
-- **Library of Congress (Free to Use)**: the general loc.gov search
-  (`/photos/?fo=json` and the other JSON APIs) answers HTTP 403 with a
-  Cloudflare challenge from some networks. The app does not try to bypass it.
-  So the app searches the LoC "Free to Use" sets
-  (<https://www.loc.gov/free-to-use/>): 101 sets with about 3400 items. The
-  search text is the title, the description and the set names.
-  The first LoC search reads the 101 sets (102 requests, about one minute) and
-  saves them in `data/loc/free-to-use.json`. The file is used again for 7 days.
-  Sets that failed during the first read are saved in the index file and read
-  again in the background after 1 hour.
-  While the data is prepared, the UI shows a message and tries again
-  automatically.
-  Resolution: for Prints & Photographs items the app gets the image from the
-  LoC IIIF server (`tile.loc.gov`). Only Carol M. Highsmith (`highsm`) items
-  come at the master size (often more than 3000 px). Other Prints & Photographs
-  items (`cph`, `det`, `ppmsca`, `mrg`) come at about 1024 px. All other items
-  (for example HABS/HAER/HALS `hhh`, maps, sheet music) give only the small
-  web-size image from the set (about 300 px).
-  The IIIF results are cached in `data/loc/iiif-cache-2.json`.
-- **National Gallery of Art**: there is no search API. The first NGA search
-  downloads the open data CSV files (~175 MB) into `data/nga/` and builds an
-  index. This takes a few minutes. The files are refreshed after 30 days.
-- **Smithsonian**: `DEMO_KEY` allows about 30 requests per hour. Put a personal
-  key in `.env`.
-- **The Met**: the search can return objects that are not public domain. The app
-  removes them, so a page can have fewer than 24 items.
-- **Rijksmuseum**: 12 items for each page (each item needs 3 requests).
-- **Openverse**: without a key, the API allows about 20 requests in each minute
-  and 200 in each day; results stop at about 240 (12 pages of 20). On HTTP 429
-  the app shows `Openverse rate limit reached. Try again in a few minutes.`
-  Openverse collects images from other sites (for example Flickr); the viewer
-  shows "via <provider>".
-- **Cleveland Museum of Art**: "Download full resolution" gives the print JPEG
-  (about 3400 px). The TIFF master can be more than 200 MB; the viewer shows it
-  as a separate link "Download TIFF (very large)".
-- **Minneapolis Institute of Art**: the image server sends no `Content-Type`;
-  the download proxy gets the type from the file extension.
-- **Wikimedia Commons subsets**: British Library, Gallica, NOAA, BHL and the 9
-  batch-5 sources (Paris Musées, Walters, Brooklyn, Auckland Museum, US National
-  Archives, Nationaal Archief, German Federal Archive, ETH Library, State
-  Library of Queensland) are searched through Wikimedia Commons with a category
-  or source filter. The item page is the Commons file page. NOAA uses the
-  category "Files from the NOAA Photo Library Flickr stream" (more hits than the
-  source filter).
-- **Art Institute of Chicago**: the AIC image server answers this server with a
-  Cloudflare challenge. The browser loads the images directly. "Download full
-  resolution" opens the image (max 3000 px wide) from artic.edu in a new tab;
-  save it from there. "Download selected" skips AIC items.
-- **Getty Museum**: search by title words only (SPARQL); one search takes about
-  8 seconds.
-- **ESA/Hubble, ESA/Webb, ESO**: "Download full resolution" gives the largest
-  JPEG of the item page ("Large JPEG", else "Publication JPEG", else "Screensize
-  JPEG"). The TIFF originals are not offered.
-- **iNaturalist**: max 60 requests in each minute; only CC0, CC BY and CC BY-SA
-  photos.
-- **DPLA and Trove**: often only a thumbnail; the viewer links to the partner
-  page.
-- **David Rumsey Map Collection**: license CC BY-NC-SA 3.0 — NON-COMMERCIAL. It
-  is the only non-commercial source. The viewer shows a note. "Download full
-  resolution" gets the full width from the IIIF server (for example 8007 px; it
-  can take some seconds).
-- **Princeton University Art Museum**: only objects whose primary image is not
-  restricted. One search needs one request for each object (24), so it is
-  slower.
-- **GBIF**: the photo license is checked for each photo (the GBIF license filter
-  is for the record, not the photo); only CC0, CC BY, CC BY-SA and public
-  domain photos.
-- **Japan Search**: only public domain (`pdm`) items with an image.
-- **K-samsök**: only images with license public domain mark, CC0, CC BY or
-  CC BY-SA.
-- **Digital Commonwealth**: only items marked "no restrictions" (the "creative
-  commons" items include NC and ND licenses and are left out).
-- **DigitalNZ** and **Trove**: some records give only a thumbnail; the viewer
-  then shows a note.
-- **Pixabay**: max 1280 px (the original needs special approval).
-  **Unsplash**: a download calls the Unsplash download endpoint, as Unsplash
-  requires.
-- **Natural History Museum**: the item page (`data.nhm.ac.uk/object/…`) can
-  answer HTTP 403 to scripts; in a browser it works.
+**Libraries and archives** — Library of Congress (Free to Use) ✓ · New York Public Library 🔑 · British Library ✓ · Gallica (BnF) ✓ · Trove 🔑 · US National Archives ✓ · Nationaal Archief ✓ · German Federal Archive ✓ · ETH Library Zurich ✓ · State Library of Queensland ✓ · National Library of Norway ✓ · Digital Commonwealth ✓ · David Rumsey Map Collection ✓
 
-## Checked, not supported
+**Science, nature and medicine** — NASA Image Library ✓ · ESA/Hubble ✓ · ESA/Webb ✓ · ESO ✓ · Wellcome Collection ✓ · Biodiversity Heritage Library ✓ · NOAA Photo Library ✓ · iNaturalist ✓ · GBIF ✓ · Natural History Museum, London ✓
 
-- Gallica direct API, Finna (Finland), Museums Victoria, Science Museum Group,
-  Auckland Museum, Brooklyn Museum, Walters Art Museum, State Library of NSW,
-  Cambridge Digital Library: blocked (Cloudflare or HTTP 403) from this
-  machine. Gallica, Auckland Museum, Brooklyn Museum and Walters Art Museum
-  come through Wikimedia Commons instead.
-- Paris Musées direct API: needs a token; schema not tested (planned). Today it
-  comes through Wikimedia Commons.
-- Deutsche Digitale Bibliothek, BHL API, DigitaltMuseum: need a key. Trove is
-  supported with a key; BHL comes through Wikimedia Commons.
-- V&A: the API works, but the images are low resolution.
-- Te Papa: the API works with a guest token, but most images are "All Rights
-  Reserved".
-- Yale LUX, NLM Digital Collections: answer HTTP 202 with no content (needs more
-  work).
-- Harvard Library (LibraryCloud): works, but the rights statements are not
-  machine-readable.
-- Encyclopedia of Life: works, but its images are mostly already in GBIF,
-  iNaturalist and Wikimedia Commons.
+Thirteen of these (Paris Musées, Walters, Brooklyn, Auckland, British Library, Gallica, US National Archives, Nationaal Archief, German Federal Archive, ETH Library, State Library of Queensland, BHL, NOAA) are searched **through Wikimedia Commons**, because their own APIs are blocked, need a token, or don't exist.
 
-## Paris Musées
+## Good to know
 
-Paris Musées' own API (GraphQL) needs `PARIS_MUSEES_TOKEN`. It is planned. Today
-Paris Musées comes through Wikimedia Commons.
+<details>
+<summary><b>The first search is slower for some sources</b></summary>
 
-## Root certificates
+- **National Gallery of Art** has no search API. The first NGA search downloads its open-data CSV files (~175 MB) into `data/nga/` and builds an index. This takes a few minutes; the files are refreshed after 30 days.
+- **Library of Congress** is searched through its 101 "Free to Use" sets (about 3,400 items). The first search reads them (about one minute) and keeps them for 7 days. The app shows "being prepared" and retries on its own.
+- **Getty Museum** searches title words through SPARQL; one search takes about 8 seconds.
+</details>
 
-The app adds two public root certificates from `certs/` to the default list of
-Node at start: "SSL.com TLS RSA Root CA 2022" and "HARICA TLS RSA Root CA
-2021". Node 26 does not have them, so the TLS check fails without them. The
-hosts that need them are `data.getty.edu`, `kulturarvsdata.se` and
-`data.artmuseum.princeton.edu`. Certificate checks stay enabled.
+<details>
+<summary><b>Rate limits</b></summary>
 
-The Commons-based sources send one request at a time, with at least 500 ms
-between two starts. On HTTP 429 the app waits (the `Retry-After` seconds, else
-5 s, at most 30 s) and tries again up to 4 times within 45 s. A timeout (20 s)
-is tried once more.
+- **Wikimedia Commons** (14 sources) limits how fast one client may ask. WOVI sends one Commons request at a time, waits as Commons asks (`Retry-After`) and retries; the browser retries too. Commons results arrive one after another over up to ~30 seconds.
+- **Smithsonian** with `DEMO_KEY`: ~30 requests per hour — add a personal key.
+- **Openverse** without a key: ~20 requests per minute, 200 per day, results stop near 240.
+- **iNaturalist**: max 60 requests per minute.
+- The server identifies itself to every source as `OpenLibraryFetch/0.1 (+https://github.com/herrhelms/wovi-open-library)`, as Wikimedia's User-Agent policy asks. It never pretends to be a browser and does not get around bot challenges.
+</details>
 
-## Open licences only
+<details>
+<summary><b>Resolution and licence notes per source</b></summary>
 
-The search has a filter "Open licences only". It is OFF by default. When it is
-ON, the app sends `open=1` to `/api/search`. The server removes the items whose
-licence is not open. This lowers the number of results and can make `total`
-unknown, because a source gives the total before the filter runs. When the item
-count changes, `total` is `null` and the status line shows only the number of
-results shown.
+- **David Rumsey Map Collection** is CC BY-NC-SA 3.0 — **non-commercial**. It is the only non-commercial source; the viewer shows a note.
+- **The Met** can return objects that are not public domain; WOVI removes them, so a page can have fewer than 24 items.
+- **Art Institute of Chicago** images load directly in your browser; "Download full resolution" opens the image (max 3000 px) in a new tab, and "Download selected" skips AIC items.
+- **Cleveland Museum of Art** offers the print JPEG (~3,400 px) and, separately, the TIFF master (can be over 200 MB).
+- **ESA/Hubble, ESA/Webb, ESO** give the largest JPEG of the item page; TIFF originals are not offered.
+- **Library of Congress**: only Carol M. Highsmith items come at master size; other Prints & Photographs items at ~1,024 px, everything else at web size.
+- **Pixabay**: max 1,280 px. **Unsplash**: downloads are reported to Unsplash, as its API terms require.
+- **DPLA, Trove, DigitalNZ**: some records only have a thumbnail; the viewer links to the partner page.
+- **Harvard, Trove**: no usable licence data — they are skipped when *Open licences only* is on.
+- **Natural History Museum**: item pages can answer HTTP 403 to scripts; they work in a browser.
+</details>
 
-The rule is in `lib/license.js`. An item is open when its licence label or URL
-says one of these:
+<details>
+<summary><b>What “Open licences only” means</b></summary>
 
-- public domain, CC0 or Public Domain Mark (`pdm`)
-- a Creative Commons licence, also NC and ND (`creativecommons.org/licenses/`)
-- rightsstatements.org `NoC-*` or `NKC/`, "no known copyright restrictions"
-- Pixabay, Pexels or Unsplash licence
+An item counts as open when its licence is public domain, CC0, the Public Domain Mark, a Creative Commons licence (including NC and ND), rightsstatements.org *No Copyright* / *No Known Copyright*, or the Pixabay / Pexels / Unsplash licence. "In copyright", "not evaluated", "undetermined" or unknown licences are hidden. The rule lives in `lib/license.js`.
 
-An item is not open when its licence is "In copyright" (rightsstatements
-`InC*`), "Copyright not evaluated" (`CNE`), "Undetermined" (`UND`), or when the
-text is unknown (for example "See item page").
+Open does not always mean "free for any use": always check the licence shown in the detail view.
+</details>
 
-Trove and Harvard have no usable licence data. The app does not search them
-when the filter is ON, and their chips are disabled.
+<details>
+<summary><b>The <code>data/</code> folder</b></summary>
 
-## Downloads
+WOVI keeps local state in `data/` (ignored by git): which sources are on (`settings.sqlite`), a thumbnail cache (max 500 MB), the NGA index and the Library of Congress sets. You can delete the folder at any time; it is rebuilt when needed.
+</details>
 
-The server streams files through `/api/download`. Only hosts of the libraries
-are allowed, so the app is not an open proxy. Europeana, Openverse, DPLA,
-Trove, GBIF, Japan Search, K-samsök, DigitalNZ and Unsplash files come from the
-record API of the source (their files can be on any host).
+<details>
+<summary><b>Root certificates</b></summary>
+
+`certs/` holds two public root certificates (SSL.com TLS RSA Root CA 2022, HARICA TLS RSA Root CA 2021) that Node.js does not ship. They are added to Node's list at start so that `data.getty.edu`, `kulturarvsdata.se` and `data.artmuseum.princeton.edu` pass the TLS check. Certificate checks stay on.
+</details>
 
 ## Development
 
-- `npm test` — unit tests, offline, with fixtures in `test/fixtures/`.
-- `npm run smoke` — live check, one call to each source.
+```bash
+npm test         # unit tests — offline, with fixtures
+npm run smoke    # live check — one request to each source
+```
 
-## Project structure
+**Add a source:** every source is one folder in `adapters/` with an `adapter.json` (name, group, key info, notes) and either an `index.js` or a shared base such as `commons-subset`. The server finds new folders at start. Step-by-step guide: [`docs/ADAPTERS.md`](docs/ADAPTERS.md).
 
 ```
-server.js            HTTP server, static files and API routes
-lib/
-  env.js             .env loader
-  http.js            fetch with timeout and User-Agent
-  tls.js             adds two public root certificates
-  wikimedia.js       Commons request limiter and 429 retry
-  csv.js             streaming CSV parser
-  download.js        download stream and host allow list
-  sources/
-    index.js         source registry
-    <id>.js          one module for each library
-public/              plain HTML, CSS and JavaScript frontend
-scripts/smoke.js     live smoke check
-test/                unit tests and fixtures
+server.js              HTTP server: static files and /api routes
+adapters/<id>/         one folder per source (adapter.json, index.js, tests)
+adapters/groups.json   source groups and their order
+lib/                   shared code: loader, HTTP, Commons limiter, caches, licences
+lib/bases/             shared factories for config-only sources
+public/                the frontend: plain HTML, CSS and ES modules, no build
+test/                  unit tests and fixtures
+design-handoff/        the WOVI design system, specs and reference screens
 ```
+
+The UI follows the WOVI design in [`design-handoff/`](design-handoff/HANDOFF.md) (tokens, components, screens).
+
+## Disclaimer
+
+WOVI is an independent, non-commercial hobby project. It is **not affiliated with, endorsed by, or sponsored by** any of the libraries, museums, archives or services it searches. All names and trademarks belong to their owners.
+
+WOVI only queries public APIs and pages on your behalf, from your own computer, with your own keys. **You are responsible for how you use it**, in particular for:
+
+- following each source's **terms of use and API terms** (some forbid bulk downloading, caching, commercial use, or sharing keys),
+- respecting the **licence and rights of every image** you download or reuse, including attribution and non-commercial conditions,
+- complying with the laws that apply to you.
+
+Licence information in WOVI comes from the sources and may be missing, outdated or wrong. Always check the item on the source's own page before you reuse it.
+
+The software is provided **"as is", without warranty of any kind**. The author and contributors are **not liable** for any claim, damage, or other liability arising from the use of this software, or from anyone's use of the content it finds. See the [LICENSE](LICENSE).
+
+## Licence
+
+The WOVI source code is released under the [MIT License](LICENSE). This licence covers the code only — **not** the images, metadata or other content from the sources, which keep their own licences and terms.
+
+The screenshots above show search results and *Endiandra cooperana botanical illustration* by the Centre for National Biodiversity Research, via Wikimedia Commons, CC BY 4.0.
+
+## Feedback and support
+
+Questions, ideas, a source that should be added, or a key-based source you could test? [Open an issue on GitHub](https://github.com/herrhelms/wovi-open-library/issues).
+
+If you want to support its continuous development, consider [becoming a GitHub Sponsor](https://github.com/sponsors/herrhelms) ♥
