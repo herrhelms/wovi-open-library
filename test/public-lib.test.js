@@ -22,6 +22,7 @@ import {
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  savedCount,
   searchKey,
   serializeSelection,
   shouldAutoLoad,
@@ -600,4 +601,22 @@ test('rateLimitWaitText is generic for other adaptors', () => {
     rateLimitWaitText(null, 15),
     'Rate limit reached. Trying again in 15 s.',
   );
+});
+
+test('savedCount returns the length of a saved array', () => {
+  assert.equal(savedCount('[1,2,3]'), 3);
+  assert.equal(savedCount('[]'), 0);
+});
+
+test('savedCount gives 0 for missing or empty input', () => {
+  assert.equal(savedCount(null), 0);
+  assert.equal(savedCount(undefined), 0);
+  assert.equal(savedCount(''), 0);
+});
+
+test('savedCount gives 0 for invalid or non-array JSON', () => {
+  assert.equal(savedCount('not json'), 0);
+  assert.equal(savedCount('{"a":1}'), 0);
+  assert.equal(savedCount('"text"'), 0);
+  assert.equal(savedCount('42'), 0);
 });
