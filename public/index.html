@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="/styles.css">
     <link rel="stylesheet" href="/viewer.css">
     <link rel="stylesheet" href="/settings.css">
+    <link rel="stylesheet" href="/saves.css">
     <script type="module" src="/app.js"></script>
   </head>
   <body>
@@ -29,9 +30,9 @@
         <nav class="main-nav" aria-label="Main">
           <a class="ghost" href="/" aria-current="page">Explore</a>
           <button class="ghost" type="button" disabled>Collections</button>
-          <button class="ghost" type="button" id="saved-open" disabled>
+          <a class="ghost" id="saved-open" href="/saved">
             Saved <span class="nav-count" id="saved-count">0</span>
-          </button>
+          </a>
           <button class="ghost" type="button" id="adaptors-open">Sources</button>
         </nav>
       </div>

@@ -25,7 +25,6 @@ import {
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
-  savedCount,
   searchKey,
   searchWithoutItem,
   searchPlaceholder,
@@ -42,12 +41,12 @@ import {
   showBackToTop,
 } from './lib.js';
 import { initSettings, openSources } from './settings.js';
+import { onSavesChange, readSaves, savedIds, toggleSave } from './saves.js';
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
 const OPEN_STORAGE_KEY = 'olf.openOnly';
 const SOURCES_OPEN_KEY = 'wovi:sources-open:v1';
-const SAVES_KEY = 'wovi:saves:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
 const DOWNLOAD_DELAY = 800;
@@ -620,6 +619,41 @@ function icon(paths, size = 18) {
 
 const DOWNLOAD_ICON = ['M12 3v12m0 0-5-5m5 5 5-5M5 21h14'];
 const CHECK_ICON = ['m5 13 4 4L19 7'];
+const BOOKMARK_ICON = ['M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'];
+
+/**
+ * Accessible label of a tile Save button.
+ * @param {object} item
+ * @param {boolean} saved
+ * @returns {string}
+ */
+function saveLabel(item, saved) {
+  const title = item.title || 'Untitled';
+  return saved ? `Saved: ${title}` : `Save ${title}`;
+}
+
+/**
+ * Show the saved state on one tile Save button.
+ * @param {{item: object, saveButton: HTMLButtonElement}} record
+ * @param {Set<string>} ids
+ */
+function applyTileSave(record, ids) {
+  if (!record.saveButton) return;
+  const saved = ids.has(record.key);
+  record.saveButton.setAttribute('aria-pressed', saved ? 'true' : 'false');
+  record.saveButton.setAttribute('aria-label', saveLabel(record.item, saved));
+}
+
+/** Saved ids, kept current for the tiles that are created next. */
+let savedIdSet = savedIds();
+
+/**
+ * Sync every tile Save button with the saved ids.
+ */
+function updateTileSaves() {
+  savedIdSet = savedIds();
+  for (const record of records) applyTileSave(record, savedIdSet);
+}
 
 /**
  * Open the full resolution of a tile in the same way as the viewer: direct
@@ -741,6 +775,21 @@ function createCard(item, key, sourceId, mediaId) {
     toggleSelection(key, selectButton.getAttribute('aria-pressed') !== 'true');
   });
 
+  const saved = savedIdSet.has(key);
+  const saveButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'ibtn tile-save',
+      'aria-pressed': saved ? 'true' : 'false',
+      'aria-label': saveLabel(item, saved),
+    },
+    [icon(BOOKMARK_ICON)],
+  );
+  saveButton.addEventListener('click', () => {
+    void toggleSave(item, { sourceName: sourceName(item.source), trigger: saveButton });
+  });
+
   const downloadButton = el(
     'button',
     {
@@ -758,7 +807,7 @@ function createCard(item, key, sourceId, mediaId) {
   ]);
 
   const overlay = el('div', { class: 'tile-ov' }, [
-    el('div', { class: 'tile-ov-top' }, [selectButton, downloadButton]),
+    el('div', { class: 'tile-ov-top' }, [selectButton, saveButton, downloadButton]),
     overlayText,
   ]);
 
@@ -780,7 +829,7 @@ function createCard(item, key, sourceId, mediaId) {
 
   article.append(imageBox, meta);
 
-  return { el: article, item, selectButton, img, key, sourceId, mediaId };
+  return { el: article, item, selectButton, saveButton, img, key, sourceId, mediaId };
 }
 
 function visibleRecords() {
@@ -1991,22 +2040,17 @@ window.addEventListener('popstate', () => {
 
 /**
  * Show the number of saved items in the header nav.
+ * @param {object[]} [list] saved snapshots; read from storage when not given
  */
-function updateSavedCount() {
+function updateSavedCount(list) {
   if (!savedCountEl) return;
-
-  let value = null;
-  try {
-    value = localStorage.getItem(SAVES_KEY);
-  } catch {
-    value = null;
-  }
-
-  savedCountEl.textContent = savedCount(value).toLocaleString('en-US');
+  const saves = Array.isArray(list) ? list : readSaves();
+  savedCountEl.textContent = saves.length.toLocaleString('en-US');
 }
 
-window.addEventListener('storage', (event) => {
-  if (event.key === SAVES_KEY || event.key === null) updateSavedCount();
+onSavesChange((list) => {
+  updateSavedCount(list);
+  updateTileSaves();
 });
 
 initSettings({ onChange: onAdapterChange });

@@ -34,6 +34,13 @@ import {
   rememberLimited,
   retryDelay,
   savedCount,
+  makeSnapshot,
+  parseSaves,
+  isSaved,
+  addSave,
+  removeSave,
+  snapshotItem,
+  savedViewText,
   isShortcut,
   searchKey,
   searchPlaceholder,
@@ -1061,4 +1068,165 @@ test('linkParts splits text and links', () => {
   assert.deepEqual(linkParts('https://x.org'), [
     { text: 'https://x.org', href: 'https://x.org' },
   ]);
+});
+
+// ---------- Saves ----------
+
+const saveA = { id: 'a', item: {} };
+const saveB = { id: 'b', item: {} };
+const saveC = { id: 'c', item: {} };
+const saveA2 = { id: 'a', item: { title: 'new' } };
+
+const snapshotOf = (extra) => ({
+  uid: 'a:1',
+  source: 'a',
+  id: '1',
+  title: 'T',
+  thumb: 'https://x/t.jpg',
+  full: 'https://x/f.jpg',
+  license: 'CC0',
+  width: 800,
+  height: 600,
+  ...extra,
+});
+
+test('makeSnapshot builds the storage snapshot', () => {
+  const item = snapshotOf();
+  const snapshot = makeSnapshot(item, 'Alpha', 1000);
+  assert.equal(snapshot.id, 'a:1');
+  assert.equal(snapshot.sourceName, 'Alpha');
+  assert.equal(snapshot.thumbUrl, thumbCandidates(item)[0]);
+  assert.equal(snapshot.fullUrl, 'https://x/f.jpg');
+  assert.equal(snapshot.licence, 'CC0');
+  assert.equal(snapshot.width, 800);
+  assert.equal(snapshot.height, 600);
+  assert.equal(snapshot.savedAt, 1000);
+  assert.equal(snapshot.item.title, 'T');
+});
+
+test('makeSnapshot falls back to source:id', () => {
+  const snapshot = makeSnapshot({ source: 'b', id: 7 }, '', 1);
+  assert.equal(snapshot.id, 'b:7');
+  assert.equal(snapshot.sourceName, '');
+});
+
+test('makeSnapshot fullUrl uses preview, then empty', () => {
+  assert.equal(
+    makeSnapshot({ source: 'b', id: 1, preview: 'https://x/p.jpg' }, '', 1).fullUrl,
+    'https://x/p.jpg',
+  );
+  assert.equal(makeSnapshot({ source: 'b', id: 1 }, '', 1).fullUrl, '');
+});
+
+test('makeSnapshot without thumb candidates gives an empty thumbUrl', () => {
+  assert.equal(makeSnapshot({ source: 'b', id: 1 }, '', 1).thumbUrl, '');
+});
+
+test('makeSnapshot cuts a long description to 2,000 characters', () => {
+  const snapshot = makeSnapshot(
+    { source: 'b', id: 1, description: 'x'.repeat(3000) },
+    '',
+    1,
+  );
+  assert.equal(snapshot.item.description.length, 2000);
+});
+
+test('makeSnapshot copies only the known item fields', () => {
+  const snapshot = makeSnapshot(
+    { source: 'b', id: 1, foo: 1, creator: undefined, title: 'T' },
+    '',
+    1,
+  );
+  assert.equal(snapshot.item.foo, undefined);
+  assert.equal(Object.hasOwn(snapshot.item, 'creator'), false);
+  assert.equal(snapshot.item.title, 'T');
+});
+
+test('makeSnapshot does not change the input item', () => {
+  const item = snapshotOf({ description: 'x'.repeat(3000), foo: 1 });
+  const before = JSON.stringify(item);
+  makeSnapshot(item, 'Alpha', 1);
+  assert.equal(JSON.stringify(item), before);
+});
+
+test('makeSnapshot gives null for a bad width or height', () => {
+  assert.equal(makeSnapshot({ source: 'b', id: 1, width: 0 }, '', 1).width, null);
+  assert.equal(makeSnapshot({ source: 'b', id: 1, width: 'x' }, '', 1).width, null);
+  assert.equal(makeSnapshot({ source: 'b', id: 1, height: -5 }, '', 1).height, null);
+});
+
+test('parseSaves gives [] for bad input', () => {
+  assert.deepEqual(parseSaves(null), []);
+  assert.deepEqual(parseSaves(''), []);
+  assert.deepEqual(parseSaves('{'), []);
+  assert.deepEqual(parseSaves('{"a":1}'), []);
+});
+
+test('parseSaves drops bad entries and repeated ids', () => {
+  const raw = JSON.stringify([
+    { id: 'a', item: {} },
+    { id: '', item: {} },
+    { id: 'b' },
+    5,
+    { id: 'a', item: { x: 1 } },
+    { id: 'c', item: {} },
+  ]);
+  const list = parseSaves(raw);
+  assert.deepEqual(list.map((entry) => entry.id), ['a', 'c']);
+  assert.deepEqual(list[0].item, {});
+});
+
+test('isSaved finds an id', () => {
+  assert.equal(isSaved([saveA], 'a'), true);
+  assert.equal(isSaved([saveA], 'b'), false);
+  assert.equal(isSaved(null, 'a'), false);
+});
+
+test('addSave places a snapshot and keeps the input', () => {
+  const input = [saveA, saveB];
+  assert.deepEqual(addSave(input, saveC), [saveC, saveA, saveB]);
+  assert.deepEqual(addSave(input, saveC, 1), [saveA, saveC, saveB]);
+  assert.deepEqual(addSave(input, saveC, 99), [saveA, saveB, saveC]);
+  assert.deepEqual(addSave(input, saveC, -3), [saveC, saveA, saveB]);
+  assert.deepEqual(addSave(input, saveA2), [saveA2, saveB]);
+  assert.deepEqual(input, [saveA, saveB]);
+});
+
+test('removeSave gives the list, the index and the snapshot', () => {
+  const input = [saveA, saveB, saveC];
+  const result = removeSave(input, 'b');
+  assert.deepEqual(result.list, [saveA, saveC]);
+  assert.equal(result.index, 1);
+  assert.equal(result.snapshot, saveB);
+  assert.deepEqual(removeSave([saveA], 'x'), {
+    list: [saveA],
+    index: -1,
+    snapshot: null,
+  });
+  assert.deepEqual(input, [saveA, saveB, saveC]);
+});
+
+test('removeSave and addSave round trip an undo', () => {
+  const removed = removeSave([saveA, saveB, saveC], 'b');
+  assert.deepEqual(addSave(removed.list, removed.snapshot, removed.index), [
+    saveA,
+    saveB,
+    saveC,
+  ]);
+});
+
+test('snapshotItem gives the item with the snapshot id as uid', () => {
+  assert.deepEqual(snapshotItem({ id: 'a:1', item: { title: 'T' } }), {
+    title: 'T',
+    uid: 'a:1',
+  });
+  assert.deepEqual(snapshotItem({ id: 'a:1', item: { uid: 'x' } }).uid, 'x');
+  assert.equal(snapshotItem({ id: 'a' }), null);
+  assert.equal(snapshotItem(null), null);
+});
+
+test('savedViewText formats the count', () => {
+  assert.equal(savedViewText(3), 'View saved (3)');
+  assert.equal(savedViewText(1234), 'View saved (1,234)');
+  assert.equal(savedViewText(undefined), 'View saved (0)');
 });

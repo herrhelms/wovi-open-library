@@ -1,0 +1,225 @@
+/* ---------- WOVI saves: first-save notice and toast ---------- */
+
+html:has(.save-notice[open]) {
+  overflow: hidden;
+}
+
+/* ---------- First-save notice ---------- */
+
+.save-notice {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(480px, 100vw - 32px);
+  max-width: none;
+  max-height: calc(100vh - 32px);
+  padding: 0;
+  border: 0;
+  border-radius: var(--wovi-r-modal);
+  background: var(--wovi-panel);
+  color: var(--wovi-ink);
+  box-shadow: var(--wovi-shadow-modal);
+  overflow: auto;
+}
+
+.save-notice::backdrop {
+  background: var(--wovi-scrim);
+  backdrop-filter: blur(4px);
+}
+
+.save-notice-inner {
+  padding: 28px;
+}
+
+.save-notice-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--wovi-green-tint);
+  color: var(--wovi-green);
+}
+
+.save-notice-title {
+  margin: 20px 0 0;
+  font-size: var(--wovi-fs-24);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.save-notice-body {
+  margin: 10px 0 0;
+  font-size: var(--wovi-fs-15);
+  line-height: 1.55;
+  color: var(--wovi-ink-2);
+}
+
+.save-notice-points {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--wovi-fs-14);
+  line-height: 1.45;
+  color: var(--wovi-ink-2);
+}
+
+.save-notice-point {
+  display: flex;
+  gap: 10px;
+}
+
+.save-notice-point svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--wovi-warn);
+}
+
+.save-notice-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 26px;
+}
+
+.save-notice-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border-radius: var(--wovi-r-lg);
+  font: inherit;
+  font-size: var(--wovi-fs-15);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--wovi-fast) var(--wovi-ease),
+    border-color var(--wovi-fast) var(--wovi-ease);
+}
+
+.save-notice-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--wovi-focus-ring);
+}
+
+.save-notice-secondary {
+  flex: 1;
+  border: 1px solid var(--wovi-line-strong);
+  background: var(--wovi-surface);
+  color: var(--wovi-ink);
+}
+
+.save-notice-secondary:hover {
+  border-color: var(--wovi-ink);
+}
+
+.save-notice-primary {
+  flex: 1.4;
+  border: 0;
+  background: var(--wovi-green);
+  color: var(--wovi-surface);
+}
+
+.save-notice-primary:hover {
+  background: var(--wovi-green-hover);
+}
+
+.save-notice-note {
+  margin: 14px 0 0;
+  font-family: var(--wovi-mono);
+  font-size: 11.5px;
+  text-align: center;
+  color: var(--wovi-ink-5);
+}
+
+/* ---------- Toast ---------- */
+
+.wovi-toast {
+  position: fixed;
+  inset: auto;
+  left: 50%;
+  bottom: 36px;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: calc(100vw - 32px);
+  margin: 0;
+  padding: 10px 10px 10px 18px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--wovi-ink);
+  color: var(--wovi-surface);
+  font-family: var(--wovi-font);
+  font-size: var(--wovi-fs-14);
+  box-shadow: var(--wovi-shadow-toast);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--wovi-base) var(--wovi-ease);
+}
+
+.wovi-toast[popover]:not(:popover-open) {
+  display: none;
+}
+
+.wovi-toast.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+@starting-style {
+  .wovi-toast.is-visible {
+    opacity: 0;
+  }
+}
+
+.wovi-toast-text {
+  min-width: 0;
+}
+
+.wovi-toast-link {
+  color: var(--wovi-green-on-dark);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.wovi-toast-link:hover {
+  text-decoration: underline;
+}
+
+.wovi-toast-action {
+  appearance: none;
+  flex: none;
+  min-height: 36px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: var(--wovi-r-md);
+  background: color-mix(in srgb, var(--wovi-surface) 12%, transparent);
+  color: var(--wovi-surface);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.wovi-toast-action:hover {
+  background: color-mix(in srgb, var(--wovi-surface) 20%, transparent);
+}
+
+.wovi-toast-link:focus-visible,
+.wovi-toast-action:focus-visible {
+  outline: none;
+  box-shadow: var(--wovi-focus-ring);
+}
+
+@media (max-width: 600px) {
+  .save-notice-inner {
+    padding: 24px;
+  }
+}

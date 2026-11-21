@@ -364,6 +364,50 @@
   border-color: var(--wovi-ink);
 }
 
+.viewer-head-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+}
+
+.viewer-save {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--wovi-line-strong);
+  border-radius: var(--wovi-r-pill);
+  background-color: var(--wovi-surface);
+  color: var(--wovi-ink);
+  cursor: pointer;
+  transition: border-color var(--wovi-fast) var(--wovi-ease),
+    background-color var(--wovi-fast) var(--wovi-ease),
+    color var(--wovi-fast) var(--wovi-ease);
+}
+
+.viewer-save:hover {
+  border-color: var(--wovi-ink);
+}
+
+.viewer-save[aria-pressed="true"] {
+  border-color: var(--wovi-green);
+  background-color: var(--wovi-green);
+  color: var(--wovi-surface);
+}
+
+.viewer-save[aria-pressed="true"]:hover {
+  border-color: var(--wovi-green-hover);
+  background-color: var(--wovi-green-hover);
+}
+
+.viewer-save[aria-pressed="true"] svg path {
+  fill: currentColor;
+}
+
 .viewer-panel-body {
   padding: 18px 32px 32px;
 }
