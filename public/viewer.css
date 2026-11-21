@@ -14,7 +14,7 @@
 }
 
 .viewer::backdrop {
-  background-color: rgba(12, 11, 10, 0.72);
+  background-color: var(--wovi-scrim);
 }
 
 .viewer-layout {
@@ -381,12 +381,6 @@
 
   .viewer-panel-inner {
     padding: var(--space-5) var(--space-4) var(--space-7);
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  .viewer-stage {
-    background-color: #0b0a09;
   }
 }
 

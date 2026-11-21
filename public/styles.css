@@ -1,19 +1,20 @@
 :root {
-  color-scheme: light dark;
+  color-scheme: light;
 
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-ui: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--wovi-font);
+  --font-ui: var(--wovi-font);
+  --font-mono: var(--wovi-mono);
 
-  --bg: #f6f3ee;
-  --bg-raised: #fbf9f6;
-  --ink: #1d1b18;
-  --ink-muted: #6b655c;
-  --rule: #d8d1c6;
-  --rule-strong: #b9b1a3;
-  --accent: #1f3a5f;
-  --accent-ink: #f6f3ee;
-  --error: #a3312a;
-  --selection: #8a2f2a;
+  --bg: var(--wovi-bg);
+  --bg-raised: var(--wovi-panel);
+  --ink: var(--wovi-ink);
+  --ink-muted: var(--wovi-ink-3);
+  --rule: var(--wovi-line);
+  --rule-strong: var(--wovi-line-strong);
+  --accent: var(--wovi-green);
+  --accent-ink: var(--wovi-surface);
+  --error: var(--wovi-warn);
+  --selection: var(--wovi-green);
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -23,23 +24,8 @@
   --space-6: 2.5rem;
   --space-7: 4rem;
 
-  --radius: 2px;
-  --measure: 1440px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #161513;
-    --bg-raised: #1e1c19;
-    --ink: #ece7de;
-    --ink-muted: #a39b8e;
-    --rule: #35322d;
-    --rule-strong: #4b463f;
-    --accent: #a8c4e6;
-    --accent-ink: #161513;
-    --error: #e0776e;
-    --selection: #d99a8f;
-  }
+  --radius: var(--wovi-r-sm);
+  --measure: var(--wovi-page-max);
 }
 
 *,
@@ -56,7 +42,8 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: var(--font-ui);
+  font-family: var(--wovi-font);
+  background-color: var(--wovi-bg);
   font-size: 1rem;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -67,10 +54,18 @@ body {
 h1,
 h2,
 h3 {
-  font-family: var(--font-display);
+  font-family: var(--wovi-font);
   font-weight: 600;
-  letter-spacing: -0.01em;
   margin: 0;
+}
+
+h1 {
+  letter-spacing: var(--wovi-track-tight);
+}
+
+h2,
+h3 {
+  letter-spacing: -0.03em;
 }
 
 button,
@@ -88,7 +83,7 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--accent);
+  outline: 2px solid var(--wovi-green);
   outline-offset: 2px;
 }
 
