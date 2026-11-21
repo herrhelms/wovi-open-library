@@ -9,50 +9,106 @@ import {
   downloadUrl,
   el,
   estimateCardHeight,
+  everythingText,
+  groupShortLabel,
   groupSources,
+  imagesText,
+  imagesTotal,
   isSearchable,
+  isShortcut,
   isUsable,
   itemKey,
   parseSavedSelection,
   pickColumn,
+  placeholderTone,
+  pullingText,
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  savesExportJson,
   searchKey,
+  searchWithoutItem,
+  searchPlaceholder,
   serializeSelection,
   shouldAutoLoad,
+  shortcutLabel,
   sleep,
-  subtitleText,
+  snapshotItem,
+  sortChipIds,
+  sourceBarSegments,
+  sourceSummary,
   thumbCandidates,
+  wallLayout,
+  backToTopBottom,
+  showBackToTop,
 } from './lib.js';
-import { initSettings } from './settings.js';
+import { initSettings, openSources } from './settings.js';
+import {
+  clearSaves,
+  confirmClearAll,
+  onSavesChange,
+  readSaves,
+  savedIds,
+  showToast,
+  toggleSave,
+} from './saves.js';
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
 const OPEN_STORAGE_KEY = 'olf.openOnly';
+const SOURCES_OPEN_KEY = 'wovi:sources-open:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
 const DOWNLOAD_DELAY = 800;
+/** The Saved page (one route, served by `GET /saved`). */
+const SAVED_PATH = '/saved';
+const isSavedPage = location.pathname === SAVED_PATH;
+// The results header can show sort, orientation and colour dropdowns, but the
+// search API has no data for them, so the controls stay off (no dead controls).
+const SHOW_RESULT_FILTERS = false;
 
 // ---------- DOM ----------
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
-const groupsEl = document.getElementById('source-groups');
+const searchShortcutEl = document.getElementById('search-shortcut');
+const groupsEl = document.getElementById('src-panel');
+const sourcesDisc = document.getElementById('sources-disc');
+const sourcesCountEl = document.getElementById('sources-count');
+const sourcesSummaryEl = document.getElementById('sources-summary');
 const allButton = document.getElementById('sources-all');
 const noneButton = document.getElementById('sources-none');
-const openOnlyInput = document.getElementById('open-only');
+const openOnlySwitch = document.getElementById('sources-licence-switch');
 const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
+const resultsTitleEl = document.getElementById('results-title');
+const resultsHeaderEl = document.querySelector('.results-header');
+const sourcesFieldset = document.querySelector('fieldset.sources');
+const savedHeaderEl = document.getElementById('saved-header');
+const savedTitleEl = document.getElementById('saved-title');
+const savedExportButton = document.getElementById('saved-export');
+const savedClearButton = document.getElementById('saved-clear');
+const savedEmptyEl = document.getElementById('saved-empty');
+const savedNavEl = document.getElementById('saved-open');
+const exploreNavEl = document.querySelector('.main-nav a[href="/"]');
+const resultsSubEl = document.getElementById('results-sub');
+const sourceBarEl = document.getElementById('source-bar');
+const sourceLegendEl = document.getElementById('source-legend');
+const noResultsEl = document.getElementById('no-results');
+const noResultsTextEl = document.getElementById('no-results-text');
+const noResultsSourcesButton = document.getElementById('no-results-sources');
 const statusLineEl = document.getElementById('status-line');
-const subtitleEl = document.querySelector('.site-header .subtitle');
+const savedCountEl = document.getElementById('saved-count');
 const resultsEl = document.getElementById('results');
+const wallSkeletonsEl = document.getElementById('wall-skeletons');
+const loadRowEl = document.getElementById('load-row');
 const loadMoreButton = document.getElementById('load-more');
 const sentinelEl = document.getElementById('sentinel');
 const selectionBarEl = document.getElementById('selection-bar');
 const selectionCountEl = document.getElementById('selection-count');
 const downloadSelectedButton = document.getElementById('download-selected');
 const clearSelectionButton = document.getElementById('selection-clear');
+const backToTopButton = document.getElementById('back-to-top');
 
 // ---------- State ----------
 /** @type {Array<{id:string,name:string,homepage:string,needsKey:boolean,keyConfigured:boolean}>} */
@@ -75,7 +131,11 @@ const controllers = new Map();
 const retryTimers = new Map();
 const errors = new Map();
 const chipEls = new Map();
-/** @type {Array<{el:HTMLElement,item:object,checkbox:HTMLInputElement,img:HTMLImageElement,key:string,sourceId:string,mediaId:string|null}>} */
+/** @type {Map<string,{sources:object[],chipsEl:HTMLElement,hitsEl:HTMLElement}>} */
+const groupRows = new Map();
+/** True while renderChips builds the fieldsets, so updateChip skips the re-layout. */
+let layingOutSources = false;
+/** @type {Array<{el:HTMLElement,item:object,selectButton:HTMLButtonElement,img:HTMLImageElement,key:string,sourceId:string,mediaId:string|null}>} */
 const records = [];
 const displayedKeys = new Set();
 const displayedMedia = new Set();
@@ -87,6 +147,11 @@ const warmSent = new Set();
 let tokenCounter = 0;
 let masonryEl = null;
 let masonryCols = [];
+/** Native `display: grid-lanes` takes over the column placement when available. */
+const nativeWall =
+  typeof CSS !== 'undefined' &&
+  typeof CSS.supports === 'function' &&
+  CSS.supports('display', 'grid-lanes');
 let resizeTimer = 0;
 /** Search key → Map(source id → { records, state }) */
 const cardCache = new Map();
@@ -129,7 +194,33 @@ function saveOpenOnly() {
 }
 
 function applyOpenOnlyUi() {
-  if (openOnlyInput) openOnlyInput.checked = openOnly;
+  if (openOnlySwitch) {
+    openOnlySwitch.setAttribute('aria-checked', openOnly ? 'true' : 'false');
+  }
+}
+
+function loadSourcesOpen() {
+  try {
+    return localStorage.getItem(SOURCES_OPEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveSourcesOpen(open) {
+  try {
+    localStorage.setItem(SOURCES_OPEN_KEY, open ? '1' : '0');
+  } catch {
+    // Storage may be blocked or full; the fieldset still works for this session.
+  }
+}
+
+function setSourcesOpen(open, { persist = true } = {}) {
+  if (sourcesDisc) {
+    sourcesDisc.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  if (groupsEl) groupsEl.hidden = !open;
+  if (persist) saveSourcesOpen(open);
 }
 
 function defaultSelection() {
@@ -162,8 +253,15 @@ function sourceState(id) {
   return state;
 }
 
+/**
+ * Source names of the saved snapshots, for sources the registry does not know
+ * (for example after a source was removed).
+ * @type {Map<string, string>}
+ */
+const savedSourceNames = new Map();
+
 function sourceName(id) {
-  return registryById.get(id)?.name ?? id;
+  return registryById.get(id)?.name ?? savedSourceNames.get(id) ?? id;
 }
 
 function searchableSelected() {
@@ -181,13 +279,105 @@ function sourceShownCount(id) {
   return count;
 }
 
+/**
+ * Hits of one source for its chip: the reported total when it is known, else
+ * the number of cards that are shown. A count exists only after a search
+ * finished (`done`).
+ * @param {string} id
+ * @returns {number|null}
+ */
+function chipHits(id) {
+  const state = states.get(id);
+  if (!state || state.status !== 'done') return null;
+  return state.total !== null ? state.total : sourceShownCount(id);
+}
+
+/**
+ * Selected sources that can be searched right now, in registry order, with
+ * their hit counts.
+ * @returns {Array<{name:string,hits:number|null}>}
+ */
+function summaryList() {
+  const list = [];
+  for (const source of registry) {
+    if (!selected.has(source.id)) continue;
+    if (!isSearchable(source, openOnly)) continue;
+    list.push({ name: source.name, hits: chipHits(source.id) });
+  }
+  return list;
+}
+
+/**
+ * Move the chips of one group into hit order. Existing elements are moved, not
+ * recreated, so keyboard focus stays on the same source.
+ * @param {{sources:object[],chipsEl:HTMLElement}} row
+ */
+function sortGroupChips(row) {
+  const ids = row.sources.map((source) => source.id);
+  const hitsById = new Map(ids.map((id) => [id, chipHits(id)]));
+  const sorted = sortChipIds(ids, hitsById);
+
+  let changed = false;
+  let index = 0;
+  for (const id of sorted) {
+    const entry = chipEls.get(id);
+    if (!entry) continue;
+    if (row.chipsEl.children[index] !== entry.button) changed = true;
+    index += 1;
+  }
+  if (!changed) return;
+
+  // Moving nodes can drop focus in some browsers; put it back afterwards.
+  const active = document.activeElement;
+  for (const id of sorted) {
+    const entry = chipEls.get(id);
+    if (entry) row.chipsEl.append(entry.button);
+  }
+  if (active instanceof HTMLElement && row.chipsEl.contains(active)) {
+    active.focus({ preventScroll: true });
+  }
+}
+
+/**
+ * Refresh the header count, the summary line and the per-group hit counts.
+ */
+function refreshSourceMeta() {
+  const total = registry.length;
+  let on = 0;
+  for (const source of registry) {
+    if (!selected.has(source.id)) continue;
+    if (!isUsable(source)) continue;
+    if (openOnly && source.openLicenses === false) continue;
+    on += 1;
+  }
+
+  if (sourcesCountEl) {
+    sourcesCountEl.textContent = `${on.toLocaleString('en-US')} of ${total.toLocaleString('en-US')} on`;
+  }
+  if (sourcesSummaryEl) {
+    sourcesSummaryEl.textContent = sourceSummary(summaryList());
+  }
+
+  for (const [, row] of groupRows) {
+    let hits = 0;
+    for (const source of row.sources) {
+      if (!selected.has(source.id)) continue;
+      if (!isSearchable(source, openOnly)) continue;
+      const value = chipHits(source.id);
+      if (typeof value === 'number') hits += value;
+    }
+    row.hitsEl.textContent = `${hits.toLocaleString('en-US')} hits`;
+    sortGroupChips(row);
+  }
+}
+
 // ---------- Chips ----------
 function needsKeyText(source) {
   return `Set ${source.keyEnv ?? 'the key'} in .env to use ${source.name}.`;
 }
 
 function createChip(source) {
-  const statusEl = el('span', { class: 'chip-status' });
+  const countEl = el('span', { class: 'chip-count' });
   const button = el(
     'button',
     {
@@ -195,48 +385,55 @@ function createChip(source) {
       class: 'chip',
       'aria-pressed': selected.has(source.id) ? 'true' : 'false',
     },
-    [el('span', { class: 'chip-name', text: source.name }), statusEl],
+    [
+      el('span', { class: 'dot', 'aria-hidden': 'true' }),
+      el('span', { class: 'chip-name', text: source.name }),
+      countEl,
+    ],
   );
 
   if (!isUsable(source)) {
     const descriptionId = `source-key-${source.id}`;
-    button.classList.add('chip-needs-key');
+    const description = needsKeyText(source);
+    button.classList.add('key');
     button.removeAttribute('aria-pressed');
     button.setAttribute('aria-disabled', 'true');
     button.setAttribute('aria-describedby', descriptionId);
-    button.title = needsKeyText(source);
-    button.append(el('span', { class: 'chip-needs-key-text', text: 'needs key' }));
+    button.title = description;
+    countEl.remove();
     button.append(
-      el('span', {
-        class: 'visually-hidden',
-        id: descriptionId,
-        text: needsKeyText(source),
-      }),
+      el('span', { class: 'keytag', text: 'KEY' }),
+      el('span', { class: 'visually-hidden', id: descriptionId, text: description }),
     );
-    // Keep the status element for layout consistency but never fill it.
-    chipEls.set(source.id, { button, statusEl, usable: false });
+    button.addEventListener('click', () => {
+      void openSources(source.id);
+    });
+    chipEls.set(source.id, { button, countEl, usable: false });
     return button;
   }
 
   if (openOnly && source.openLicenses === false) {
-    button.classList.add('chip-no-licence');
+    button.classList.add('off');
     button.removeAttribute('aria-pressed');
     button.setAttribute('aria-disabled', 'true');
     button.title = OPEN_DISABLED_TEXT;
-    button.append(el('span', { class: 'visually-hidden', text: OPEN_DISABLED_TEXT }));
-    chipEls.set(source.id, { button, statusEl, usable: false });
+    countEl.remove();
+    button.append(
+      el('span', { class: 'visually-hidden', text: OPEN_DISABLED_TEXT }),
+    );
+    chipEls.set(source.id, { button, countEl, usable: false });
     return button;
   }
 
   button.addEventListener('click', () => toggleSource(source.id));
-  chipEls.set(source.id, { button, statusEl, usable: true });
+  chipEls.set(source.id, { button, countEl, usable: true });
   updateChip(source.id);
   return button;
 }
 
-function createGroupAllButton(rowId, isOn) {
+function createGroupButton(rowId, isOn) {
   return el('button', {
-    class: 'text-button',
+    class: 'mini',
     type: 'button',
     text: isOn ? 'All' : 'None',
     onclick: () => setGroupAll(rowId, isOn),
@@ -244,57 +441,78 @@ function createGroupAllButton(rowId, isOn) {
 }
 
 function renderChips() {
+  if (!groupsEl) return;
+  layingOutSources = true;
   groupsEl.replaceChildren();
   chipEls.clear();
+  groupRows.clear();
 
   const rows = groupSources(registry, groups);
   for (const row of rows) {
-    const chips = el(
-      'div',
-      { class: 'chips' },
-      row.sources.map((source) => createChip(source)),
-    );
-    const actions = el('div', { class: 'source-actions source-actions-group' }, [
-      el('span', { class: 'section-label', text: row.label }),
-      createGroupAllButton(row.id, true),
-      createGroupAllButton(row.id, false),
+    const chipsEl = el('div', { class: 'chips' });
+    const hitsEl = el('span', { class: 'src-group-hits' });
+    const legend = el('legend', {}, [
+      el('span', {
+        class: 'src-group-name',
+        text: groupShortLabel(row.id, row.label),
+      }),
+      el('div', { class: 'src-group-meta' }, [
+        hitsEl,
+        createGroupButton(row.id, true),
+        createGroupButton(row.id, false),
+      ]),
     ]);
-    const groupEl = el(
-      'div',
-      { class: 'source-group', role: 'group', 'aria-label': row.label },
-      [actions, chips],
-    );
+    const groupEl = el('fieldset', { class: 'src-group' }, [legend, chipsEl]);
+    for (const source of row.sources) chipsEl.append(createChip(source));
+    groupRows.set(row.id, { sources: row.sources, chipsEl, hitsEl });
     groupsEl.append(groupEl);
   }
+
+  layingOutSources = false;
+  refreshSourceMeta();
 }
 
 function updateChip(id) {
   const entry = chipEls.get(id);
   if (!entry) return;
-  if (!entry.usable) return;
-  const isOn = selected.has(id);
-  entry.button.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-  entry.button.removeAttribute('title');
-  entry.button.classList.remove('has-error');
 
-  const statusEl = entry.statusEl;
-  statusEl.replaceChildren();
-  const state = sourceState(id);
+  if (entry.usable) {
+    const isOn = selected.has(id);
+    const state = states.get(id);
+    const button = entry.button;
+    const countEl = entry.countEl;
 
-  if (state.status === 'loading') {
-    statusEl.append(el('span', { class: 'spinner', 'aria-label': 'loading' }));
-  } else if (state.status === 'done') {
-    const count = state.total !== null ? state.total : sourceShownCount(id);
-    statusEl.textContent = Number(count).toLocaleString();
-  } else if (state.status === 'error') {
-    statusEl.append(el('span', { class: 'chip-error-dot', 'aria-hidden': 'true' }));
-    entry.button.classList.add('has-error');
-    entry.button.title = state.error || 'Search failed';
+    button.classList.remove('on', 'off', 'zero', 'loading', 'has-error');
+    button.removeAttribute('title');
+    countEl.textContent = '';
+    button.classList.toggle('on', isOn);
+    button.classList.toggle('off', !isOn);
+    button.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+
+    if (isOn && state?.status === 'loading') {
+      button.classList.add('loading');
+    } else if (state?.status === 'error') {
+      button.classList.add('has-error');
+      countEl.textContent =
+        state.code === 'RATE_LIMIT'
+          ? 'limit'
+          : state.code === 'PREPARING'
+            ? 'wait'
+            : 'error';
+      button.title = state.error || 'Search failed';
+    } else if (state?.status === 'done') {
+      const count = chipHits(id);
+      countEl.textContent = Number(count).toLocaleString('en-US');
+      if (isOn && count === 0) button.classList.add('zero');
+    }
   }
+
+  if (!layingOutSources) refreshSourceMeta();
 }
 
 // ---------- Errors ----------
 function renderErrors() {
+  if (isSavedPage) return;
   errorListEl.replaceChildren();
   for (const [id, info] of errors) {
     if (!selected.has(id)) continue;
@@ -316,13 +534,81 @@ function updateSelectionUi() {
   selectionCountEl.textContent = `${count} selected`;
 
   for (const [key, record] of cardsByKey) {
-    record.el.classList.toggle('selected', selection.has(key));
-    record.checkbox.checked = selection.has(key);
+    const isOn = selection.has(key);
+    record.el.classList.toggle('selected', isOn);
+    record.selectButton.setAttribute('aria-pressed', isOn ? 'true' : 'false');
   }
 
   if (count > 0 && !downloading) {
     downloadSelectedButton.textContent = 'Download selected';
   }
+
+  updateBackToTopPosition();
+}
+
+// ---------- Back to top ----------
+const narrowQuery = window.matchMedia('(max-width: 600px)');
+const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/**
+ * Keep the back-to-top button above the selection bar when that bar shows.
+ */
+function updateBackToTopPosition() {
+  if (!backToTopButton) return;
+  const base = narrowQuery.matches ? 16 : 28;
+  let height = 0;
+  let bottom = 0;
+  if (!selectionBarEl.hidden) {
+    height = selectionBarEl.offsetHeight;
+    const raw = parseFloat(window.getComputedStyle(selectionBarEl).bottom);
+    bottom = Number.isFinite(raw) ? raw : 0;
+  }
+  backToTopButton.style.bottom = `${backToTopBottom(height, bottom, base)}px`;
+}
+
+/**
+ * Show or hide the back-to-top button for a scroll position.
+ * @param {number} scrollY
+ */
+function applyBackToTop(scrollY) {
+  if (!backToTopButton) return;
+  const visible = showBackToTop(scrollY);
+  backToTopButton.classList.toggle('is-visible', visible);
+  if (visible) {
+    backToTopButton.removeAttribute('tabindex');
+    backToTopButton.removeAttribute('aria-hidden');
+  } else {
+    if (document.activeElement === backToTopButton) {
+      searchInput.focus({ preventScroll: true });
+    }
+    backToTopButton.setAttribute('tabindex', '-1');
+    backToTopButton.setAttribute('aria-hidden', 'true');
+  }
+}
+
+if (backToTopButton) {
+  let backToTopFrame = 0;
+  const checkBackToTop = () => {
+    backToTopFrame = 0;
+    applyBackToTop(window.scrollY);
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (backToTopFrame) return;
+      backToTopFrame = requestAnimationFrame(checkBackToTop);
+    },
+    { passive: true },
+  );
+  window.addEventListener('resize', updateBackToTopPosition);
+  checkBackToTop();
+  updateBackToTopPosition();
+
+  backToTopButton.addEventListener('click', () => {
+    const reduced = reduceMotionQuery.matches;
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    searchInput.focus({ preventScroll: true });
+  });
 }
 
 function toggleSelection(key, isOn) {
@@ -334,34 +620,129 @@ function toggleSelection(key, isOn) {
 }
 
 // ---------- Cards ----------
-function metaLine(item) {
-  const parts = [];
-  if (item.creator) parts.push(String(item.creator));
-  if (item.date) parts.push(String(item.date));
-  return parts.join(' · ');
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/**
+ * Inline stroke icon: 2 px stroke, round caps, currentColor.
+ * @param {string[]} paths
+ * @param {number} [size]
+ * @returns {SVGSVGElement}
+ */
+function icon(paths, size = 18) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const d of paths) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+  }
+  return svg;
+}
+
+const DOWNLOAD_ICON = ['M12 3v12m0 0-5-5m5 5 5-5M5 21h14'];
+const CHECK_ICON = ['m5 13 4 4L19 7'];
+const BOOKMARK_ICON = ['M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'];
+
+/**
+ * Accessible label of a tile Save button.
+ * @param {object} item
+ * @param {boolean} saved
+ * @returns {string}
+ */
+function saveLabel(item, saved) {
+  const title = item.title || 'Untitled';
+  return saved ? `Saved: ${title}` : `Save ${title}`;
+}
+
+/**
+ * Show the saved state on one tile Save button.
+ * @param {{item: object, saveButton: HTMLButtonElement}} record
+ * @param {Set<string>} ids
+ */
+function applyTileSave(record, ids) {
+  if (!record.saveButton) return;
+  const saved = ids.has(record.key);
+  record.saveButton.setAttribute('aria-pressed', saved ? 'true' : 'false');
+  record.saveButton.setAttribute('aria-label', saveLabel(record.item, saved));
+}
+
+/** Saved ids, kept current for the tiles that are created next. */
+let savedIdSet = savedIds();
+
+/**
+ * Sync every tile Save button with the saved ids.
+ */
+function updateTileSaves() {
+  savedIdSet = savedIds();
+  for (const record of records) applyTileSave(record, savedIdSet);
+}
+
+/**
+ * Open the full resolution of a tile in the same way as the viewer: direct
+ * download items open in a new tab, everything else goes through /api/download.
+ * @param {object} item
+ */
+function downloadItem(item) {
+  if (item.directDownload === true && typeof item.full === 'string' && item.full !== '') {
+    window.open(item.full, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  const link = el('a', { href: downloadUrl(item), download: '' });
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+/**
+ * Licence text of one item, with the "Rights reserved" fallback for closed items.
+ * @param {object} item
+ * @returns {{text:string, reserved:boolean}}
+ */
+function licenceInfo(item) {
+  const text = typeof item.license === 'string' ? item.license.trim() : '';
+  if (text !== '') return { text, reserved: false };
+  if (item.open !== true) return { text: 'Rights reserved', reserved: true };
+  return { text: '', reserved: false };
 }
 
 function createCard(item, key, sourceId, mediaId) {
   const dataset = { uid: key, source: sourceId };
   if (mediaId !== null) dataset.mediaId = mediaId;
-  const article = el('article', { class: 'card', dataset });
-  const checkbox = el('input', {
-    type: 'checkbox',
-    'aria-label': `Select ${item.title || 'item'}`,
-  });
-  const checkWrap = el('label', { class: 'card-check' }, [checkbox]);
+  const article = el('article', { class: 'tile', dataset });
+  const title = item.title || 'Untitled';
+
+  const width = Number(item.width);
+  const height = Number(item.height);
+  const hasSize =
+    Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0;
+
+  const imageBox = el('div', { class: 'tile-img' });
+  if (hasSize) {
+    imageBox.style.aspectRatio = `${Math.round(width)} / ${Math.round(height)}`;
+  } else {
+    // Unknown size: keep the placeholder at the square shape that
+    // estimateCardHeight assumes, so the box is never 0 px high.
+    imageBox.style.aspectRatio = '1 / 1';
+  }
+  imageBox.style.background = `var(--wovi-ph-${placeholderTone(records.length)})`;
 
   const candidates = thumbCandidates(item);
   const img = el('img', {
-    class: 'card-media',
+    class: 'tile-media',
     src: candidates[0],
-    alt: item.title || '',
+    alt: title,
     loading: 'lazy',
     decoding: 'async',
   });
-  const width = Number(item.width);
-  const height = Number(item.height);
-  if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
+  if (hasSize) {
     img.setAttribute('width', String(Math.round(width)));
     img.setAttribute('height', String(Math.round(height)));
   }
@@ -373,12 +754,28 @@ function createCard(item, key, sourceId, mediaId) {
       img.src = candidates[candidateIndex];
       return;
     }
+    // On the Saved page the tile stays (with its placeholder) so the user can
+    // still unsave it.
+    if (isSavedPage) {
+      img.remove();
+      return;
+    }
     article.hidden = true;
     if (selection.delete(key)) updateSelectionUi();
     updateUi();
   });
 
   img.addEventListener('load', () => {
+    const naturalWidth = Number(img.naturalWidth);
+    const naturalHeight = Number(img.naturalHeight);
+    if (
+      Number.isFinite(naturalWidth) &&
+      Number.isFinite(naturalHeight) &&
+      naturalWidth > 0 &&
+      naturalHeight > 0
+    ) {
+      imageBox.style.aspectRatio = `${naturalWidth} / ${naturalHeight}`;
+    }
     if (item.thumbCached === true) return;
     if (typeof mediaId !== 'string' || mediaId === '') return;
     if (candidates[candidateIndex] !== item.thumbSource) return;
@@ -393,23 +790,82 @@ function createCard(item, key, sourceId, mediaId) {
     }
   });
 
-  const bodyChildren = [
-    el('h3', { class: 'card-title', text: item.title || 'Untitled' }),
-  ];
-  const meta = metaLine(item);
-  if (meta) bodyChildren.push(el('p', { class: 'card-meta', text: meta }));
-  bodyChildren.push(el('p', { class: 'card-source', text: sourceName(item.source) }));
-
-  const openButton = el('button', { type: 'button', class: 'card-open' }, [
-    img,
-    el('div', { class: 'card-body' }, bodyChildren),
-  ]);
+  const openButton = el('button', {
+    type: 'button',
+    class: 'tile-open',
+    'aria-label': title,
+  });
   openButton.addEventListener('click', () => openCard(key));
 
-  checkbox.addEventListener('change', () => toggleSelection(key, checkbox.checked));
-  article.append(checkWrap, openButton);
+  const selectButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'ibtn tile-select',
+      'aria-pressed': selection.has(key) ? 'true' : 'false',
+      'aria-label': `Select ${title}`,
+    },
+    [icon(CHECK_ICON)],
+  );
+  selectButton.addEventListener('click', () => {
+    toggleSelection(key, selectButton.getAttribute('aria-pressed') !== 'true');
+  });
 
-  return { el: article, item, checkbox, img, key, sourceId, mediaId };
+  const saved = savedIdSet.has(key);
+  const saveButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'ibtn tile-save',
+      'aria-pressed': saved ? 'true' : 'false',
+      'aria-label': saveLabel(item, saved),
+    },
+    [icon(BOOKMARK_ICON)],
+  );
+  saveButton.addEventListener('click', () => {
+    void toggleSave(item, { sourceName: sourceName(item.source), trigger: saveButton });
+  });
+
+  const downloadButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'ibtn tile-download',
+      'aria-label': 'Download full resolution',
+    },
+    [icon(DOWNLOAD_ICON)],
+  );
+  downloadButton.addEventListener('click', () => downloadItem(item));
+
+  const overlayText = el('div', { class: 'tile-ov-text', 'aria-hidden': 'true' }, [
+    el('span', { class: 'tile-title', text: title }),
+    el('span', { class: 'tile-ov-source', text: sourceName(item.source) }),
+  ]);
+
+  const overlay = el('div', { class: 'tile-ov' }, [
+    el('div', { class: 'tile-ov-top' }, [selectButton, saveButton, downloadButton]),
+    overlayText,
+  ]);
+
+  imageBox.append(img, openButton, overlay);
+
+  const licence = licenceInfo(item);
+  const metaChildren = [
+    el('span', { class: 'tile-source', text: sourceName(item.source) }),
+  ];
+  if (licence.text !== '') {
+    const tag = el('span', {
+      class: licence.reserved ? 'lic lic-rr' : 'lic',
+      text: licence.text,
+      title: licence.text,
+    });
+    metaChildren.push(tag);
+  }
+  const meta = el('div', { class: 'tile-meta' }, metaChildren);
+
+  article.append(imageBox, meta);
+
+  return { el: article, item, selectButton, saveButton, img, key, sourceId, mediaId };
 }
 
 function visibleRecords() {
@@ -433,18 +889,28 @@ function openCard(key) {
 
 // ---------- Masonry grid ----------
 function masonryGap() {
-  if (!masonryEl) return 0;
+  if (!masonryEl) return wallLayout(window.innerWidth).gap;
   const style = getComputedStyle(masonryEl);
   const raw = style.columnGap || style.gap || '';
   const value = Number.parseFloat(raw);
-  return Number.isFinite(value) && value >= 0 ? value : 0;
+  if (Number.isFinite(value) && value >= 0) return value;
+  return wallLayout(window.innerWidth).gap;
 }
 
+/**
+ * Build the wall. In native `grid-lanes` mode the cards go straight into
+ * `.masonry`; otherwise one `.masonry-col` per column holds them.
+ */
 function createMasonry() {
   masonryEl = el('div', { class: 'masonry' });
   masonryCols = [];
   resultsEl.append(masonryEl);
-  const count = columnCount(resultsEl.clientWidth, 240, masonryGap());
+  if (nativeWall) return;
+  const layout = wallLayout(window.innerWidth);
+  const count = Math.min(
+    layout.maxColumns,
+    columnCount(resultsEl.clientWidth, layout.minColumn, masonryGap()),
+  );
   for (let index = 0; index < count; index += 1) {
     const column = el('div', { class: 'masonry-col' });
     masonryCols.push(column);
@@ -474,30 +940,34 @@ function addItems(sourceId, items) {
 }
 
 /**
- * Put cards into the columns, shortest column first. Reads the column heights
- * one time. New cards use the estimated height. Restored cards also use their
- * real height when the browser can give one.
+ * Put cards into the wall. In native mode they keep their insertion order; in
+ * JS mode they go to the shortest column, whose heights are read one time.
+ * New cards use the estimated height; restored cards also use their real height
+ * when the browser can give one.
  * @param {Array<{item:object,key:string,mediaId:string|null,sourceId?:string,record?:object}>} entries
  * @param {{realHeights?:boolean}} [options]
  */
 function placeEntries(entries, { realHeights = false } = {}) {
   if (!Array.isArray(entries) || entries.length === 0) return;
-  if (!masonryEl || masonryCols.length === 0) createMasonry();
+  if (!masonryEl) createMasonry();
+  if (!nativeWall && masonryCols.length === 0) createMasonry();
 
-  const heights = masonryCols.map((column) => column.offsetHeight);
+  const heights = nativeWall ? [] : masonryCols.map((column) => column.offsetHeight);
   const firstWidth = masonryCols[0]?.clientWidth ?? 0;
   const columnWidth = firstWidth > 0 ? firstWidth : resultsEl.clientWidth;
   const gap = masonryGap();
 
   for (const entry of entries) {
-    const columnIndex = pickColumn(heights);
+    const columnIndex = nativeWall ? 0 : pickColumn(heights);
     const record =
       entry.record ??
       createCard(entry.item, entry.key, entry.sourceId, entry.mediaId);
-    masonryCols[columnIndex].append(record.el);
+    if (nativeWall) masonryEl.append(record.el);
+    else masonryCols[columnIndex].append(record.el);
     records.push(record);
     cardsByKey.set(record.key, record);
 
+    if (nativeWall) continue;
     let height = 0;
     if (realHeights) height = record.el.offsetHeight;
     if (!(height > 0)) height = estimateCardHeight(entry.item, columnWidth);
@@ -505,11 +975,16 @@ function placeEntries(entries, { realHeights = false } = {}) {
   }
 }
 
-function reflowMasonry() {
-  if (!masonryEl) return;
+/** Re-lay the JS column wall after a resize or a tile change. Native mode does nothing. */
+function reflowMasonry({ force = false } = {}) {
+  if (!masonryEl || nativeWall) return;
+  const layout = wallLayout(window.innerWidth);
   const gap = masonryGap();
-  const count = columnCount(resultsEl.clientWidth, 240, gap);
-  if (count === masonryCols.length) return;
+  const count = Math.min(
+    layout.maxColumns,
+    columnCount(resultsEl.clientWidth, layout.minColumn, gap),
+  );
+  if (count === masonryCols.length && !force) return;
 
   const heights = records.map((record) => record.el.offsetHeight);
   masonryEl.replaceChildren();
@@ -539,7 +1014,7 @@ function removeSourceCards(id) {
     // The record is no longer in cardsByKey, so updateSelectionUi cannot reset it.
     // Clear the visual selection state here, so a later restore starts unselected.
     record.el.classList.remove('selected');
-    record.checkbox.checked = selection.has(record.key);
+    record.selectButton.setAttribute('aria-pressed', 'false');
   }
   updateSelectionUi();
 }
@@ -785,7 +1260,7 @@ function resetSearchState() {
   // selection map is cleared, so a later restore starts unselected.
   for (const record of records) {
     record.el.classList.remove('selected');
-    record.checkbox.checked = false;
+    record.selectButton.setAttribute('aria-pressed', 'false');
   }
   records.length = 0;
   displayedKeys.clear();
@@ -949,7 +1424,7 @@ async function reloadSources(adapter) {
   }
 
   registryById = new Map(registry.map((source) => [source.id, source]));
-  if (subtitleEl) subtitleEl.textContent = subtitleText(registry);
+  updateSearchPlaceholder();
   renderChips();
 
   if (adapter && adapter.enabled === false) {
@@ -1043,8 +1518,137 @@ function setGroupAll(groupId, isOn) {
   updateUi();
 }
 
+// ---------- Results header ----------
+/**
+ * Per-source hit list of the searched sources, for the header and the bar.
+ * @returns {Array<{id:string, name:string, hits:number|null}>}
+ */
+function headerSourceList() {
+  const list = [];
+  for (const source of searchableSelected()) {
+    list.push({ id: source.id, name: source.name, hits: chipHits(source.id) });
+  }
+  return list;
+}
+
+/**
+ * Number of searched sources that gave at least one hit.
+ * @param {Array<{name:string, hits:number|null}>} list
+ * @returns {number}
+ */
+function sourcesWithHits(list) {
+  return list.filter(
+    (entry) => typeof entry.hits === 'number' && Number.isFinite(entry.hits) && entry.hits > 0,
+  ).length;
+}
+
+/**
+ * Show the query, the image total, the source line and the source bar.
+ * Without a query the h1 is visually hidden and the rest is hidden.
+ * The marks and text of the header are set with textContent only.
+ */
+function updateResultsHeader() {
+  if (!resultsTitleEl) return;
+  if (isSavedPage) return;
+
+  if (!query) {
+    resultsTitleEl.classList.add('visually-hidden');
+    resultsTitleEl.textContent = 'WOVI — World of Visual Inspiration';
+    if (resultsSubEl) {
+      resultsSubEl.hidden = true;
+      resultsSubEl.textContent = '';
+    }
+    if (sourceBarEl) {
+      sourceBarEl.hidden = true;
+      sourceBarEl.replaceChildren();
+    }
+    if (sourceLegendEl) {
+      sourceLegendEl.hidden = true;
+      sourceLegendEl.replaceChildren();
+    }
+    return;
+  }
+
+  const list = headerSourceList();
+  const totals = list.map((entry) => entry.hits);
+  const shown = visibleItems().length;
+  const total = imagesTotal(totals, shown);
+
+  resultsTitleEl.classList.remove('visually-hidden');
+  const totalEl = el('span', { class: 'results-total', text: `· ${imagesText(total)}` });
+  resultsTitleEl.replaceChildren(document.createTextNode(`${query} `), totalEl);
+
+  const withHits = sourcesWithHits(list);
+  const segments = sourceBarSegments(list);
+
+  if (resultsSubEl) {
+    if (withHits === 0) {
+      resultsSubEl.hidden = true;
+      resultsSubEl.textContent = '';
+    } else {
+      resultsSubEl.hidden = false;
+      resultsSubEl.textContent = `from ${withHits.toLocaleString('en-US')} of ${registry.length.toLocaleString('en-US')} sources`;
+    }
+  }
+
+  if (sourceBarEl) {
+    sourceBarEl.replaceChildren();
+    sourceBarEl.hidden = segments.length === 0;
+    for (const segment of segments) {
+      const part = el('span', { class: `source-bar-seg ${segment.tone}` });
+      part.style.flexGrow = String(segment.hits);
+      sourceBarEl.append(part);
+    }
+  }
+
+  if (sourceLegendEl) {
+    sourceLegendEl.replaceChildren();
+    sourceLegendEl.hidden = segments.length === 0;
+    for (const segment of segments) {
+      sourceLegendEl.append(
+        el('li', {}, [
+          el('span', { class: `legend-swatch ${segment.tone}`, 'aria-hidden': 'true' }),
+          el('span', { text: segment.name }),
+          el('span', {
+            class: 'legend-count',
+            text: segment.hits.toLocaleString('en-US'),
+          }),
+        ]),
+      );
+    }
+  }
+}
+
+/**
+ * Show the empty-result block when every searched source finished without a
+ * card. It stays hidden while sources are still loading.
+ * @param {Array<{id:string, name:string, hits:number|null}>} searchable
+ */
+function updateNoResults(searchable) {
+  if (!noResultsEl) return;
+  if (isSavedPage) return;
+
+  const show =
+    query !== '' &&
+    searchable.length > 0 &&
+    visibleItems().length === 0 &&
+    searchable.every((entry) => states.get(entry.id)?.status === 'done');
+
+  noResultsEl.hidden = !show;
+  if (!show) {
+    if (noResultsTextEl) noResultsTextEl.textContent = '';
+    return;
+  }
+
+  if (noResultsTextEl) {
+    const sources = searchable.length === 1 ? '1 source' : `${searchable.length.toLocaleString('en-US')} sources`;
+    noResultsTextEl.textContent = `Nothing in ${sources}. Try fewer words, or turn on more sources.`;
+  }
+}
+
 // ---------- Status ----------
 function updateStatus() {
+  if (isSavedPage) return;
   if (!query) {
     statusLineEl.textContent = '';
     return;
@@ -1061,28 +1665,15 @@ function updateStatus() {
   }
 
   let loading = 0;
-  let finished = 0;
-  let knownTotal = 0;
-  let totalsComplete = true;
-
   for (const source of searchable) {
     const state = sourceState(source.id);
     if (state.status === 'loading') loading += 1;
-    if (state.status === 'done') {
-      finished += 1;
-      if (state.total !== null) knownTotal += state.total;
-      else totalsComplete = false;
-    } else if (state.status === 'error') {
-      finished += 1;
-      totalsComplete = false;
-    } else if (state.status === 'idle') {
-      totalsComplete = false;
-    }
   }
 
+  // The infinite-load row is the live loading message; the status line stays
+  // quiet while sources are loading.
   if (loading > 0) {
-    const count = searchable.length;
-    statusLineEl.textContent = `Searching ${count} source${count === 1 ? '' : 's'}…`;
+    statusLineEl.textContent = '';
     return;
   }
 
@@ -1092,34 +1683,133 @@ function updateStatus() {
     return;
   }
 
-  const shown = visibleItems().length;
-  const allFinished = finished === searchable.length;
+  statusLineEl.textContent = '';
+}
 
-  if (allFinished && shown === 0) {
-    statusLineEl.textContent = `No results for "${query}".`;
+// ---------- Wall chrome ----------
+const SKELETON_HEIGHTS = [200, 260, 340, 220, 300];
+
+/** Show five skeleton tiles while at least one searched source is loading. */
+function updateSkeletons() {
+  if (!wallSkeletonsEl) return;
+  if (isSavedPage) return;
+  const loading =
+    Boolean(query) &&
+    searchableSelected().some((source) => sourceState(source.id).status === 'loading');
+  wallSkeletonsEl.hidden = !loading;
+  if (!loading) {
+    wallSkeletonsEl.replaceChildren();
+    return;
+  }
+  if (wallSkeletonsEl.childElementCount === SKELETON_HEIGHTS.length) return;
+  wallSkeletonsEl.replaceChildren(
+    ...SKELETON_HEIGHTS.map((height) => {
+      const tile = el('div', { class: 'wall-skeleton' });
+      tile.style.height = `${height}px`;
+      return tile;
+    }),
+  );
+}
+
+/** Last text written to the load row, so an unchanged line is not rewritten. */
+let lastLoadRowText = '';
+/** Dots and text of the load row, created once and then kept. */
+let loadRowDotsEl = null;
+let loadRowTextEl = null;
+
+/** Build the dots and text spans of the load row on first use. */
+function ensureLoadRowParts() {
+  if (loadRowDotsEl && loadRowTextEl) return;
+  loadRowDotsEl = el('span', { class: 'load-dots', 'aria-hidden': 'true' }, [
+    el('span', { class: 'load-dot' }),
+    el('span', { class: 'load-dot' }),
+    el('span', { class: 'load-dot' }),
+  ]);
+  loadRowTextEl = el('span');
+  loadRowEl.append(loadRowDotsEl, loadRowTextEl);
+}
+
+/** Write the load-row text only when it differs from the last text written. */
+function setLoadRowText(text) {
+  if (text === lastLoadRowText) return;
+  if (!loadRowTextEl) {
+    if (text === '') return;
+    ensureLoadRowParts();
+  }
+  loadRowTextEl.textContent = text;
+  lastLoadRowText = text;
+}
+
+/** Text of the infinite-load row: pulling names, the exhausted line, or nothing. */
+function updateLoadRow() {
+  if (!loadRowEl) return;
+  if (isSavedPage) return;
+  const searchable = searchableSelected();
+  const loadingNames = searchable
+    .filter((source) => sourceState(source.id).status === 'loading')
+    .map((source) => source.name);
+
+  if (query && loadingNames.length > 0) {
+    const text = pullingText(loadingNames);
+    if (text === '') {
+      loadRowEl.hidden = true;
+      setLoadRowText('');
+      return;
+    }
+    ensureLoadRowParts();
+    loadRowEl.hidden = false;
+    loadRowDotsEl.hidden = false;
+    setLoadRowText(text);
     return;
   }
 
-  if (totalsComplete && knownTotal > 0) {
-    statusLineEl.textContent = `${shown.toLocaleString()} results shown of ${knownTotal.toLocaleString()}`;
-  } else {
-    statusLineEl.textContent = `${shown.toLocaleString()} results shown`;
+  const withHits = searchable.filter((source) => {
+    const hits = chipHits(source.id);
+    return typeof hits === 'number' && Number.isFinite(hits) && hits > 0;
+  }).length;
+  const exhausted =
+    Boolean(query) &&
+    loadingNames.length === 0 &&
+    !canLoadMore() &&
+    !searchable.some((source) => sourceState(source.id).hasMore) &&
+    visibleRecords().length > 0;
+
+  if (exhausted) {
+    ensureLoadRowParts();
+    loadRowEl.hidden = false;
+    loadRowDotsEl.hidden = true;
+    setLoadRowText(everythingText(withHits));
+    return;
   }
+
+  loadRowEl.hidden = true;
+  setLoadRowText('');
 }
 
 function updateUi() {
   updateStatus();
+  const searchable = searchableSelected();
+  updateResultsHeader();
+  updateNoResults(searchable);
+  if (!isSavedPage) refreshSourceMeta();
+  updateSkeletons();
+  updateLoadRow();
 
-  const showMore = canLoadMore();
+  const showMore = !isSavedPage && canLoadMore();
   loadMoreButton.hidden = !showMore;
 
   const count = selection.size;
   selectionBarEl.hidden = count === 0;
   selectionCountEl.textContent = `${count} selected`;
   resultsEl.classList.toggle('has-selection', count > 0);
+  updateBackToTopPosition();
 }
 
 // ---------- URL ----------
+// Last search applied without the viewer's `i` parameter. The viewer changes
+// only `i`, so popstate can skip a full search re-apply in that case.
+let lastSearchWithoutItem = searchWithoutItem(location.search);
+
 function updateUrl(mode) {
   const params = new URLSearchParams();
   if (query) params.set('q', query);
@@ -1132,9 +1822,11 @@ function updateUrl(mode) {
   } catch {
     // History can be unavailable in some embeddings; ignore.
   }
+  lastSearchWithoutItem = searchWithoutItem(location.search);
 }
 
 function applyUrlState() {
+  lastSearchWithoutItem = searchWithoutItem(location.search);
   const params = new URLSearchParams(location.search);
   if (params.has('q') || params.has('sources')) {
     openOnly = params.get('open') === '1';
@@ -1235,6 +1927,161 @@ async function downloadSelected() {
   if (skippedNote) statusLineEl.textContent = skippedNote;
 }
 
+// ---------- Saved page ----------
+
+/**
+ * Show the Saved-page header, the nav state and the stored tiles.
+ */
+function setupSavedPage() {
+  document.title = 'Saved — WOVI';
+  if (exploreNavEl) exploreNavEl.removeAttribute('aria-current');
+  if (savedNavEl) savedNavEl.setAttribute('aria-current', 'page');
+
+  const hidden = [
+    sourcesFieldset,
+    errorListEl,
+    resultsHeaderEl,
+    statusLineEl,
+    noResultsEl,
+    emptyStateEl,
+    wallSkeletonsEl,
+    loadRowEl,
+    loadMoreButton,
+  ];
+  for (const node of hidden) {
+    if (node) node.hidden = true;
+  }
+  if (savedHeaderEl) savedHeaderEl.hidden = false;
+
+  buildSavedWall();
+  updateSavedHeading();
+  updateSavedEmpty();
+  updateSavedClearButton();
+}
+
+/**
+ * Build the wall from the stored snapshots, newest first.
+ */
+function buildSavedWall() {
+  const entries = [];
+  const seen = new Set();
+  const saves = readSaves();
+  for (const snapshot of saves) {
+    if (snapshot.sourceName && !savedSourceNames.has(snapshot.source)) {
+      savedSourceNames.set(snapshot.source, snapshot.sourceName);
+    }
+  }
+  for (const snapshot of saves) {
+    const item = snapshotItem(snapshot);
+    if (!item) continue;
+    const key = itemKey(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const mediaId =
+      typeof item.mediaId === 'string' && item.mediaId !== '' ? item.mediaId : null;
+    const sourceId = typeof item.source === 'string' ? item.source : '';
+    entries.push({ item, key, mediaId, sourceId });
+  }
+  placeEntries(entries);
+}
+
+/**
+ * Show the saved count in the Saved-page h1.
+ */
+function updateSavedHeading() {
+  if (!savedTitleEl) return;
+  const n = visibleRecords().length;
+  savedTitleEl.replaceChildren(
+    document.createTextNode('Saved '),
+    el('span', { class: 'results-total', text: `· ${imagesText(n)}` }),
+  );
+}
+
+/**
+ * Show the empty state when no saved tile is visible.
+ */
+function updateSavedEmpty() {
+  if (!savedEmptyEl) return;
+  savedEmptyEl.hidden = visibleRecords().length > 0;
+}
+
+/**
+ * Disable the Clear-all button when there are no saves. When it becomes
+ * disabled while focused, move focus to the Explore link of the empty state.
+ */
+function updateSavedClearButton() {
+  if (!savedClearButton) return;
+  const hasSaves = readSaves().length > 0;
+  const wasDisabled = savedClearButton.disabled;
+  savedClearButton.disabled = !hasSaves;
+  if (!hasSaves && !wasDisabled && document.activeElement === savedClearButton) {
+    const exploreLink = savedEmptyEl?.querySelector('a');
+    if (exploreLink instanceof HTMLElement) exploreLink.focus({ preventScroll: true });
+  }
+}
+
+/**
+ * Hide saved tiles that are no longer saved, show ones that are again, then
+ * re-lay the wall and update the heading and the empty state.
+ * @param {object[]} list saved snapshots
+ */
+function syncSavedWall(list) {
+  const ids = new Set((Array.isArray(list) ? list : []).map((snapshot) => snapshot?.id));
+  for (const record of records) {
+    const show = ids.has(record.key);
+    record.el.hidden = !show;
+    if (!show && selection.delete(record.key)) {
+      record.el.classList.remove('selected');
+      record.selectButton.setAttribute('aria-pressed', 'false');
+    }
+  }
+  reflowMasonry({ force: true });
+  updateSelectionUi();
+  updateSavedHeading();
+  updateSavedEmpty();
+  updateSavedClearButton();
+}
+
+/**
+ * Download the stored snapshots as pretty JSON.
+ */
+function exportSaves() {
+  const blob = new Blob([savesExportJson(readSaves())], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = el('a', { href: url, download: 'wovi-saves.json' });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  // Give the browser a moment to start the download before releasing the URL.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+/**
+ * Ask before removing every save, then empty the wall.
+ * @param {HTMLElement|null} trigger
+ */
+async function clearAllSaves(trigger) {
+  const n = readSaves().length;
+  const confirmed = await confirmClearAll(n, trigger);
+  if (!confirmed) return;
+
+  if (!clearSaves()) {
+    showToast({ text: "Saving isn't available in this browser." });
+    return;
+  }
+
+  for (const record of records) record.el.hidden = true;
+  selection.clear();
+  reflowMasonry({ force: true });
+  updateSelectionUi();
+  updateSavedHeading();
+  updateSavedEmpty();
+  updateSavedClearButton();
+  showToast({ text: 'Saves cleared' });
+}
+
 // ---------- Init ----------
 async function loadGroups() {
   try {
@@ -1251,6 +2098,55 @@ async function loadGroups() {
     // Use the fallback groups below.
   }
   return DEFAULT_GROUPS;
+}
+
+/**
+ * Show the number of usable sources in the search field placeholder.
+ */
+function updateSearchPlaceholder() {
+  if (!searchInput) return;
+  const usable = Array.isArray(registry) ? registry.filter(isUsable).length : 0;
+  searchInput.placeholder = searchPlaceholder(usable);
+}
+
+/**
+ * Show the platform keyboard shortcut in the search field.
+ */
+function updateShortcutLabel() {
+  if (!searchShortcutEl) return;
+  const platform =
+    navigator.userAgentData?.platform || navigator.platform || '';
+  searchShortcutEl.textContent = shortcutLabel(platform);
+}
+
+/**
+ * Whether the focused element is a text field other than the search input.
+ * @returns {boolean}
+ */
+function focusIsOtherTextField() {
+  const active = document.activeElement;
+  if (!active || active === searchInput) return false;
+  const tag = active.tagName;
+  return (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    active.isContentEditable === true
+  );
+}
+
+/**
+ * Focus the search field from anywhere on the page (Cmd/Ctrl + K).
+ * @param {KeyboardEvent} event
+ */
+function onShortcutKeydown(event) {
+  if (!isShortcut(event)) return;
+  if (document.querySelector('dialog[open]')) return;
+  if (focusIsOtherTextField()) return;
+  event.preventDefault();
+  if (!searchInput) return;
+  searchInput.focus();
+  searchInput.select();
 }
 
 async function init() {
@@ -1273,27 +2169,47 @@ async function init() {
     sourceListError = 'The source list could not be loaded.';
   }
   registryById = new Map(registry.map((source) => [source.id, source]));
+  updateSearchPlaceholder();
 
-  if (subtitleEl) subtitleEl.textContent = subtitleText(registry);
-
+  updateSavedCount();
+  if (isSavedPage) {
+    setupSavedPage();
+    updateUi();
+    return;
+  }
   applyUrlState();
   if (sourceListError && statusLineEl.textContent === '') {
     statusLineEl.textContent = sourceListError;
   }
 }
 
+updateShortcutLabel();
+document.addEventListener('keydown', onShortcutKeydown);
+setSourcesOpen(loadSourcesOpen(), { persist: false });
+
 searchForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const value = searchInput.value.trim();
   if (!value) return;
+  if (isSavedPage) {
+    location.assign(`/?q=${encodeURIComponent(value)}`);
+    return;
+  }
   runSearch(value, { urlMode: 'push' });
 });
 
 allButton.addEventListener('click', () => setAll(true));
 noneButton.addEventListener('click', () => setAll(false));
-if (openOnlyInput) {
-  openOnlyInput.addEventListener('change', () => {
-    openOnly = openOnlyInput.checked;
+if (sourcesDisc) {
+  sourcesDisc.addEventListener('click', () => {
+    const open = sourcesDisc.getAttribute('aria-expanded') !== 'true';
+    setSourcesOpen(open);
+  });
+}
+if (openOnlySwitch) {
+  openOnlySwitch.addEventListener('click', () => {
+    openOnly = !openOnly;
+    applyOpenOnlyUi();
     saveOpenOnly();
     updateUrl('replace');
     renderChips();
@@ -1307,6 +2223,12 @@ loadMoreButton.addEventListener('click', () => {
   updateUi();
 });
 downloadSelectedButton.addEventListener('click', downloadSelected);
+if (noResultsSourcesButton) {
+  noResultsSourcesButton.addEventListener('click', () => {
+    setSourcesOpen(true);
+    sourcesDisc?.focus();
+  });
+}
 clearSelectionButton.addEventListener('click', () => {
   selection.clear();
   updateSelectionUi();
@@ -1342,8 +2264,47 @@ if (typeof ResizeObserver === 'function') {
   resizeObserver.observe(resultsEl);
 }
 
-window.addEventListener('popstate', applyUrlState);
+window.addEventListener('popstate', () => {
+  if (isSavedPage) return;
+  if (searchWithoutItem(location.search) === lastSearchWithoutItem) return;
+  applyUrlState();
+});
+
+/**
+ * Show the number of saved items in the header nav.
+ * @param {object[]} [list] saved snapshots; read from storage when not given
+ */
+function updateSavedCount(list) {
+  if (!savedCountEl) return;
+  const saves = Array.isArray(list) ? list : readSaves();
+  savedCountEl.textContent = saves.length.toLocaleString('en-US');
+}
+
+onSavesChange((list) => {
+  updateSavedCount(list);
+  updateTileSaves();
+  if (isSavedPage) syncSavedWall(list);
+});
+
+if (savedExportButton) {
+  savedExportButton.addEventListener('click', exportSaves);
+}
+if (savedClearButton) {
+  savedClearButton.addEventListener('click', () => {
+    void clearAllSaves(savedClearButton);
+  });
+}
 
 initSettings({ onChange: onAdapterChange });
+
+// There is no deep link to a viewer item: drop `i` before the first read.
+try {
+  if (new URLSearchParams(location.search).has('i')) {
+    const search = searchWithoutItem(location.search);
+    history.replaceState(null, '', `${location.pathname}${search}${location.hash}`);
+  }
+} catch {
+  // History can be unavailable in some embeddings; ignore.
+}
 
 init();

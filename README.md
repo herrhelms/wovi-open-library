@@ -1,7 +1,38 @@
-# Open Library Fetch
+# 🔭 WOVI 
+Welcome to a **world of visual inspiration**
 
-A local web app that searches 51 open image libraries in one grid and downloads
-the highest available resolution of each image.
+###	Design Handoff (remove from here later)
+Unzip this **into the root of your project repo**. You get:
+
+```
+.claude/skills/wovi-design/SKILL.md     ← design rules, auto-loaded by Claude Code
+.claude/skills/wovi-implement/SKILL.md  ← step-by-step build workflow
+design-handoff/
+  HANDOFF.md                            ← start here: plan, new behaviour, acceptance checklist
+  design/tokens.css · tokens.json       ← colours, type, radii, spacing, motion
+  design/components.md                  ← every component, states, a11y
+  design/screens/01-search.md           ← search, collapsible sources, masonry wall
+  design/screens/02-detail.md           ← detail viewer
+  design/screens/03-sources.md          ← sources modal (old "Adaptors")
+  design/screens/04-first-save.md       ← localStorage saves + first-save notice
+  reference/01-search.html … 04-…html   ← the design, runnable in a browser (double-click)
+  reference/wovi-preview.js             ← viewer for the reference files only, never ship it
+```
+
+(If your repo already has a `.claude/skills` folder, the two skill folders just sit beside the others.)
+
+## Kick-off prompt for Claude Code
+
+```
+Read design-handoff/HANDOFF.md and use the wovi-implement and wovi-design skills.
+Start with §2: map this codebase and write the findings to design-handoff/PROGRESS.md.
+Then do step 1 (tokens + fonts) and stop so I can check it.
+```
+
+Then each next session: `Continue the WOVI redesign with the next unchecked step.`
+
+# Product:
+A local web app that searches >=51 open image libraries in one grid and downloads the highest available resolution of each image.
 
 ## Sources
 

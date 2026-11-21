@@ -2,33 +2,70 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  attributionText,
+  backToTopBottom,
   columnCount,
   countActive,
   DEFAULT_GROUPS,
   distribute,
   downloadUrl,
   estimateCardHeight,
+  everythingText,
+  filmstripRange,
   filterAdapters,
   firstLoaded,
+  groupShortLabel,
   groupSources,
   imageCandidates,
+  imagesText,
+  imagesTotal,
   isSearchable,
   isUpgrade,
   isUsable,
   itemKey,
   keyStatus,
+  licenceMeaning,
+  needsAttribution,
   parseSavedSelection,
   pickColumn,
+  placeholderTone,
+  pullingText,
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  savedCount,
+  makeSnapshot,
+  parseSaves,
+  isSaved,
+  addSave,
+  removeSave,
+  snapshotItem,
+  savedViewText,
+  clearAllText,
+  savesExportJson,
+  isShortcut,
   searchKey,
+  searchPlaceholder,
+  searchWithoutItem,
   serializeSelection,
+  shortcutLabel,
+  sortChipIds,
+  sourceBarSegments,
+  sourceSummary,
   shouldAutoLoad,
   subtitleText,
   thumbCandidates,
   VIEWER_PROBE_TIMEOUT_MS,
   viewerPlan,
+  showBackToTop,
+  wallLayout,
+  withItemParam,
+  statusPill,
+  adaptorMatchesFilter,
+  adaptorFilterCounts,
+  sourcesSubline,
+  splitNotes,
+  linkParts,
 } from '../public/lib.js';
 
 const source = (id, extra = {}) => ({
@@ -398,11 +435,11 @@ test('pickColumn gives the first smallest index', () => {
 });
 
 test('estimateCardHeight uses the image ratio and adds card text', () => {
-  assert.equal(estimateCardHeight({ width: 400, height: 200 }, 240), 192);
-  assert.equal(estimateCardHeight({ width: '400', height: '200' }, 240), 192);
-  assert.equal(estimateCardHeight({}, 240), 312);
-  assert.equal(estimateCardHeight({ width: 0, height: 100 }, 240), 312);
-  assert.equal(estimateCardHeight(null, 200), 272);
+  assert.equal(estimateCardHeight({ width: 400, height: 200 }, 240), 152);
+  assert.equal(estimateCardHeight({ width: '400', height: '200' }, 240), 152);
+  assert.equal(estimateCardHeight({}, 240), 272);
+  assert.equal(estimateCardHeight({ width: 0, height: 100 }, 240), 272);
+  assert.equal(estimateCardHeight(null, 200), 232);
 });
 
 test('distribute fills the shortest column', () => {
@@ -600,4 +637,622 @@ test('rateLimitWaitText is generic for other adaptors', () => {
     rateLimitWaitText(null, 15),
     'Rate limit reached. Trying again in 15 s.',
   );
+});
+
+test('savedCount returns the length of a saved array', () => {
+  assert.equal(savedCount('[1,2,3]'), 3);
+  assert.equal(savedCount('[]'), 0);
+});
+
+test('savedCount gives 0 for missing or empty input', () => {
+  assert.equal(savedCount(null), 0);
+  assert.equal(savedCount(undefined), 0);
+  assert.equal(savedCount(''), 0);
+});
+
+test('savedCount gives 0 for invalid or non-array JSON', () => {
+  assert.equal(savedCount('not json'), 0);
+  assert.equal(savedCount('{"a":1}'), 0);
+  assert.equal(savedCount('"text"'), 0);
+  assert.equal(savedCount('42'), 0);
+});
+
+test('shortcutLabel uses the command key on Apple platforms', () => {
+  assert.equal(shortcutLabel('MacIntel'), '⌘K');
+  assert.equal(shortcutLabel('macOS'), '⌘K');
+  assert.equal(shortcutLabel('iPhone'), '⌘K');
+  assert.equal(shortcutLabel('iPad'), '⌘K');
+});
+
+test('shortcutLabel uses Ctrl K elsewhere', () => {
+  assert.equal(shortcutLabel('Win32'), 'Ctrl K');
+  assert.equal(shortcutLabel('Linux x86_64'), 'Ctrl K');
+  assert.equal(shortcutLabel(''), 'Ctrl K');
+  assert.equal(shortcutLabel(undefined), 'Ctrl K');
+});
+
+test('isShortcut accepts meta or ctrl with k', () => {
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: true, ctrlKey: false, altKey: false }),
+    true,
+  );
+  assert.equal(
+    isShortcut({ key: 'K', metaKey: false, ctrlKey: true, altKey: false }),
+    true,
+  );
+});
+
+test('isShortcut rejects other combinations', () => {
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: true, ctrlKey: true, altKey: false }),
+    false,
+  );
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: false, ctrlKey: false, altKey: false }),
+    false,
+  );
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: true, ctrlKey: false, altKey: true }),
+    false,
+  );
+  assert.equal(
+    isShortcut({ key: 'j', metaKey: true, ctrlKey: false, altKey: false }),
+    false,
+  );
+});
+
+test('isShortcut handles a missing event', () => {
+  assert.equal(isShortcut(null), false);
+  assert.equal(isShortcut(undefined), false);
+});
+
+test('searchPlaceholder names the number of usable sources', () => {
+  assert.equal(
+    searchPlaceholder(42),
+    'Search 42 open libraries — prints, maps, specimens, stars…',
+  );
+  assert.equal(
+    searchPlaceholder(1234),
+    'Search 1,234 open libraries — prints, maps, specimens, stars…',
+  );
+});
+
+test('searchPlaceholder falls back for counts that are not positive numbers', () => {
+  const generic = 'Search open libraries — prints, maps, specimens, stars…';
+  assert.equal(searchPlaceholder(0), generic);
+  assert.equal(searchPlaceholder(-3), generic);
+  assert.equal(searchPlaceholder(NaN), generic);
+  assert.equal(searchPlaceholder(undefined), generic);
+});
+
+test('sourceSummary names the top sources with results', () => {
+  assert.equal(sourceSummary([]), 'No sources selected');
+  assert.equal(sourceSummary(null), 'No sources selected');
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: null },
+      { name: 'B', hits: 0 },
+    ]),
+    '',
+  );
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: 5 },
+      { name: 'B', hits: 50 },
+      { name: 'C', hits: 0 },
+    ]),
+    'B, A',
+  );
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: 1 },
+      { name: 'B', hits: 4 },
+      { name: 'C', hits: 3 },
+      { name: 'D', hits: 2 },
+      { name: 'E', hits: 9 },
+    ]),
+    'E, B, C + 2 more with results',
+  );
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: 3 },
+      { name: 'B', hits: 3 },
+      { name: 'C', hits: 3 },
+    ]),
+    'A, B, C',
+  );
+});
+
+test('sortChipIds puts counted ids first and keeps the rest in input order', () => {
+  assert.deepEqual(
+    sortChipIds(['a', 'b', 'c', 'd'], new Map([['a', 2], ['b', null], ['c', 10]])),
+    ['c', 'a', 'b', 'd'],
+  );
+  assert.deepEqual(sortChipIds(['a', 'b'], { a: 1, b: 1 }), ['a', 'b']);
+  assert.deepEqual(sortChipIds([], new Map()), []);
+
+  const ids = ['a', 'b', 'c'];
+  sortChipIds(ids, new Map([['c', 4]]));
+  assert.deepEqual(ids, ['a', 'b', 'c']);
+});
+
+test('groupShortLabel uses the short group labels', () => {
+  assert.equal(groupShortLabel('museums', 'Museums and galleries'), 'Museums & galleries');
+  assert.equal(groupShortLabel('aggregators', 'Open-licence aggregators'), 'Aggregators');
+  assert.equal(groupShortLabel('libraries', 'Libraries and archives'), 'Libraries & archives');
+  assert.equal(groupShortLabel('science', 'Science, nature and medicine'), 'Science & nature');
+  assert.equal(groupShortLabel('other', 'Other'), 'Other');
+});
+
+test('imagesTotal sums the known totals and never drops below the shown count', () => {
+  assert.equal(imagesTotal([10, 20], 5), 30);
+  assert.equal(imagesTotal([10, null], 5), 10);
+  assert.equal(imagesTotal([null, null], 7), 7);
+  assert.equal(imagesTotal([3], 12), 12);
+  assert.equal(imagesTotal([], 0), 0);
+  assert.equal(imagesTotal([10, undefined, -4, Infinity], 2), 10);
+  assert.equal(imagesTotal([5], 0), 5);
+  assert.equal(imagesTotal([5], null), 5);
+});
+
+test('imagesText formats the image count', () => {
+  assert.equal(imagesText(1), '1 image');
+  assert.equal(imagesText(0), '0 images');
+  assert.equal(imagesText(1234), '1,234 images');
+  assert.equal(imagesText(2), '2 images');
+});
+
+test('sourceBarSegments builds the bar segments', () => {
+  assert.deepEqual(sourceBarSegments([]), []);
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 0 },
+      { name: 'B', hits: null },
+    ]),
+    [],
+  );
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 30 },
+      { name: 'B', hits: 10 },
+    ]),
+    [
+      { name: 'A', hits: 30, share: 0.75, tone: 'first' },
+      { name: 'B', hits: 10, share: 0.25, tone: 'second' },
+    ],
+  );
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 10 },
+      { name: 'B', hits: 50 },
+      { name: 'C', hits: 20 },
+      { name: 'D', hits: 20 },
+    ]),
+    [
+      { name: 'B', hits: 50, share: 0.5, tone: 'first' },
+      { name: 'C', hits: 20, share: 0.2, tone: 'second' },
+      { name: '2 other sources', hits: 30, share: 0.3, tone: 'rest' },
+    ],
+  );
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 5 },
+      { name: 'B', hits: 3 },
+      { name: 'C', hits: 2 },
+    ]),
+    [
+      { name: 'A', hits: 5, share: 0.5, tone: 'first' },
+      { name: 'B', hits: 3, share: 0.3, tone: 'second' },
+      { name: '1 other source', hits: 2, share: 0.2, tone: 'rest' },
+    ],
+  );
+});
+
+test('pullingText', () => {
+  assert.equal(pullingText([]), '');
+  assert.equal(pullingText(['A']), 'Pulling more from A');
+  assert.equal(pullingText(['A', 'B']), 'Pulling more from A and B');
+  assert.equal(pullingText(['A', 'B', 'C']), 'Pulling more from A, B and 1 other');
+  assert.equal(
+    pullingText(['A', 'B', 'C', 'D', 'E']),
+    'Pulling more from A, B and 3 others',
+  );
+});
+
+test('everythingText', () => {
+  assert.equal(everythingText(1), 'That’s everything from 1 source.');
+  assert.equal(everythingText(12), 'That’s everything from 12 sources.');
+  assert.equal(everythingText(1200), 'That’s everything from 1,200 sources.');
+});
+
+test('wallLayout', () => {
+  assert.deepEqual(wallLayout(1440), { minColumn: 250, gap: 20, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(601), { minColumn: 250, gap: 20, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(600), { minColumn: 160, gap: 12, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(390), { minColumn: 160, gap: 12, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(380), { minColumn: 160, gap: 12, maxColumns: 1 });
+  assert.deepEqual(wallLayout(NaN), { minColumn: 250, gap: 20, maxColumns: Infinity });
+});
+
+test('placeholderTone', () => {
+  assert.equal(placeholderTone(0), 1);
+  assert.equal(placeholderTone(9), 10);
+  assert.equal(placeholderTone(10), 1);
+  assert.equal(placeholderTone(-1), 1);
+});
+
+test('showBackToTop', () => {
+  assert.equal(showBackToTop(0), false);
+  assert.equal(showBackToTop(600), false);
+  assert.equal(showBackToTop(601), true);
+  assert.equal(showBackToTop(NaN), false);
+  assert.equal(showBackToTop(undefined), false);
+});
+
+test('backToTopBottom', () => {
+  assert.equal(backToTopBottom(0, 0), 28);
+  assert.equal(backToTopBottom(64, 24), 100);
+  assert.equal(backToTopBottom(64, NaN), 76);
+  assert.equal(backToTopBottom(0, 24, 16), 16);
+  assert.equal(backToTopBottom(-5, 24), 28);
+});
+
+test('licenceMeaning reads the licence text and the URL', () => {
+  assert.equal(licenceMeaning('Public Domain Mark 1.0', '', true), 'no restrictions');
+  assert.equal(licenceMeaning('CC0 1.0', '', true), 'no restrictions');
+  assert.equal(
+    licenceMeaning('', 'https://creativecommons.org/publicdomain/zero/1.0/', true),
+    'no restrictions',
+  );
+  assert.equal(licenceMeaning('No known copyright restrictions', '', true), 'no restrictions');
+  assert.equal(licenceMeaning('CC BY 4.0', '', true), 'credit required');
+  assert.equal(
+    licenceMeaning('', 'https://creativecommons.org/licenses/by/4.0/', true),
+    'credit required',
+  );
+  assert.equal(licenceMeaning('CC-BY-SA', '', true), 'credit & share alike');
+  assert.equal(
+    licenceMeaning('CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true),
+    'credit & share alike',
+  );
+  assert.equal(licenceMeaning('cc by-nc 3.0', '', false), 'credit, non-commercial');
+  assert.equal(licenceMeaning('CC BY-NC-SA 4.0', '', false), 'credit, non-commercial');
+  assert.equal(licenceMeaning('CC BY-ND 4.0', '', false), 'credit, no changes');
+  assert.equal(licenceMeaning('Standby license', '', false), 'check with source');
+  assert.equal(licenceMeaning('', '', false), 'check with source');
+});
+
+test('needsAttribution is true only for the BY family', () => {
+  assert.equal(needsAttribution('CC BY 4.0', ''), true);
+  assert.equal(needsAttribution('CC BY-NC-ND 4.0', ''), true);
+  assert.equal(
+    needsAttribution('', 'https://creativecommons.org/licenses/by-sa/4.0/'),
+    true,
+  );
+  assert.equal(needsAttribution('CC0 1.0', ''), false);
+  assert.equal(needsAttribution('Public Domain', ''), false);
+  assert.equal(needsAttribution('', ''), false);
+  assert.equal(needsAttribution('Standby', ''), false);
+});
+
+test('attributionText builds the credit line', () => {
+  assert.equal(
+    attributionText({ title: ' Moon ', creator: 'NASA', source: 'NASA Images', license: 'CC BY 4.0' }),
+    '\u201cMoon\u201d, NASA, via NASA Images, CC BY 4.0',
+  );
+  assert.equal(
+    attributionText({ title: '', creator: '', source: 'Met', license: 'CC BY 4.0' }),
+    '\u201cUntitled\u201d, via Met, CC BY 4.0',
+  );
+});
+
+test('filmstripRange clamps the window around the current item', () => {
+  assert.deepEqual(filmstripRange(0, 20), { start: 0, end: 5 });
+  assert.deepEqual(filmstripRange(10, 20), { start: 6, end: 15 });
+  assert.deepEqual(filmstripRange(19, 20), { start: 15, end: 20 });
+  assert.deepEqual(filmstripRange(1, 3), { start: 0, end: 3 });
+  assert.deepEqual(filmstripRange(2, 10, 1), { start: 1, end: 4 });
+  assert.deepEqual(filmstripRange(-1, 10), { start: 0, end: 0 });
+  assert.deepEqual(filmstripRange(10, 10), { start: 0, end: 0 });
+  assert.deepEqual(filmstripRange(NaN, 10), { start: 0, end: 0 });
+  assert.deepEqual(filmstripRange(0, 0), { start: 0, end: 0 });
+});
+
+test('withItemParam sets and removes the i parameter', () => {
+  assert.equal(withItemParam('?q=cat', 'met:42'), '?q=cat&i=met%3A42');
+  assert.equal(withItemParam('?i=old&q=cat', 'new'), '?i=new&q=cat');
+  assert.equal(withItemParam('q=cat&open=1', 'x'), '?q=cat&open=1&i=x');
+  assert.equal(withItemParam('?q=cat&i=x', ''), '?q=cat');
+  assert.equal(withItemParam('?i=x', null), '');
+  assert.equal(withItemParam('', ''), '');
+});
+
+test('searchWithoutItem drops the i parameter', () => {
+  assert.equal(searchWithoutItem('?q=cat&i=x&open=1'), '?q=cat&open=1');
+  assert.equal(searchWithoutItem(''), '');
+});
+
+const freeAdapter = { enabled: true, key: null };
+const setAdapter = { enabled: true, key: { required: true, configured: true } };
+const missingAdapter = { enabled: true, key: { required: true, configured: false } };
+const optionalAdapter = { enabled: false, key: { required: false, configured: false, default: 'DEMO' } };
+const offFreeAdapter = { enabled: false, key: null };
+
+test('statusPill maps the key status to a short pill', () => {
+  assert.deepEqual(statusPill(freeAdapter), { kind: 'free', text: 'No key needed' });
+  assert.deepEqual(statusPill(setAdapter), { kind: 'set', text: 'Key set' });
+  assert.deepEqual(statusPill(missingAdapter), { kind: 'missing', text: 'Key missing' });
+  assert.deepEqual(statusPill(optionalAdapter), { kind: 'optional', text: 'Key optional' });
+  assert.deepEqual(statusPill(null), { kind: 'free', text: 'No key needed' });
+});
+
+test('adaptorMatchesFilter ready needs an on adaptor without a missing key', () => {
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'ready'), true);
+  assert.equal(adaptorMatchesFilter(setAdapter, 'ready'), true);
+  assert.equal(adaptorMatchesFilter(missingAdapter, 'ready'), false);
+  assert.equal(adaptorMatchesFilter(optionalAdapter, 'ready'), false);
+  assert.equal(adaptorMatchesFilter(null, 'ready'), false);
+});
+
+test('adaptorMatchesFilter key shows missing keys only', () => {
+  assert.equal(adaptorMatchesFilter(missingAdapter, 'key'), true);
+  assert.equal(adaptorMatchesFilter(optionalAdapter, 'key'), false);
+  assert.equal(adaptorMatchesFilter(null, 'key'), false);
+});
+
+test('adaptorMatchesFilter off shows disabled adaptors', () => {
+  assert.equal(adaptorMatchesFilter(offFreeAdapter, 'off'), true);
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'off'), false);
+  assert.equal(adaptorMatchesFilter(null, 'off'), true);
+});
+
+test('adaptorMatchesFilter all matches everything', () => {
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'all'), true);
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'bogus'), true);
+  assert.equal(adaptorMatchesFilter(null, 'all'), true);
+});
+
+test('adaptorFilterCounts counts each filter', () => {
+  assert.deepEqual(
+    adaptorFilterCounts([freeAdapter, setAdapter, missingAdapter, optionalAdapter, offFreeAdapter]),
+    { all: 5, ready: 2, key: 1, off: 2 },
+  );
+  assert.deepEqual(adaptorFilterCounts(null), { all: 0, ready: 0, key: 0, off: 0 });
+  assert.deepEqual(adaptorFilterCounts([null, 3, freeAdapter]), {
+    all: 1,
+    ready: 1,
+    key: 0,
+    off: 0,
+  });
+});
+
+test('sourcesSubline counts on and missing keys', () => {
+  assert.equal(
+    sourcesSubline([freeAdapter, setAdapter, missingAdapter, optionalAdapter, offFreeAdapter]),
+    '3 of 5 adaptors on · 1 needs a key',
+  );
+  assert.equal(
+    sourcesSubline([freeAdapter, missingAdapter, missingAdapter]),
+    '3 of 3 adaptors on · 2 need a key',
+  );
+  assert.equal(sourcesSubline([freeAdapter, offFreeAdapter]), '1 of 2 adaptors on');
+  assert.equal(sourcesSubline(null), '0 of 0 adaptors on');
+});
+
+test('sourcesSubline groups big numbers', () => {
+  const list = Array.from({ length: 1200 }, () => freeAdapter);
+  assert.equal(sourcesSubline(list), '1,200 of 1,200 adaptors on');
+});
+
+test('splitNotes pulls out the untested note', () => {
+  assert.deepEqual(splitNotes(['Not yet tested live.', ' Uses IIIF. ', '', 3]), {
+    untested: true,
+    notes: ['Uses IIIF.'],
+  });
+  assert.deepEqual(splitNotes(['A']), { untested: false, notes: ['A'] });
+  assert.deepEqual(splitNotes(undefined), { untested: false, notes: [] });
+});
+
+test('linkParts splits text and links', () => {
+  assert.deepEqual(linkParts('Sign up at https://example.org/key.'), [
+    { text: 'Sign up at ' },
+    { text: 'https://example.org/key', href: 'https://example.org/key' },
+    { text: '.' },
+  ]);
+  assert.deepEqual(linkParts('(see http://a.b/c), then go'), [
+    { text: '(see ' },
+    { text: 'http://a.b/c', href: 'http://a.b/c' },
+    { text: '), then go' },
+  ]);
+  assert.deepEqual(linkParts('no link'), [{ text: 'no link' }]);
+  assert.deepEqual(linkParts(''), []);
+  assert.deepEqual(linkParts(null), []);
+  assert.deepEqual(linkParts('https://x.org'), [
+    { text: 'https://x.org', href: 'https://x.org' },
+  ]);
+});
+
+// ---------- Saves ----------
+
+const saveA = { id: 'a', item: {} };
+const saveB = { id: 'b', item: {} };
+const saveC = { id: 'c', item: {} };
+const saveA2 = { id: 'a', item: { title: 'new' } };
+
+const snapshotOf = (extra) => ({
+  uid: 'a:1',
+  source: 'a',
+  id: '1',
+  title: 'T',
+  thumb: 'https://x/t.jpg',
+  full: 'https://x/f.jpg',
+  license: 'CC0',
+  width: 800,
+  height: 600,
+  ...extra,
+});
+
+test('makeSnapshot builds the storage snapshot', () => {
+  const item = snapshotOf();
+  const snapshot = makeSnapshot(item, 'Alpha', 1000);
+  assert.equal(snapshot.id, 'a:1');
+  assert.equal(snapshot.sourceName, 'Alpha');
+  assert.equal(snapshot.thumbUrl, thumbCandidates(item)[0]);
+  assert.equal(snapshot.fullUrl, 'https://x/f.jpg');
+  assert.equal(snapshot.licence, 'CC0');
+  assert.equal(snapshot.width, 800);
+  assert.equal(snapshot.height, 600);
+  assert.equal(snapshot.savedAt, 1000);
+  assert.equal(snapshot.item.title, 'T');
+});
+
+test('makeSnapshot falls back to source:id', () => {
+  const snapshot = makeSnapshot({ source: 'b', id: 7 }, '', 1);
+  assert.equal(snapshot.id, 'b:7');
+  assert.equal(snapshot.sourceName, '');
+});
+
+test('makeSnapshot fullUrl uses preview, then empty', () => {
+  assert.equal(
+    makeSnapshot({ source: 'b', id: 1, preview: 'https://x/p.jpg' }, '', 1).fullUrl,
+    'https://x/p.jpg',
+  );
+  assert.equal(makeSnapshot({ source: 'b', id: 1 }, '', 1).fullUrl, '');
+});
+
+test('makeSnapshot without thumb candidates gives an empty thumbUrl', () => {
+  assert.equal(makeSnapshot({ source: 'b', id: 1 }, '', 1).thumbUrl, '');
+});
+
+test('makeSnapshot cuts a long description to 2,000 characters', () => {
+  const snapshot = makeSnapshot(
+    { source: 'b', id: 1, description: 'x'.repeat(3000) },
+    '',
+    1,
+  );
+  assert.equal(snapshot.item.description.length, 2000);
+});
+
+test('makeSnapshot copies only the known item fields', () => {
+  const snapshot = makeSnapshot(
+    { source: 'b', id: 1, foo: 1, creator: undefined, title: 'T' },
+    '',
+    1,
+  );
+  assert.equal(snapshot.item.foo, undefined);
+  assert.equal(Object.hasOwn(snapshot.item, 'creator'), false);
+  assert.equal(snapshot.item.title, 'T');
+});
+
+test('makeSnapshot does not change the input item', () => {
+  const item = snapshotOf({ description: 'x'.repeat(3000), foo: 1 });
+  const before = JSON.stringify(item);
+  makeSnapshot(item, 'Alpha', 1);
+  assert.equal(JSON.stringify(item), before);
+});
+
+test('makeSnapshot gives null for a bad width or height', () => {
+  assert.equal(makeSnapshot({ source: 'b', id: 1, width: 0 }, '', 1).width, null);
+  assert.equal(makeSnapshot({ source: 'b', id: 1, width: 'x' }, '', 1).width, null);
+  assert.equal(makeSnapshot({ source: 'b', id: 1, height: -5 }, '', 1).height, null);
+});
+
+test('parseSaves gives [] for bad input', () => {
+  assert.deepEqual(parseSaves(null), []);
+  assert.deepEqual(parseSaves(''), []);
+  assert.deepEqual(parseSaves('{'), []);
+  assert.deepEqual(parseSaves('{"a":1}'), []);
+});
+
+test('parseSaves drops bad entries and repeated ids', () => {
+  const raw = JSON.stringify([
+    { id: 'a', item: {} },
+    { id: '', item: {} },
+    { id: 'b' },
+    5,
+    { id: 'a', item: { x: 1 } },
+    { id: 'c', item: {} },
+  ]);
+  const list = parseSaves(raw);
+  assert.deepEqual(list.map((entry) => entry.id), ['a', 'c']);
+  assert.deepEqual(list[0].item, {});
+});
+
+test('isSaved finds an id', () => {
+  assert.equal(isSaved([saveA], 'a'), true);
+  assert.equal(isSaved([saveA], 'b'), false);
+  assert.equal(isSaved(null, 'a'), false);
+});
+
+test('addSave places a snapshot and keeps the input', () => {
+  const input = [saveA, saveB];
+  assert.deepEqual(addSave(input, saveC), [saveC, saveA, saveB]);
+  assert.deepEqual(addSave(input, saveC, 1), [saveA, saveC, saveB]);
+  assert.deepEqual(addSave(input, saveC, 99), [saveA, saveB, saveC]);
+  assert.deepEqual(addSave(input, saveC, -3), [saveC, saveA, saveB]);
+  assert.deepEqual(addSave(input, saveA2), [saveA2, saveB]);
+  assert.deepEqual(input, [saveA, saveB]);
+});
+
+test('removeSave gives the list, the index and the snapshot', () => {
+  const input = [saveA, saveB, saveC];
+  const result = removeSave(input, 'b');
+  assert.deepEqual(result.list, [saveA, saveC]);
+  assert.equal(result.index, 1);
+  assert.equal(result.snapshot, saveB);
+  assert.deepEqual(removeSave([saveA], 'x'), {
+    list: [saveA],
+    index: -1,
+    snapshot: null,
+  });
+  assert.deepEqual(input, [saveA, saveB, saveC]);
+});
+
+test('removeSave and addSave round trip an undo', () => {
+  const removed = removeSave([saveA, saveB, saveC], 'b');
+  assert.deepEqual(addSave(removed.list, removed.snapshot, removed.index), [
+    saveA,
+    saveB,
+    saveC,
+  ]);
+});
+
+test('snapshotItem gives the item with the snapshot id as uid', () => {
+  assert.deepEqual(snapshotItem({ id: 'a:1', item: { title: 'T' } }), {
+    title: 'T',
+    uid: 'a:1',
+  });
+  assert.deepEqual(snapshotItem({ id: 'a:1', item: { uid: 'x' } }).uid, 'x');
+  assert.equal(snapshotItem({ id: 'a' }), null);
+  assert.equal(snapshotItem(null), null);
+});
+
+test('savedViewText formats the count', () => {
+  assert.equal(savedViewText(3), 'View saved (3)');
+  assert.equal(savedViewText(1234), 'View saved (1,234)');
+  assert.equal(savedViewText(undefined), 'View saved (0)');
+});
+
+test('clearAllText formats the count', () => {
+  assert.equal(
+    clearAllText(3),
+    'This removes 3 saved images from this browser. You can’t undo this.',
+  );
+  assert.equal(
+    clearAllText(1),
+    'This removes 1 saved image from this browser. You can’t undo this.',
+  );
+  assert.ok(clearAllText(1200).includes('1,200 saved images'));
+  assert.ok(clearAllText(undefined).includes('0 saved images'));
+  assert.ok(clearAllText(-4).includes('0 saved images'));
+});
+
+test('savesExportJson writes pretty JSON', () => {
+  assert.equal(
+    savesExportJson([{ id: 'a' }]),
+    '[\n  {\n    "id": "a"\n  }\n]',
+  );
+  assert.equal(savesExportJson(null), '[]');
+  assert.equal(savesExportJson('x'), '[]');
+  assert.equal(savesExportJson([]), '[]');
 });

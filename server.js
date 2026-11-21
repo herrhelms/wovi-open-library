@@ -648,7 +648,9 @@ async function handleStatic(req, res, publicDir) {
   }
 
   let file = resolved.file;
-  if (rawPath === '/' || rawPath === '') file = join(resolve(publicDir), 'index.html');
+  if (rawPath === '/' || rawPath === '' || rawPath === '/saved') {
+    file = join(resolve(publicDir), 'index.html');
+  }
 
   let info;
   try {

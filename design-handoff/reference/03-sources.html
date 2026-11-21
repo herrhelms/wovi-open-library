@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>WOVI — Sources and adaptors</title>
+<script src="./wovi-preview.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;800&amp;family=Geist+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0B6E4F}a:hover{color:#08553D}
+.mono{font-family:'Geist Mono',ui-monospace,monospace}
+.seg{appearance:none;border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:500;color:#5A5A55;padding:0 12px;min-height:36px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.seg:hover{color:#121212}
+.seg.on{background:#121212;color:#fff}
+.seg .n{font-family:'Geist Mono',monospace;font-size:11.5px;opacity:.7}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 16px;align-items:center;padding:14px 16px;border-radius:12px}
+.row:hover{background:#F4F4F1}
+.row.open{background:#F4F4F1}
+.pill{font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px;white-space:nowrap}
+.pill.free{color:#3E3E3A;background:#ECECE6}
+.pill.set{color:#08553D;background:#DDF1E8}
+.pill.miss{color:#A3360F;background:#FBE9E1}
+.setup{appearance:none;border:0;background:transparent;font:inherit;font-size:13px;font-weight:600;color:#A3360F;padding:4px 6px;min-height:32px;border-radius:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.setup:hover{background:#FBE9E1}
+.switch{appearance:none;border:0;background:transparent;padding:0;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer}
+.switch .track{width:36px;height:22px;border-radius:999px;background:#CFCFC8;position:relative;transition:background .15s}
+.switch .knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.switch.on .track{background:#0B6E4F}
+.switch.on .knob{left:17px}
+.copy{appearance:none;border:0;background:#121212;color:#fff;font:inherit;font-size:12px;font-weight:600;border-radius:6px;padding:0 10px;min-height:30px;cursor:pointer}
+input.find{border:0;outline:0;background:transparent;font:inherit;font-size:15px;color:#121212;flex:1;min-width:0}
+input.find::placeholder{color:#6B6B66}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1000px; position: relative; overflow: hidden; background: #F4F4F1; font-family: 'Geist', system-ui, sans-serif; color: #121212">
+  <div aria-hidden="true" style="position: absolute; inset: 0; padding: 40px; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px">
+    <span style="height: 340px; background: #DCDBD5; border-radius: 6px"></span><span style="height: 240px; background: #D2D1CA; border-radius: 6px"></span><span style="height: 410px; background: #E3E2DC; border-radius: 6px"></span><span style="height: 280px; background: #C9C8C1; border-radius: 6px"></span><span style="height: 360px; background: #D8DADB; border-radius: 6px"></span><span style="height: 220px; background: #E0DDD6; border-radius: 6px"></span>
+    <span style="height: 300px; background: #D6D3CB; border-radius: 6px"></span><span style="height: 380px; background: #CFD2D3; border-radius: 6px"></span><span style="height: 260px; background: #C4C3BC; border-radius: 6px"></span><span style="height: 340px; background: #DEDFDB; border-radius: 6px"></span><span style="height: 300px; background: #DCDBD5; border-radius: 6px"></span><span style="height: 420px; background: #D2D1CA; border-radius: 6px"></span>
+  </div>
+  <div aria-hidden="true" style="position: absolute; inset: 0; background: rgba(18,18,18,.42); backdrop-filter: blur(6px)"></div>
+
+  <section role="dialog" aria-modal="true" aria-labelledby="ad-title" style="position: absolute; top: 48px; left: 50%; transform: translateX(-50%); width: 780px; height: 904px; background: #FBFBF9; border-radius: 20px; box-shadow: 0 40px 100px -30px rgba(0,0,0,.5); display: flex; flex-direction: column; overflow: hidden">
+    <header style="padding: 24px 28px 16px; border-bottom: 1px solid #E3E3DD">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 16px">
+        <div>
+          <h2 id="ad-title" style="margin: 0; font-size: 26px; font-weight: 600; letter-spacing: -.03em">Sources</h2>
+          <p style="margin: 6px 0 0; font-size: 14px; color: #5A5A55">{{ activeN }} of 51 adaptors on · {{ missN }} need a key</p>
+        </div>
+        <a href="01-search.html" aria-label="Close" style="width: 44px; height: 44px; border-radius: 999px; border: 1px solid #DCDCD6; background: #fff; color: #121212; display: inline-flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"></path></svg></a>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 18px">
+        <label style="flex: 1 1 260px; display: flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #DCDCD6; border-radius: 12px; padding: 0 14px; min-height: 46px">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+          <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Find a source</span>
+          <input class="find" type="search" placeholder="Find a source" value="{{ q }}" onChange="{{ onQ }}">
+        </label>
+        <div role="group" aria-label="Show" style="display: flex; gap: 2px; background: #ECECE6; border-radius: 999px; padding: 3px">
+          <sc-for list="{{ filters }}" as="f" hint-placeholder-count="4">
+            <button type="button" class="{{ f.cls }}" onClick="{{ f.pick }}" aria-pressed="{{ f.pressed }}">{{ f.label }} <span class="n">{{ f.n }}</span></button>
+          </sc-for>
+        </div>
+      </div>
+    </header>
+
+    <div style="flex: 1; overflow-y: auto; padding: 8px 12px 24px">
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="4">
+        <div style="padding: 16px 16px 6px; display: flex; justify-content: space-between; align-items: baseline">
+          <h3 class="mono" style="margin: 0; font-size: 11.5px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: #5E5E58">{{ g.label }}</h3>
+          <span class="mono" style="font-size: 11.5px; color: #6B6B66">{{ g.count }}</span>
+        </div>
+        <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="5">
+          <div class="{{ r.cls }}">
+            <div style="min-width: 0">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+                <a href="#" style="color: #121212; font-size: 15px; font-weight: 600; text-decoration: none">{{ r.name }}</a>
+                <sc-if value="{{ r.untested }}" hint-placeholder-val="{{ false }}"><span class="mono" style="font-size: 11px; color: #6B6B66; border: 1px dashed #C9C9C2; border-radius: 5px; padding: 1px 6px">untested</span></sc-if>
+              </div>
+              <sc-if value="{{ r.hasDesc }}" hint-placeholder-val="{{ true }}"><p style="margin: 3px 0 0; font-size: 13.5px; color: #5A5A55">{{ r.desc }}</p></sc-if>
+              <sc-if value="{{ r.hasMeta }}" hint-placeholder-val="{{ false }}"><p class="mono" style="margin: 6px 0 0; font-size: 11.5px; color: #5E5E58">{{ r.meta }}</p></sc-if>
+            </div>
+            <div style="display: flex; align-items: center; gap: 6px">
+              <sc-if value="{{ r.missing }}" hint-placeholder-val="{{ false }}">
+                <button type="button" class="setup" onClick="{{ r.toggle }}" aria-expanded="{{ r.openStr }}">Set up key <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}"><path d="m6 15 6-6 6 6"></path></sc-if><sc-if value="{{ r.closed }}" hint-placeholder-val="{{ true }}"><path d="m6 9 6 6 6-6"></path></sc-if></svg></button>
+              </sc-if>
+              <span class="{{ r.pillCls }}">{{ r.pill }}</span>
+            </div>
+            <button type="button" class="{{ r.swCls }}" onClick="{{ r.flip }}" aria-pressed="{{ r.onStr }}" aria-label="{{ r.swLabel }}"><span class="track"><span class="knob"></span></span></button>
+            <sc-if value="{{ r.open }}" hint-placeholder-val="{{ false }}">
+              <div style="grid-column: 1 / -1; margin-top: 8px; padding: 16px; background: #fff; border: 1px solid #E3E3DD; border-radius: 10px; display: flex; flex-direction: column; gap: 12px">
+                <ol style="margin: 0; padding-left: 20px; font-size: 13.5px; line-height: 1.6; color: #3E3E3A">
+                  <li>Create an app and get a key at <a href="#">{{ r.keyUrl }}</a></li>
+                  <li>Add it to <span class="mono">.env</span> in the project root, then restart the server</li>
+                </ol>
+                <div style="display: flex; align-items: center; gap: 10px; background: #121212; color: #fff; border-radius: 8px; padding: 6px 6px 6px 14px">
+                  <span class="mono" style="flex: 1; font-size: 13px">{{ r.env }}=<span style="color: #5FC79E">your-key</span></span>
+                  <button type="button" class="copy" onClick="{{ r.copy }}" style="background: #0B6E4F">{{ r.copyLabel }}</button>
+                </div>
+                <p style="margin: 0; font-size: 12.5px; color: #5A5A55">Built from the public API docs, not yet tested with a live key.</p>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </sc-for>
+    </div>
+
+    <footer style="padding: 14px 28px; border-top: 1px solid #E3E3DD; display: flex; justify-content: space-between; align-items: center; gap: 12px">
+      <span style="font-size: 13px; color: #5A5A55">Keys live in <span class="mono">.env</span> on your server, never in the browser.</span>
+      <a href="01-search.html" style="display: inline-flex; align-items: center; min-height: 44px; padding: 0 22px; border-radius: 12px; background: #0B6E4F; color: #fff; text-decoration: none; font-size: 14px; font-weight: 600">Done</a>
+    </footer>
+    <div style="padding: 16px 28px 18px; border-top: 1px solid #E3E3DD; background: #F4F4F1; display: flex; gap: 12px; align-items: flex-start">
+      <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex: none; margin-top: 1px"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"></path></svg>
+      <p style="margin: 0; font-size: 13.5px; line-height: 1.55; color: #3E3E3A">Let me know what you think about this project <a href="#">on GitHub</a>.<br>If you want to support its continuous development, consider <a href="#">becoming a GitHub Sponsor</a> <span aria-hidden="true" style="color: #C4306B">♥</span></p>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1000}}'>
+var KEYURL = { 'Flickr Commons': 'flickr.com/services/apps/create', 'Flickr (open licences)': 'flickr.com/services/apps/create' };
+var ENV = { 'Flickr Commons': 'FLICKR_KEY', 'Flickr (open licences)': 'FLICKR_KEY' };
+var DESC = {
+  'Wikimedia Commons': 'Wikimedia Commons free media files.',
+  'Openverse': 'Openly licensed images from many sites; the viewer shows “via <provider>”.',
+  'Flickr Commons': 'Photos with no known copyright restrictions.',
+  'Flickr (open licences)': 'Flickr photos with open Creative Commons licences.',
+  'Internet Archive': 'Internet Archive image items.'
+};
+var META = { 'Openverse': 'No key: ~20 req/min · 200/day · results stop near 240' };
+// status: f = no key needed, s = key set, m = key missing
+var SRC = [
+  ['agg','Wikimedia Commons','f'],['agg','Openverse','f'],['agg','Flickr Commons','m'],['agg','Flickr (open licences)','m'],['agg','Internet Archive','f'],['agg','Europeana','s'],['agg','DPLA','f'],['agg','Japan Search','f'],['agg','Swedish heritage (K-samsök)','f'],['agg','DigitalNZ','f'],['agg','Pixabay','m'],['agg','Pexels','m'],['agg','Unsplash','m'],
+  ['mus','The Met','f'],['mus','Smithsonian Open Access','f'],['mus','Rijksmuseum','f'],['mus','National Gallery of Art','f'],['mus','Art Institute of Chicago','f'],['mus','Cleveland Museum of Art','f'],['mus','Getty Museum','f'],['mus','Minneapolis Institute of Art','f'],['mus','SMK – National Gallery of Denmark','f'],['mus','Paris Musées','f'],['mus','Walters Art Museum','f'],['mus','Brooklyn Museum','f'],['mus','Auckland Museum','f'],['mus','Princeton University Art Museum','f'],['mus','Harvard Art Museums','f'],
+  ['lib','Library of Congress','f'],['lib','New York Public Library','f'],['lib','British Library','f'],['lib','Gallica (BnF)','f'],['lib','Trove (National Library of Australia)','m'],['lib','US National Archives','f'],['lib','Nationaal Archief','f'],['lib','German Federal Archive','f'],['lib','ETH Library Zurich','f'],['lib','State Library of Queensland','f'],['lib','National Library of Norway','f'],['lib','Digital Commonwealth','f'],['lib','David Rumsey Map Collection','f'],
+  ['sci','NASA Image Library','f'],['sci','ESA/Hubble','f'],['sci','ESA/Webb','f'],['sci','ESO','f'],['sci','Wellcome Collection','f'],['sci','Biodiversity Heritage Library','f'],['sci','NOAA Photo Library','f'],['sci','iNaturalist','f'],['sci','GBIF','f'],['sci','Natural History Museum, London','f']
+];
+var GROUPS = [['agg','Open-licence aggregators'],['mus','Museums & galleries'],['lib','Libraries & archives'],['sci','Science, nature & medicine']];
+var PILL = { f: ['No key needed','pill free'], s: ['Key set','pill set'], m: ['Key missing','pill miss'] };
+class Component extends DCLogic {
+  constructor(p){ super(p); this.state = { q: '', filter: 'all', off: {}, open: { 'Flickr Commons': true }, copied: '' }; }
+  renderVals() {
+    var s = this.state, self = this;
+    var isOn = function(n){ return !s.off[n]; };
+    var match = function(x){
+      if (s.q && x[1].toLowerCase().indexOf(s.q.toLowerCase()) < 0) return false;
+      if (s.filter === 'ready') return x[2] !== 'm' && isOn(x[1]);
+      if (s.filter === 'key') return x[2] === 'm';
+      if (s.filter === 'off') return !isOn(x[1]);
+      return true;
+    };
+    var cnt = function(fn){ return SRC.filter(fn).length; };
+    var filters = [
+      ['all','All', cnt(function(){ return true; })],
+      ['ready','Ready', cnt(function(x){ return x[2] !== 'm' && isOn(x[1]); })],
+      ['key','Needs key', cnt(function(x){ return x[2] === 'm'; })],
+      ['off','Off', cnt(function(x){ return !isOn(x[1]); })]
+    ].map(function(f){ return { label: f[1], n: f[2], cls: 'seg' + (s.filter===f[0] ? ' on' : ''), pressed: s.filter===f[0] ? 'true' : 'false', pick: function(){ self.setState({ filter: f[0] }); } }; });
+    var groups = GROUPS.map(function(g){
+      var all = SRC.filter(function(x){ return x[0]===g[0]; });
+      var rows = all.filter(match).map(function(x){
+        var name = x[1], st = x[2], on = isOn(name), open = !!s.open[name] && st === 'm';
+        var desc = DESC[name] || '';
+        return { name: name, desc: desc, hasDesc: !!desc, meta: META[name] || '', hasMeta: !!META[name],
+          untested: st === 'm', missing: st === 'm', open: open, openStr: open ? 'true' : 'false',
+          closed: !open,
+          cls: 'row' + (open ? ' open' : ''),
+          pill: PILL[st][0], pillCls: PILL[st][1],
+          swCls: 'switch' + (on ? ' on' : ''), onStr: on ? 'true' : 'false', swLabel: name + (on ? ' on' : ' off'),
+          keyUrl: KEYURL[name] || '[signup page]', env: ENV[name] || '[KEY_NAME]',
+          copyLabel: s.copied === name ? 'Copied ✓' : 'Copy',
+          copy: function(){ self.setState({ copied: name }); setTimeout(function(){ self.setState({ copied: '' }); }, 1400); },
+          toggle: function(){ var o = Object.assign({}, s.open); o[name] = !o[name]; self.setState({ open: o }); },
+          flip: function(){ var o = Object.assign({}, s.off); o[name] = !o[name]; self.setState({ off: o }); } };
+      });
+      return { label: g[1], count: all.filter(function(x){ return isOn(x[1]); }).length + ' / ' + all.length + ' on', rows: rows };
+    }).filter(function(g){ return g.rows.length > 0; });
+    return {
+      q: s.q, onQ: function(e){ self.setState({ q: e.target.value }); },
+      filters: filters, groups: groups,
+      activeN: cnt(function(x){ return isOn(x[1]); }),
+      missN: cnt(function(x){ return x[2] === 'm'; })
+    };
+  }
+}
+</script>
+</body>
+</html>
