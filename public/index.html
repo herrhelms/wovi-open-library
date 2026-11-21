@@ -38,8 +38,6 @@
     </header>
 
     <div class="page">
-      <h1 class="visually-hidden">WOVI — World of Visual Inspiration</h1>
-
       <form class="search" role="search" id="search-form">
         <label class="sbox">
           <span class="visually-hidden">Search images</span>
@@ -86,6 +84,20 @@
       <ul class="error-list" id="error-list" aria-live="polite"></ul>
 
       <main class="site-main">
+        <header class="results-header">
+          <h1 class="results-title visually-hidden" id="results-title">WOVI — World of Visual Inspiration</h1>
+          <p class="results-sub" id="results-sub" hidden></p>
+          <div class="source-bar" id="source-bar" role="img" aria-label="Results by source" hidden></div>
+          <ul class="source-legend" id="source-legend" hidden></ul>
+        </header>
+
+        <p class="status-line" id="status-line" aria-live="polite"></p>
+
+        <section class="no-results" id="no-results" hidden>
+          <p class="no-results-text" id="no-results-text"></p>
+          <button class="ghost" type="button" id="no-results-sources">Show sources</button>
+        </section>
+
         <section class="empty-state" id="empty-state" aria-label="Example searches">
           <p class="empty-text">
             Search the collections above, or start with one of these.
@@ -99,8 +111,6 @@
             <button class="example" type="button" data-query="portrait">portrait</button>
           </div>
         </section>
-
-        <p class="status-line" id="status-line" aria-live="polite"></p>
 
         <div class="results" id="results"></div>
 

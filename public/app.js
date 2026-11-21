@@ -11,6 +11,8 @@ import {
   estimateCardHeight,
   groupShortLabel,
   groupSources,
+  imagesText,
+  imagesTotal,
   isSearchable,
   isShortcut,
   isUsable,
@@ -28,6 +30,7 @@ import {
   shortcutLabel,
   sleep,
   sortChipIds,
+  sourceBarSegments,
   sourceSummary,
   thumbCandidates,
 } from './lib.js';
@@ -41,6 +44,9 @@ const SAVES_KEY = 'wovi:saves:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
 const DOWNLOAD_DELAY = 800;
+// The results header can show sort, orientation and colour dropdowns, but the
+// search API has no data for them, so the controls stay off (no dead controls).
+const SHOW_RESULT_FILTERS = false;
 
 // ---------- DOM ----------
 const searchForm = document.getElementById('search-form');
@@ -56,6 +62,13 @@ const openOnlySwitch = document.getElementById('sources-licence-switch');
 const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
+const resultsTitleEl = document.getElementById('results-title');
+const resultsSubEl = document.getElementById('results-sub');
+const sourceBarEl = document.getElementById('source-bar');
+const sourceLegendEl = document.getElementById('source-legend');
+const noResultsEl = document.getElementById('no-results');
+const noResultsTextEl = document.getElementById('no-results-text');
+const noResultsSourcesButton = document.getElementById('no-results-sources');
 const statusLineEl = document.getElementById('status-line');
 const savedCountEl = document.getElementById('saved-count');
 const resultsEl = document.getElementById('results');
@@ -1204,6 +1217,132 @@ function setGroupAll(groupId, isOn) {
   updateUi();
 }
 
+// ---------- Results header ----------
+/**
+ * Per-source hit list of the searched sources, for the header and the bar.
+ * @returns {Array<{id:string, name:string, hits:number|null}>}
+ */
+function headerSourceList() {
+  const list = [];
+  for (const source of searchableSelected()) {
+    list.push({ id: source.id, name: source.name, hits: chipHits(source.id) });
+  }
+  return list;
+}
+
+/**
+ * Number of searched sources that gave at least one hit.
+ * @param {Array<{name:string, hits:number|null}>} list
+ * @returns {number}
+ */
+function sourcesWithHits(list) {
+  return list.filter(
+    (entry) => typeof entry.hits === 'number' && Number.isFinite(entry.hits) && entry.hits > 0,
+  ).length;
+}
+
+/**
+ * Show the query, the image total, the source line and the source bar.
+ * Without a query the h1 is visually hidden and the rest is hidden.
+ * The marks and text of the header are set with textContent only.
+ */
+function updateResultsHeader() {
+  if (!resultsTitleEl) return;
+
+  if (!query) {
+    resultsTitleEl.classList.add('visually-hidden');
+    resultsTitleEl.textContent = 'WOVI — World of Visual Inspiration';
+    if (resultsSubEl) {
+      resultsSubEl.hidden = true;
+      resultsSubEl.textContent = '';
+    }
+    if (sourceBarEl) {
+      sourceBarEl.hidden = true;
+      sourceBarEl.replaceChildren();
+    }
+    if (sourceLegendEl) {
+      sourceLegendEl.hidden = true;
+      sourceLegendEl.replaceChildren();
+    }
+    return;
+  }
+
+  const list = headerSourceList();
+  const totals = list.map((entry) => entry.hits);
+  const shown = visibleItems().length;
+  const total = imagesTotal(totals, shown);
+
+  resultsTitleEl.classList.remove('visually-hidden');
+  const totalEl = el('span', { class: 'results-total', text: `· ${imagesText(total)}` });
+  resultsTitleEl.replaceChildren(document.createTextNode(`${query} `), totalEl);
+
+  const withHits = sourcesWithHits(list);
+  const segments = sourceBarSegments(list);
+
+  if (resultsSubEl) {
+    if (withHits === 0) {
+      resultsSubEl.hidden = true;
+      resultsSubEl.textContent = '';
+    } else {
+      resultsSubEl.hidden = false;
+      resultsSubEl.textContent = `from ${withHits.toLocaleString('en-US')} of ${registry.length.toLocaleString('en-US')} sources`;
+    }
+  }
+
+  if (sourceBarEl) {
+    sourceBarEl.replaceChildren();
+    sourceBarEl.hidden = segments.length === 0;
+    for (const segment of segments) {
+      const part = el('span', { class: `source-bar-seg ${segment.tone}` });
+      part.style.flexGrow = String(segment.hits);
+      sourceBarEl.append(part);
+    }
+  }
+
+  if (sourceLegendEl) {
+    sourceLegendEl.replaceChildren();
+    sourceLegendEl.hidden = segments.length === 0;
+    for (const segment of segments) {
+      sourceLegendEl.append(
+        el('li', {}, [
+          el('span', { class: `legend-swatch ${segment.tone}`, 'aria-hidden': 'true' }),
+          el('span', { text: segment.name }),
+          el('span', {
+            class: 'legend-count',
+            text: segment.hits.toLocaleString('en-US'),
+          }),
+        ]),
+      );
+    }
+  }
+}
+
+/**
+ * Show the empty-result block when every searched source finished without a
+ * card. It stays hidden while sources are still loading.
+ * @param {Array<{id:string, name:string, hits:number|null}>} searchable
+ */
+function updateNoResults(searchable) {
+  if (!noResultsEl) return;
+
+  const show =
+    query !== '' &&
+    searchable.length > 0 &&
+    visibleItems().length === 0 &&
+    searchable.every((entry) => states.get(entry.id)?.status === 'done');
+
+  noResultsEl.hidden = !show;
+  if (!show) {
+    if (noResultsTextEl) noResultsTextEl.textContent = '';
+    return;
+  }
+
+  if (noResultsTextEl) {
+    const sources = searchable.length === 1 ? '1 source' : `${searchable.length.toLocaleString('en-US')} sources`;
+    noResultsTextEl.textContent = `Nothing in ${sources}. Try fewer words, or turn on more sources.`;
+  }
+}
+
 // ---------- Status ----------
 function updateStatus() {
   if (!query) {
@@ -1222,23 +1361,9 @@ function updateStatus() {
   }
 
   let loading = 0;
-  let finished = 0;
-  let knownTotal = 0;
-  let totalsComplete = true;
-
   for (const source of searchable) {
     const state = sourceState(source.id);
     if (state.status === 'loading') loading += 1;
-    if (state.status === 'done') {
-      finished += 1;
-      if (state.total !== null) knownTotal += state.total;
-      else totalsComplete = false;
-    } else if (state.status === 'error') {
-      finished += 1;
-      totalsComplete = false;
-    } else if (state.status === 'idle') {
-      totalsComplete = false;
-    }
   }
 
   if (loading > 0) {
@@ -1253,23 +1378,14 @@ function updateStatus() {
     return;
   }
 
-  const shown = visibleItems().length;
-  const allFinished = finished === searchable.length;
-
-  if (allFinished && shown === 0) {
-    statusLineEl.textContent = `No results for "${query}".`;
-    return;
-  }
-
-  if (totalsComplete && knownTotal > 0) {
-    statusLineEl.textContent = `${shown.toLocaleString()} results shown of ${knownTotal.toLocaleString()}`;
-  } else {
-    statusLineEl.textContent = `${shown.toLocaleString()} results shown`;
-  }
+  statusLineEl.textContent = '';
 }
 
 function updateUi() {
   updateStatus();
+  const searchable = searchableSelected();
+  updateResultsHeader();
+  updateNoResults(searchable);
   refreshSourceMeta();
 
   const showMore = canLoadMore();
@@ -1529,6 +1645,12 @@ loadMoreButton.addEventListener('click', () => {
   updateUi();
 });
 downloadSelectedButton.addEventListener('click', downloadSelected);
+if (noResultsSourcesButton) {
+  noResultsSourcesButton.addEventListener('click', () => {
+    setSourcesOpen(true);
+    sourcesDisc?.focus();
+  });
+}
 clearSelectionButton.addEventListener('click', () => {
   selection.clear();
   updateSelectionUi();
