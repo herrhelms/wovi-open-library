@@ -130,7 +130,7 @@ Thirteen of these (Paris Musées, Walters, Brooklyn, Auckland, British Library, 
 - **Smithsonian** with `DEMO_KEY`: ~30 requests per hour — add a personal key.
 - **Openverse** without a key: ~20 requests per minute, 200 per day, results stop near 240.
 - **iNaturalist**: max 60 requests per minute.
-- The server identifies itself to every source as `OpenLibraryFetch/0.1 (+https://github.com/herrhelms/wovi-open-library)`, as Wikimedia's User-Agent policy asks. It never pretends to be a browser and does not get around bot challenges.
+- The server identifies itself to every source as `OpenLibraryFetch/0.1 (local research tool)`. It never pretends to be a browser and does not get around bot challenges.
 </details>
 
 <details>
