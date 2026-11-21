@@ -260,9 +260,10 @@ Node at start: "SSL.com TLS RSA Root CA 2022" and "HARICA TLS RSA Root CA
 hosts that need them are `data.getty.edu`, `kulturarvsdata.se` and
 `data.artmuseum.princeton.edu`. Certificate checks stay enabled.
 
-The Commons-based sources share a limit of 2 requests at the same time. On
-HTTP 429 the app waits (the `Retry-After` seconds, else 2 s, at most 5 s) and
-tries one more time.
+The Commons-based sources send one request at a time, with at least 500 ms
+between two starts. On HTTP 429 the app waits (the `Retry-After` seconds, else
+5 s, at most 30 s) and tries again up to 4 times within 45 s. A timeout (20 s)
+is tried once more.
 
 ## Open licences only
 
