@@ -19,6 +19,7 @@ import {
   viewerPlan,
   withItemParam,
 } from './lib.js';
+import { isItemSaved, onSavesChange, toggleSave } from './saves.js';
 
 const COPY_RESET_MS = 1400;
 const SVG_NS = 'http://www.w3.org/2000/svg';
@@ -34,6 +35,8 @@ let previouslyFocused = null;
 let pushed = false;
 let drag = null;
 let dragEndedAt = 0;
+/** Source name the panel shows for the current item. */
+let currentSourceName = '';
 
 // ---------- Icons ----------
 
@@ -67,6 +70,7 @@ const CHEVRON_LEFT = ['m15 18-6-6 6-6'];
 const CHEVRON_RIGHT = ['m9 18 6-6-6-6'];
 const CLOSE_ICON = ['M6 6l12 12M18 6 6 18'];
 const DOWNLOAD_ICON = ['M12 3v12m0 0-5-5m5 5 5-5M5 21h14'];
+const BOOKMARK_ICON = ['M19 21 12 16 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z'];
 
 // ---------- Source names ----------
 
@@ -195,7 +199,17 @@ function buildDialog() {
     'aria-label': 'Close',
   });
   close.append(icon(CLOSE_ICON, 18));
-  const head = el('div', { class: 'viewer-panel-head' }, [eyebrow, close]);
+
+  const save = el('button', {
+    class: 'viewer-save',
+    type: 'button',
+    'aria-label': 'Save',
+    'aria-pressed': 'false',
+  });
+  save.append(icon(BOOKMARK_ICON, 18));
+
+  const headActions = el('div', { class: 'viewer-head-actions' }, [save, close]);
+  const head = el('div', { class: 'viewer-panel-head' }, [eyebrow, headActions]);
 
   const body = el('div', { class: 'viewer-panel-body' });
   const panel = el('aside', { class: 'viewer-panel' }, [head, body]);
@@ -221,6 +235,7 @@ function buildDialog() {
     next,
     strip,
     eyebrow,
+    save,
     close,
     panel,
     body,
@@ -229,6 +244,11 @@ function buildDialog() {
   prev.addEventListener('click', () => step(-1));
   next.addEventListener('click', () => step(1));
   close.addEventListener('click', () => node.close());
+  save.addEventListener('click', () => {
+    const item = state?.list[state.index];
+    if (!item) return;
+    void toggleSave(item, { sourceName: currentSourceName, trigger: save });
+  });
   logo.addEventListener('click', (event) => {
     event.preventDefault();
     node.close();
@@ -252,6 +272,8 @@ function buildDialog() {
 
   node.addEventListener('keydown', onKeydown);
   node.addEventListener('close', onClose);
+
+  onSavesChange(() => updateSaveButton());
 
   return node;
 }
@@ -648,6 +670,7 @@ function renderPanel(item) {
   body.replaceChildren();
 
   let resolvedName = sourceNameOf(item, null);
+  currentSourceName = resolvedName;
   const sourceEl = dom.eyebrow;
   sourceEl.textContent = resolvedName;
 
@@ -841,6 +864,7 @@ function renderPanel(item) {
   getSourceNames().then((names) => {
     if (!state || state.list[state.index] !== item) return;
     resolvedName = sourceNameOf(item, names);
+    currentSourceName = resolvedName;
     sourceEl.textContent = resolvedName;
     sourceValue.textContent = withProvider(resolvedName);
     if (pageLink) pageLink.textContent = `View on ${resolvedName} \u2197`;
@@ -964,6 +988,17 @@ function resetCopyButtons() {
 }
 
 /**
+ * Show the saved state of the current item on the panel Save button.
+ */
+function updateSaveButton() {
+  if (!dom || !dom.save) return;
+  const item = state?.list[state.index];
+  const saved = item ? isItemSaved(item) : false;
+  dom.save.setAttribute('aria-pressed', saved ? 'true' : 'false');
+  dom.save.setAttribute('aria-label', saved ? 'Saved' : 'Save');
+}
+
+/**
  * Update the position, the nav buttons and the logo link.
  */
 function updateChrome() {
@@ -999,6 +1034,7 @@ function show(index) {
   if (!item) return;
 
   renderPanel(item);
+  updateSaveButton();
   loadImage(item);
   renderStrip(list, nextIndex);
   updateChrome();

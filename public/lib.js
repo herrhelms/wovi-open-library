@@ -1259,3 +1259,214 @@ export function backToTopBottom(barHeight, barBottom, base = 28) {
       : 0;
   return bottom + barHeight + 12;
 }
+
+/** Item fields that a saved snapshot keeps for the tile and the viewer. */
+const SNAPSHOT_ITEM_FIELDS = [
+  'uid',
+  'id',
+  'source',
+  'title',
+  'creator',
+  'date',
+  'description',
+  'thumb',
+  'thumbSource',
+  'thumbFallback',
+  'preview',
+  'full',
+  'fullTiff',
+  'pageUrl',
+  'license',
+  'licenseUrl',
+  'open',
+  'width',
+  'height',
+  'provider',
+  'directDownload',
+  'mediaId',
+  'note',
+  'sets',
+];
+
+/** Longest description text a snapshot keeps. */
+const SNAPSHOT_DESCRIPTION_MAX = 2000;
+
+/**
+ * A string value, or '' for anything else.
+ * @param {unknown} value
+ * @returns {string}
+ */
+function snapshotString(value) {
+  return typeof value === 'string' ? value : '';
+}
+
+/**
+ * A positive finite number, or null.
+ * @param {unknown} value
+ * @returns {number|null}
+ */
+function snapshotSize(value) {
+  if (value === null || value === '' || typeof value === 'boolean') return null;
+  const number = Number(value);
+  if (!Number.isFinite(number) || number <= 0) return null;
+  return number;
+}
+
+/**
+ * Copy of the item fields a saved snapshot keeps. Only fields that are not
+ * `undefined` are copied. The description is cut to 2,000 characters.
+ * @param {object} item
+ * @returns {object}
+ */
+function snapshotItemCopy(item) {
+  const copy = {};
+  for (const field of SNAPSHOT_ITEM_FIELDS) {
+    const value = item[field];
+    if (value === undefined) continue;
+    if (field === 'description' && typeof value === 'string') {
+      copy.description = value.slice(0, SNAPSHOT_DESCRIPTION_MAX);
+      continue;
+    }
+    copy[field] = value;
+  }
+  return copy;
+}
+
+/**
+ * Storage snapshot of one item, for `localStorage`. The input item is not
+ * changed. `now` is the save time in milliseconds.
+ * @param {object} item
+ * @param {string} sourceName
+ * @param {number} now
+ * @returns {object}
+ */
+export function makeSnapshot(item, sourceName, now) {
+  const list = item && typeof item === 'object' ? item : {};
+  const candidates = thumbCandidates(list);
+  return {
+    id: itemKey(list),
+    source: snapshotString(list.source),
+    sourceName: snapshotString(sourceName),
+    title: snapshotString(list.title),
+    creator: snapshotString(list.creator),
+    date: snapshotString(list.date),
+    thumbUrl: candidates[0] ?? '',
+    fullUrl: list.full || list.preview || '',
+    pageUrl: snapshotString(list.pageUrl),
+    licence: snapshotString(list.license),
+    licenceUrl: snapshotString(list.licenseUrl),
+    open: list.open === true,
+    width: snapshotSize(list.width),
+    height: snapshotSize(list.height),
+    savedAt: typeof now === 'number' && Number.isFinite(now) ? now : 0,
+    item: snapshotItemCopy(list),
+  };
+}
+
+/**
+ * Read a stored saves JSON string into an array of valid snapshots. The stored
+ * order is kept; repeated ids keep the first entry.
+ * @param {string|null|undefined} raw
+ * @returns {object[]}
+ */
+export function parseSaves(raw) {
+  if (typeof raw !== 'string' || raw === '') return [];
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return [];
+  }
+  if (!Array.isArray(data)) return [];
+
+  const result = [];
+  const seen = new Set();
+  for (const entry of data) {
+    if (!entry || typeof entry !== 'object') continue;
+    if (typeof entry.id !== 'string' || entry.id === '') continue;
+    if (!entry.item || typeof entry.item !== 'object') continue;
+    if (seen.has(entry.id)) continue;
+    seen.add(entry.id);
+    result.push(entry);
+  }
+  return result;
+}
+
+/**
+ * Whether a snapshot list holds an id.
+ * @param {object[]} list
+ * @param {string} id
+ * @returns {boolean}
+ */
+export function isSaved(list, id) {
+  if (!Array.isArray(list)) return false;
+  return list.some((entry) => entry?.id === id);
+}
+
+/**
+ * New snapshot list with `snapshot` at `index` and no other entry with the same
+ * id. The input array is not changed.
+ * @param {object[]} list
+ * @param {object} snapshot
+ * @param {number} [index]
+ * @returns {object[]}
+ */
+export function addSave(list, snapshot, index = 0) {
+  const source = Array.isArray(list) ? list : [];
+  const wanted = Math.trunc(Number(index));
+  const entry = snapshot;
+  if (!entry || typeof entry !== 'object') return source.slice();
+
+  const rest = source.filter((item) => item?.id !== entry.id);
+  const at = Number.isFinite(wanted)
+    ? Math.min(Math.max(wanted, 0), rest.length)
+    : 0;
+  const result = rest.slice();
+  result.splice(at, 0, entry);
+  return result;
+}
+
+/**
+ * New snapshot list without the id. Gives the new list, the index of the
+ * removed entry (−1 when not found) and the removed snapshot (null when not
+ * found). The input array is not changed.
+ * @param {object[]} list
+ * @param {string} id
+ * @returns {{list: object[], index: number, snapshot: object|null}}
+ */
+export function removeSave(list, id) {
+  const source = Array.isArray(list) ? list : [];
+  const index = source.findIndex((entry) => entry?.id === id);
+  if (index < 0) return { list: source.slice(), index: -1, snapshot: null };
+  return {
+    list: source.filter((_, position) => position !== index),
+    index,
+    snapshot: source[index],
+  };
+}
+
+/**
+ * The item of a snapshot for the tile and the viewer. The snapshot id becomes
+ * the uid when the item has none. Returns null when the snapshot has no item.
+ * @param {object|null|undefined} snapshot
+ * @returns {object|null}
+ */
+export function snapshotItem(snapshot) {
+  const item = snapshot?.item;
+  if (!item || typeof item !== 'object') return null;
+  const result = { ...item };
+  if (typeof result.uid !== 'string' || result.uid === '') {
+    result.uid = snapshot.id;
+  }
+  return result;
+}
+
+/**
+ * Toast link text for a number of saved images.
+ * @param {number} n
+ * @returns {string}
+ */
+export function savedViewText(n) {
+  const value = typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  return `View saved (${value.toLocaleString('en-US')})`;
+}

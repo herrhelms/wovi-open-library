@@ -1133,24 +1133,32 @@ h1 {
 }
 
 .tile:hover .tile-select,
+.tile:hover .tile-save,
 .tile:hover .tile-download,
 .tile:focus-within .tile-select,
+.tile:focus-within .tile-save,
 .tile:focus-within .tile-download,
 .results.has-selection .tile-select {
   opacity: 1;
   pointer-events: auto;
 }
 
-.tile-select[aria-pressed="true"] {
+.tile-select[aria-pressed="true"],
+.tile-save[aria-pressed="true"] {
   background: var(--wovi-green);
   color: var(--wovi-surface);
   opacity: 1;
   pointer-events: auto;
 }
 
-.tile-select[aria-pressed="true"]:hover {
+.tile-select[aria-pressed="true"]:hover,
+.tile-save[aria-pressed="true"]:hover {
   background: var(--wovi-green-hover);
   color: var(--wovi-surface);
+}
+
+.tile-save[aria-pressed="true"] svg path {
+  fill: currentColor;
 }
 
 .tile-ov-text {
@@ -1225,6 +1233,7 @@ h1 {
 
 @media (hover: none) {
   .tile-select,
+  .tile-save,
   .tile-download {
     opacity: 1;
     pointer-events: auto;
