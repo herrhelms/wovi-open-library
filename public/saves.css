@@ -232,4 +232,16 @@ html:has(.save-notice[open]) {
   .save-notice-inner {
     padding: 24px;
   }
+
+  .wovi-toast {
+    flex-wrap: wrap;
+    row-gap: 6px;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+  }
+
+  .wovi-toast-text {
+    white-space: nowrap;
+    flex: 1 0 100%;
+  }
 }

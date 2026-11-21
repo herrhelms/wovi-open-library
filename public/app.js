@@ -1711,6 +1711,35 @@ function updateSkeletons() {
   );
 }
 
+/** Last text written to the load row, so an unchanged line is not rewritten. */
+let lastLoadRowText = '';
+/** Dots and text of the load row, created once and then kept. */
+let loadRowDotsEl = null;
+let loadRowTextEl = null;
+
+/** Build the dots and text spans of the load row on first use. */
+function ensureLoadRowParts() {
+  if (loadRowDotsEl && loadRowTextEl) return;
+  loadRowDotsEl = el('span', { class: 'load-dots', 'aria-hidden': 'true' }, [
+    el('span', { class: 'load-dot' }),
+    el('span', { class: 'load-dot' }),
+    el('span', { class: 'load-dot' }),
+  ]);
+  loadRowTextEl = el('span');
+  loadRowEl.append(loadRowDotsEl, loadRowTextEl);
+}
+
+/** Write the load-row text only when it differs from the last text written. */
+function setLoadRowText(text) {
+  if (text === lastLoadRowText) return;
+  if (!loadRowTextEl) {
+    if (text === '') return;
+    ensureLoadRowParts();
+  }
+  loadRowTextEl.textContent = text;
+  lastLoadRowText = text;
+}
+
 /** Text of the infinite-load row: pulling names, the exhausted line, or nothing. */
 function updateLoadRow() {
   if (!loadRowEl) return;
@@ -1724,18 +1753,13 @@ function updateLoadRow() {
     const text = pullingText(loadingNames);
     if (text === '') {
       loadRowEl.hidden = true;
-      loadRowEl.replaceChildren();
+      setLoadRowText('');
       return;
     }
+    ensureLoadRowParts();
     loadRowEl.hidden = false;
-    loadRowEl.replaceChildren(
-      el('span', { class: 'load-dots', 'aria-hidden': 'true' }, [
-        el('span', { class: 'load-dot' }),
-        el('span', { class: 'load-dot' }),
-        el('span', { class: 'load-dot' }),
-      ]),
-      el('span', { text }),
-    );
+    loadRowDotsEl.hidden = false;
+    setLoadRowText(text);
     return;
   }
 
@@ -1751,13 +1775,15 @@ function updateLoadRow() {
     visibleRecords().length > 0;
 
   if (exhausted) {
+    ensureLoadRowParts();
     loadRowEl.hidden = false;
-    loadRowEl.replaceChildren(el('span', { text: everythingText(withHits) }));
+    loadRowDotsEl.hidden = true;
+    setLoadRowText(everythingText(withHits));
     return;
   }
 
   loadRowEl.hidden = true;
-  loadRowEl.replaceChildren();
+  setLoadRowText('');
 }
 
 function updateUi() {
