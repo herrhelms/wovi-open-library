@@ -40,7 +40,7 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 - **Fonts.** Geist + Geist Mono from Google Fonts, the same way the reference and the old app load fonts. (Self-hosting the OFL font files is possible later if no third-party request is wanted.)
 - **Screenshots.** Playwright is not installed; use `agent-browser` for 1440×1000 and 390×844 shots.
 - **Code changes** are written by Hermes (project workflow); Claude plans, checks and ticks this file.
-- **Repo and Sponsors URLs (step 11):** `https://github.com/herrhelms/wowi` and `https://github.com/sponsors/herrhelms`. Push to the public repo only when the redesign is done.
+- **Repo and Sponsors URLs (step 11):** `https://github.com/herrhelms/wovi-open-library` and `https://github.com/sponsors/herrhelms`. Push to the public repo only when the redesign is done.
 - **Open questions for later steps:** Explore / Collections routes (step 2), "More like this" data (step 8: no data source exists today).
 
 ## Steps (HANDOFF §3)
