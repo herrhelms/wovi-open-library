@@ -1608,3 +1608,67 @@ body:has(.selection-bar:not([hidden])) .site-main {
     animation: none;
   }
 }
+
+/* ---------- GitHub footer strip ---------- */
+
+.gh-strip {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px 28px 18px;
+  background: var(--wovi-bg);
+  border-top: 1px solid var(--wovi-line);
+  color: var(--wovi-ink);
+}
+
+.gh-strip svg {
+  flex: none;
+  margin-top: 1px;
+}
+
+.gh-strip p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--wovi-ink-2);
+}
+
+.gh-strip a {
+  color: var(--wovi-green);
+  text-decoration: underline;
+}
+
+.gh-strip a:hover {
+  color: var(--wovi-green-hover);
+}
+
+.gh-strip a:focus-visible {
+  outline: none;
+  box-shadow: var(--wovi-focus-ring);
+  border-radius: 4px;
+}
+
+.gh-heart {
+  color: var(--wovi-heart);
+}
+
+.src-modal > .gh-strip {
+  flex: none;
+}
+
+.save-notice .gh-strip {
+  margin: 20px -28px -28px;
+  padding: 16px 28px 20px;
+  border-radius: 0 0 var(--wovi-r-modal) var(--wovi-r-modal);
+}
+
+@media (max-width: 600px) {
+  .gh-strip {
+    padding: 14px 16px 16px;
+  }
+
+  .save-notice .gh-strip {
+    margin: 20px -24px -24px;
+    padding: 14px 24px 16px;
+  }
+}
