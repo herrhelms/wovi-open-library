@@ -18,11 +18,11 @@ import {
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  savedCount,
   searchKey,
   serializeSelection,
   shouldAutoLoad,
   sleep,
-  subtitleText,
   thumbCandidates,
 } from './lib.js';
 import { initSettings } from './settings.js';
@@ -30,6 +30,7 @@ import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
 const OPEN_STORAGE_KEY = 'olf.openOnly';
+const SAVES_KEY = 'wovi:saves:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
 const DOWNLOAD_DELAY = 800;
@@ -45,7 +46,7 @@ const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
 const statusLineEl = document.getElementById('status-line');
-const subtitleEl = document.querySelector('.site-header .subtitle');
+const savedCountEl = document.getElementById('saved-count');
 const resultsEl = document.getElementById('results');
 const loadMoreButton = document.getElementById('load-more');
 const sentinelEl = document.getElementById('sentinel');
@@ -949,7 +950,6 @@ async function reloadSources(adapter) {
   }
 
   registryById = new Map(registry.map((source) => [source.id, source]));
-  if (subtitleEl) subtitleEl.textContent = subtitleText(registry);
   renderChips();
 
   if (adapter && adapter.enabled === false) {
@@ -1274,8 +1274,7 @@ async function init() {
   }
   registryById = new Map(registry.map((source) => [source.id, source]));
 
-  if (subtitleEl) subtitleEl.textContent = subtitleText(registry);
-
+  updateSavedCount();
   applyUrlState();
   if (sourceListError && statusLineEl.textContent === '') {
     statusLineEl.textContent = sourceListError;
@@ -1343,6 +1342,26 @@ if (typeof ResizeObserver === 'function') {
 }
 
 window.addEventListener('popstate', applyUrlState);
+
+/**
+ * Show the number of saved items in the header nav.
+ */
+function updateSavedCount() {
+  if (!savedCountEl) return;
+
+  let value = null;
+  try {
+    value = localStorage.getItem(SAVES_KEY);
+  } catch {
+    value = null;
+  }
+
+  savedCountEl.textContent = savedCount(value).toLocaleString('en-US');
+}
+
+window.addEventListener('storage', (event) => {
+  if (event.key === SAVES_KEY || event.key === null) updateSavedCount();
+});
 
 initSettings({ onChange: onAdapterChange });
 

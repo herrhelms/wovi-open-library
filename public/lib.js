@@ -662,6 +662,25 @@ export function rateLimitWaitText(message, seconds) {
 }
 
 /**
+ * Number of saved items in a raw localStorage value.
+ * Never throws; anything that is not a JSON array counts as 0.
+ * @param {string|null|undefined} raw
+ * @returns {number}
+ */
+export function savedCount(raw) {
+  if (typeof raw !== 'string' || raw === '') return 0;
+
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch {
+    return 0;
+  }
+
+  return Array.isArray(data) ? data.length : 0;
+}
+
+/**
  * Wait for a number of milliseconds.
  * @param {number} ms
  * @returns {Promise<void>}
