@@ -34,7 +34,7 @@ test('aic constants', () => {
   assert.equal(keyEnv, null);
   assert.equal(
     AIC_USER_AGENT,
-    'OpenLibraryFetch/0.1 (+https://github.com/herrhelms/wovi-open-library)',
+    'OpenLibraryFetch/0.1 (local research tool)',
   );
   assert.equal(AIC_USER_AGENT, USER_AGENT);
   assert.equal(typeof aic.resolveDownload, 'undefined');
