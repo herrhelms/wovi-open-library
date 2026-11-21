@@ -1,8 +1,17 @@
 {
-  "name": "open-library-fetch",
+  "name": "wovi-open-library",
   "version": "0.1.0",
+  "description": "WOVI — World of Visual Inspiration: search 51 open image libraries at once and download the highest resolution.",
   "private": true,
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/herrhelms/wovi-open-library.git"
+  },
+  "homepage": "https://github.com/herrhelms/wovi-open-library#readme",
+  "bugs": {
+    "url": "https://github.com/herrhelms/wovi-open-library/issues"
+  },
   "type": "module",
   "engines": {
     "node": ">=26"
