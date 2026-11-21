@@ -13,6 +13,8 @@ import {
   groupShortLabel,
   groupSources,
   imageCandidates,
+  imagesText,
+  imagesTotal,
   isSearchable,
   isUpgrade,
   isUsable,
@@ -30,6 +32,7 @@ import {
   serializeSelection,
   shortcutLabel,
   sortChipIds,
+  sourceBarSegments,
   sourceSummary,
   shouldAutoLoad,
   subtitleText,
@@ -752,4 +755,68 @@ test('groupShortLabel uses the short group labels', () => {
   assert.equal(groupShortLabel('libraries', 'Libraries and archives'), 'Libraries & archives');
   assert.equal(groupShortLabel('science', 'Science, nature and medicine'), 'Science & nature');
   assert.equal(groupShortLabel('other', 'Other'), 'Other');
+});
+
+test('imagesTotal sums the known totals and never drops below the shown count', () => {
+  assert.equal(imagesTotal([10, 20], 5), 30);
+  assert.equal(imagesTotal([10, null], 5), 10);
+  assert.equal(imagesTotal([null, null], 7), 7);
+  assert.equal(imagesTotal([3], 12), 12);
+  assert.equal(imagesTotal([], 0), 0);
+  assert.equal(imagesTotal([10, undefined, -4, Infinity], 2), 10);
+  assert.equal(imagesTotal([5], 0), 5);
+  assert.equal(imagesTotal([5], null), 5);
+});
+
+test('imagesText formats the image count', () => {
+  assert.equal(imagesText(1), '1 image');
+  assert.equal(imagesText(0), '0 images');
+  assert.equal(imagesText(1234), '1,234 images');
+  assert.equal(imagesText(2), '2 images');
+});
+
+test('sourceBarSegments builds the bar segments', () => {
+  assert.deepEqual(sourceBarSegments([]), []);
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 0 },
+      { name: 'B', hits: null },
+    ]),
+    [],
+  );
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 30 },
+      { name: 'B', hits: 10 },
+    ]),
+    [
+      { name: 'A', hits: 30, share: 0.75, tone: 'first' },
+      { name: 'B', hits: 10, share: 0.25, tone: 'second' },
+    ],
+  );
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 10 },
+      { name: 'B', hits: 50 },
+      { name: 'C', hits: 20 },
+      { name: 'D', hits: 20 },
+    ]),
+    [
+      { name: 'B', hits: 50, share: 0.5, tone: 'first' },
+      { name: 'C', hits: 20, share: 0.2, tone: 'second' },
+      { name: '2 other sources', hits: 30, share: 0.3, tone: 'rest' },
+    ],
+  );
+  assert.deepEqual(
+    sourceBarSegments([
+      { name: 'A', hits: 5 },
+      { name: 'B', hits: 3 },
+      { name: 'C', hits: 2 },
+    ]),
+    [
+      { name: 'A', hits: 5, share: 0.5, tone: 'first' },
+      { name: 'B', hits: 3, share: 0.3, tone: 'second' },
+      { name: '1 other source', hits: 2, share: 0.2, tone: 'rest' },
+    ],
+  );
 });

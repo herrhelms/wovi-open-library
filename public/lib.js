@@ -784,6 +784,88 @@ export function sortChipIds(ids, hitsById) {
 }
 
 /**
+ * Total number of images for the results header.
+ * `totals` holds the reported total of each searched source, or null when that
+ * total is not known. The result is the sum of the numeric, finite, non-negative
+ * values, but never less than `shown` (a non-number `shown` counts as 0).
+ * @param {Array<number|null>} totals
+ * @param {number} shown
+ * @returns {number}
+ */
+export function imagesTotal(totals, shown) {
+  const list = Array.isArray(totals) ? totals : [];
+  let sum = 0;
+  for (const value of list) {
+    if (typeof value !== 'number' || !Number.isFinite(value) || value < 0) continue;
+    sum += value;
+  }
+  const floor =
+    typeof shown === 'number' && Number.isFinite(shown) && shown > 0
+      ? Math.floor(shown)
+      : 0;
+  return Math.max(sum, floor);
+}
+
+/**
+ * Header text for a number of images: '1 image', else 'N images' with en-US
+ * grouping. A value that is not a finite number counts as 0.
+ * @param {number} total
+ * @returns {string}
+ */
+export function imagesText(total) {
+  const value = typeof total === 'number' && Number.isFinite(total) ? total : 0;
+  if (value === 1) return '1 image';
+  return `${value.toLocaleString('en-US')} images`;
+}
+
+/**
+ * Build the segments of the results source bar.
+ * Only entries with a positive hit count count. They are sorted by hits
+ * descending, stable for equal counts. The first two keep their own segment;
+ * all others merge into one "{N} other sources" segment. `share` is the part of
+ * all hits, from 0 to 1. No entry with hits > 0 gives an empty list.
+ * @param {Array<{name: string, hits: number|null}>} list
+ * @returns {Array<{name: string, hits: number, share: number, tone: 'first'|'second'|'rest'}>}
+ */
+export function sourceBarSegments(list) {
+  const entries = [];
+  if (Array.isArray(list)) {
+    list.forEach((entry, index) => {
+      const hits = entry?.hits;
+      if (typeof hits !== 'number' || !Number.isFinite(hits) || hits <= 0) return;
+      entries.push({ name: String(entry.name ?? ''), hits, index });
+    });
+  }
+  if (entries.length === 0) return [];
+
+  entries.sort((a, b) => b.hits - a.hits || a.index - b.index);
+  const total = entries.reduce((sum, entry) => sum + entry.hits, 0);
+  const result = [];
+
+  entries.slice(0, 2).forEach((entry, index) => {
+    result.push({
+      name: entry.name,
+      hits: entry.hits,
+      share: entry.hits / total,
+      tone: index === 0 ? 'first' : 'second',
+    });
+  });
+
+  const rest = entries.slice(2);
+  if (rest.length > 0) {
+    const hits = rest.reduce((sum, entry) => sum + entry.hits, 0);
+    result.push({
+      name: `${rest.length} other source${rest.length === 1 ? '' : 's'}`,
+      hits,
+      share: hits / total,
+      tone: 'rest',
+    });
+  }
+
+  return result;
+}
+
+/**
  * Summary line for the collapsed sources fieldset: the top three sources with
  * results, by hits, then how many more have results.
  * @param {Array<{name: string, hits: number|null}>} list selected, usable sources in registry order
