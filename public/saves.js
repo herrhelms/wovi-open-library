@@ -14,6 +14,7 @@ import {
   removeSave,
   savedViewText,
 } from './lib.js';
+import { createGithubStrip } from './github-strip.js';
 
 export const SAVES_KEY = 'wovi:saves:v1';
 export const ACK_KEY = 'wovi:saves-ack:v1';
@@ -453,6 +454,7 @@ function buildNotice() {
     bullets,
     buttons,
     note,
+    createGithubStrip(),
   ]);
 
   const dialog = el(

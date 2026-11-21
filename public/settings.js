@@ -12,6 +12,7 @@ import {
   splitNotes,
   statusPill,
 } from './lib.js';
+import { createGithubStrip } from './github-strip.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const COPY_RESET_MS = 1400;
@@ -575,6 +576,7 @@ function createErrorContent(message) {
     createHead(),
     el('p', { class: 'src-load-error', role: 'alert', text: message }),
     createFooter(),
+    createGithubStrip(),
   ]);
 }
 
@@ -615,6 +617,7 @@ function createLoadingContent() {
     createHead(),
     el('p', { class: 'src-loading', role: 'status', text: 'Loading sources…' }),
     createFooter(),
+    createGithubStrip(),
   ]);
 }
 
@@ -753,7 +756,9 @@ function fillDialog() {
 
   list.append(createEmptyState());
 
-  dialog.replaceChildren(el('div', { class: 'src-modal' }, [header, list, createFooter()]));
+  dialog.replaceChildren(
+    el('div', { class: 'src-modal' }, [header, list, createFooter(), createGithubStrip()]),
+  );
   updateCounts();
   applyFilter();
 }
