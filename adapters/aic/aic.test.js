@@ -14,6 +14,7 @@ import {
 } from './index.js';
 
 import { getSource } from '../../lib/sources/index.js';
+import { USER_AGENT } from '../../lib/http.js';
 
 const {
   group,
@@ -31,7 +32,11 @@ test('aic constants', () => {
   assert.equal(name, 'Art Institute of Chicago');
   assert.equal(group, 'museums');
   assert.equal(keyEnv, null);
-  assert.equal(AIC_USER_AGENT, 'OpenLibraryFetch/0.1 (local research tool)');
+  assert.equal(
+    AIC_USER_AGENT,
+    'OpenLibraryFetch/0.1 (+https://github.com/herrhelms/wovi-open-library)',
+  );
+  assert.equal(AIC_USER_AGENT, USER_AGENT);
   assert.equal(typeof aic.resolveDownload, 'undefined');
   assert.equal(typeof aic.trustResolvedUrl, 'undefined');
 });

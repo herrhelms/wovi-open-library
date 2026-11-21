@@ -912,17 +912,22 @@ export function retryDelay(code, retryAfterSeconds, attempt, random) {
   if (code === 'PREPARING') {
     return done < 20 ? 15000 : null;
   }
+  const jitter = Math.floor((Number(random) || 0) * 3000);
   if (code === 'RATE_LIMIT') {
-    if (done >= 3) return null;
+    if (done >= 5) return null;
     const seconds =
       typeof retryAfterSeconds === 'number' &&
       Number.isFinite(retryAfterSeconds) &&
       retryAfterSeconds > 0
         ? retryAfterSeconds
         : 0;
-    const base = Math.max(seconds * 1000, 15000);
-    const jitter = Math.floor((Number(random) || 0) * 3000);
-    return base + jitter;
+    const base = Math.max(seconds * 1000, 10000);
+    const delay = base * (1 + done * 0.5) + jitter;
+    return Math.min(delay, 60000);
+  }
+  if (code === 'TIMEOUT') {
+    if (done >= 2) return null;
+    return 8000 * (done + 1) + jitter;
   }
   return null;
 }
@@ -938,6 +943,23 @@ export function rateLimitWaitText(message, seconds) {
     return `Wikimedia Commons rate limit reached. Trying again in ${seconds} s.`;
   }
   return `Rate limit reached. Trying again in ${seconds} s.`;
+}
+
+/**
+ * Error list text while any retry waits.
+ * @param {string|null|undefined} code
+ * @param {string|null|undefined} message
+ * @param {number} seconds
+ * @returns {string}
+ */
+export function retryWaitText(code, message, seconds) {
+  if (code === 'TIMEOUT') {
+    const base =
+      typeof message === 'string' && message !== '' ? message : 'Search timed out';
+    const sentence = base.endsWith('.') ? base : `${base}.`;
+    return `${sentence} Trying again in ${seconds} s.`;
+  }
+  return rateLimitWaitText(message, seconds);
 }
 
 /**

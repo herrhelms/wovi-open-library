@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  COMMONS_TIMEOUT_MS,
+  commonsLimiter,
   createLimiter,
   fetchCommonsJson,
   resetCommonsGate,
@@ -151,7 +153,7 @@ test('fetchCommonsJson caps the pause at 30 000 ms', async () => {
   assert.equal(startTimes[1] - startTimes[0], 30_000);
 });
 
-test('fetchCommonsJson gives up after three 429 answers', async () => {
+test('fetchCommonsJson gives up after five 429 answers', async () => {
   resetCommonsGate();
   const clock = fakeClock();
   let calls = 0;
@@ -176,7 +178,7 @@ test('fetchCommonsJson gives up after three 429 answers', async () => {
     },
   );
 
-  assert.equal(calls, 3);
+  assert.equal(calls, 5);
 });
 
 test('fetchCommonsJson stops before the third fetch when the total wait is too long', async () => {
@@ -233,7 +235,7 @@ test('fetchCommonsJson rethrows other errors at once without sleeping', async ()
   assert.deepEqual(clock.sleeps, []);
 });
 
-test('fetchCommonsJson leaves at least 250 ms between two starts', async () => {
+test('fetchCommonsJson leaves at least 500 ms between two starts', async () => {
   resetCommonsGate();
   const clock = fakeClock();
   const startTimes = [];
@@ -253,7 +255,7 @@ test('fetchCommonsJson leaves at least 250 ms between two starts', async () => {
   await fetchCommonsJson(URL_UNDER_TEST, deps);
 
   assert.equal(startTimes.length, 2);
-  assert.ok(startTimes[1] - startTimes[0] >= 250);
+  assert.ok(startTimes[1] - startTimes[0] >= 500);
 });
 
 test('a 429 pauses other queued requests', async () => {
@@ -352,4 +354,192 @@ test('a throwing task does not block the limiter', async () => {
   await assert.rejects(failing, (err) => err === failure);
   assert.equal(await next, 'ok');
   assert.equal(ran, true);
+});
+
+test('commonsLimiter(1) runs one task at a time in FIFO order', async () => {
+  const started = [];
+  const resolvers = [];
+  let active = 0;
+  let maxActive = 0;
+
+  const tasks = [];
+  for (let i = 0; i < 3; i += 1) {
+    tasks.push(
+      commonsLimiter(() => {
+        started.push(i);
+        active += 1;
+        maxActive = Math.max(maxActive, active);
+        return new Promise((resolve) => {
+          resolvers.push(() => {
+            active -= 1;
+            resolve(i);
+          });
+        });
+      }),
+    );
+  }
+
+  await Promise.resolve();
+  await Promise.resolve();
+  assert.deepEqual(started, [0]);
+
+  resolvers.shift()();
+  for (let i = 0; i < 6; i += 1) await Promise.resolve();
+  assert.deepEqual(started, [0, 1]);
+
+  resolvers.shift()();
+  for (let i = 0; i < 6; i += 1) await Promise.resolve();
+  assert.deepEqual(started, [0, 1, 2]);
+
+  resolvers.shift()();
+  const results = await Promise.all(tasks);
+  assert.deepEqual(results, [0, 1, 2]);
+  assert.equal(maxActive, 1);
+});
+
+test('two fetchCommonsJson calls in sequence keep a 500 ms gap', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const startTimes = [];
+  const fetchJson = async () => {
+    startTimes.push(clock.now());
+    return { ok: true };
+  };
+
+  const deps = {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  };
+
+  await fetchCommonsJson(URL_UNDER_TEST, deps);
+  await fetchCommonsJson(URL_UNDER_TEST, deps);
+
+  assert.equal(startTimes.length, 2);
+  assert.ok(startTimes[1] - startTimes[0] >= 500);
+  assert.deepEqual(clock.sleeps, [500]);
+});
+
+test('a TIMEOUT is retried once after the gap', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const startTimes = [];
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    startTimes.push(clock.now());
+    if (calls === 1) {
+      throw new HttpError('commons.wikimedia.org did not answer in 20 s', {
+        host: 'commons.wikimedia.org',
+        code: 'TIMEOUT',
+      });
+    }
+    return { ok: true };
+  };
+
+  const result = await fetchCommonsJson(URL_UNDER_TEST, {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(calls, 2);
+  assert.equal(startTimes[1] - startTimes[0], 500);
+});
+
+test('a second TIMEOUT is thrown unchanged', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    throw new HttpError('commons.wikimedia.org did not answer in 20 s', {
+      host: 'commons.wikimedia.org',
+      code: 'TIMEOUT',
+    });
+  };
+
+  await assert.rejects(
+    fetchCommonsJson(URL_UNDER_TEST, {
+      fetchJson,
+      sleep: clock.sleep,
+      now: clock.now,
+      limiter: noLimiter,
+    }),
+    (err) => {
+      assert.equal(err.code, 'TIMEOUT');
+      return true;
+    },
+  );
+  assert.equal(calls, 2);
+});
+
+test('fetchCommonsJson resolves after four 429 answers', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    if (calls <= 4) throw http429(1);
+    return { ok: true };
+  };
+
+  const result = await fetchCommonsJson(URL_UNDER_TEST, {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(calls, 5);
+});
+
+test('fetchCommonsJson passes the Commons timeout to the default fetch', async () => {
+  resetCommonsGate();
+  let seenOptions = null;
+  const fetchJson = async (url, opts) => {
+    seenOptions = opts;
+    return { ok: true };
+  };
+
+  await fetchCommonsJson(URL_UNDER_TEST, {
+    fetchJson,
+    sleep: async () => {},
+    now: () => 0,
+    limiter: noLimiter,
+  });
+
+  assert.equal(COMMONS_TIMEOUT_MS, 20000);
+  assert.deepEqual(seenOptions, { timeoutMs: 20000 });
+});
+
+test('one 429 then one TIMEOUT then success resolves', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    if (calls === 1) throw http429(1);
+    if (calls === 2) {
+      throw new HttpError('commons.wikimedia.org did not answer in 20 s', {
+        host: 'commons.wikimedia.org',
+        code: 'TIMEOUT',
+      });
+    }
+    return { ok: true };
+  };
+
+  const result = await fetchCommonsJson(URL_UNDER_TEST, {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  });
+
+  assert.deepEqual(result, { ok: true });
+  assert.equal(calls, 3);
 });
