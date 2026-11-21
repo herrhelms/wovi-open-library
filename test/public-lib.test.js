@@ -51,6 +51,12 @@ import {
   showBackToTop,
   wallLayout,
   withItemParam,
+  statusPill,
+  adaptorMatchesFilter,
+  adaptorFilterCounts,
+  sourcesSubline,
+  splitNotes,
+  linkParts,
 } from '../public/lib.js';
 
 const source = (id, extra = {}) => ({
@@ -955,4 +961,104 @@ test('withItemParam sets and removes the i parameter', () => {
 test('searchWithoutItem drops the i parameter', () => {
   assert.equal(searchWithoutItem('?q=cat&i=x&open=1'), '?q=cat&open=1');
   assert.equal(searchWithoutItem(''), '');
+});
+
+const freeAdapter = { enabled: true, key: null };
+const setAdapter = { enabled: true, key: { required: true, configured: true } };
+const missingAdapter = { enabled: true, key: { required: true, configured: false } };
+const optionalAdapter = { enabled: false, key: { required: false, configured: false, default: 'DEMO' } };
+const offFreeAdapter = { enabled: false, key: null };
+
+test('statusPill maps the key status to a short pill', () => {
+  assert.deepEqual(statusPill(freeAdapter), { kind: 'free', text: 'No key needed' });
+  assert.deepEqual(statusPill(setAdapter), { kind: 'set', text: 'Key set' });
+  assert.deepEqual(statusPill(missingAdapter), { kind: 'missing', text: 'Key missing' });
+  assert.deepEqual(statusPill(optionalAdapter), { kind: 'optional', text: 'Key optional' });
+  assert.deepEqual(statusPill(null), { kind: 'free', text: 'No key needed' });
+});
+
+test('adaptorMatchesFilter ready needs an on adaptor without a missing key', () => {
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'ready'), true);
+  assert.equal(adaptorMatchesFilter(setAdapter, 'ready'), true);
+  assert.equal(adaptorMatchesFilter(missingAdapter, 'ready'), false);
+  assert.equal(adaptorMatchesFilter(optionalAdapter, 'ready'), false);
+  assert.equal(adaptorMatchesFilter(null, 'ready'), false);
+});
+
+test('adaptorMatchesFilter key shows missing keys only', () => {
+  assert.equal(adaptorMatchesFilter(missingAdapter, 'key'), true);
+  assert.equal(adaptorMatchesFilter(optionalAdapter, 'key'), false);
+  assert.equal(adaptorMatchesFilter(null, 'key'), false);
+});
+
+test('adaptorMatchesFilter off shows disabled adaptors', () => {
+  assert.equal(adaptorMatchesFilter(offFreeAdapter, 'off'), true);
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'off'), false);
+  assert.equal(adaptorMatchesFilter(null, 'off'), true);
+});
+
+test('adaptorMatchesFilter all matches everything', () => {
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'all'), true);
+  assert.equal(adaptorMatchesFilter(freeAdapter, 'bogus'), true);
+  assert.equal(adaptorMatchesFilter(null, 'all'), true);
+});
+
+test('adaptorFilterCounts counts each filter', () => {
+  assert.deepEqual(
+    adaptorFilterCounts([freeAdapter, setAdapter, missingAdapter, optionalAdapter, offFreeAdapter]),
+    { all: 5, ready: 2, key: 1, off: 2 },
+  );
+  assert.deepEqual(adaptorFilterCounts(null), { all: 0, ready: 0, key: 0, off: 0 });
+  assert.deepEqual(adaptorFilterCounts([null, 3, freeAdapter]), {
+    all: 1,
+    ready: 1,
+    key: 0,
+    off: 0,
+  });
+});
+
+test('sourcesSubline counts on and missing keys', () => {
+  assert.equal(
+    sourcesSubline([freeAdapter, setAdapter, missingAdapter, optionalAdapter, offFreeAdapter]),
+    '3 of 5 adaptors on · 1 needs a key',
+  );
+  assert.equal(
+    sourcesSubline([freeAdapter, missingAdapter, missingAdapter]),
+    '3 of 3 adaptors on · 2 need a key',
+  );
+  assert.equal(sourcesSubline([freeAdapter, offFreeAdapter]), '1 of 2 adaptors on');
+  assert.equal(sourcesSubline(null), '0 of 0 adaptors on');
+});
+
+test('sourcesSubline groups big numbers', () => {
+  const list = Array.from({ length: 1200 }, () => freeAdapter);
+  assert.equal(sourcesSubline(list), '1,200 of 1,200 adaptors on');
+});
+
+test('splitNotes pulls out the untested note', () => {
+  assert.deepEqual(splitNotes(['Not yet tested live.', ' Uses IIIF. ', '', 3]), {
+    untested: true,
+    notes: ['Uses IIIF.'],
+  });
+  assert.deepEqual(splitNotes(['A']), { untested: false, notes: ['A'] });
+  assert.deepEqual(splitNotes(undefined), { untested: false, notes: [] });
+});
+
+test('linkParts splits text and links', () => {
+  assert.deepEqual(linkParts('Sign up at https://example.org/key.'), [
+    { text: 'Sign up at ' },
+    { text: 'https://example.org/key', href: 'https://example.org/key' },
+    { text: '.' },
+  ]);
+  assert.deepEqual(linkParts('(see http://a.b/c), then go'), [
+    { text: '(see ' },
+    { text: 'http://a.b/c', href: 'http://a.b/c' },
+    { text: '), then go' },
+  ]);
+  assert.deepEqual(linkParts('no link'), [{ text: 'no link' }]);
+  assert.deepEqual(linkParts(''), []);
+  assert.deepEqual(linkParts(null), []);
+  assert.deepEqual(linkParts('https://x.org'), [
+    { text: 'https://x.org', href: 'https://x.org' },
+  ]);
 });

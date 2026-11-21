@@ -690,6 +690,148 @@ export function countActive(list) {
 }
 
 /**
+ * Status pill of one adaptor row in the Sources modal.
+ * Uses the kind of `keyStatus`: `none` becomes `free`, the others keep their
+ * kind. The text is the short pill text.
+ * @param {object} adapter
+ * @returns {{kind: 'free'|'set'|'missing'|'optional', text: string}}
+ */
+export function statusPill(adapter) {
+  const kind = keyStatus(adapter).kind;
+  if (kind === 'set') return { kind: 'set', text: 'Key set' };
+  if (kind === 'missing') return { kind: 'missing', text: 'Key missing' };
+  if (kind === 'optional') return { kind: 'optional', text: 'Key optional' };
+  return { kind: 'free', text: 'No key needed' };
+}
+
+/**
+ * Whether an adaptor row matches a segmented filter.
+ * `ready` = on and not key-missing. `key` = key-missing. `off` = not on.
+ * `all`, and any unknown value, match everything. A value that is not an
+ * object matches `all` and `off` only.
+ * @param {object} adapter
+ * @param {'all'|'ready'|'key'|'off'} filter
+ * @returns {boolean}
+ */
+export function adaptorMatchesFilter(adapter, filter) {
+  if (filter === 'ready') {
+    return adapter?.enabled === true && statusPill(adapter).kind !== 'missing';
+  }
+  if (filter === 'key') {
+    return adapter != null && statusPill(adapter).kind === 'missing';
+  }
+  if (filter === 'off') return adapter?.enabled !== true;
+  return true;
+}
+
+/**
+ * Number of adaptor rows per segmented filter. Entries that are not objects
+ * are skipped. A value that is not an array gives all zeros.
+ * @param {object[]} list
+ * @returns {{all: number, ready: number, key: number, off: number}}
+ */
+export function adaptorFilterCounts(list) {
+  const result = { all: 0, ready: 0, key: 0, off: 0 };
+  if (!Array.isArray(list)) return result;
+  for (const adapter of list) {
+    if (!adapter || typeof adapter !== 'object') continue;
+    result.all += 1;
+    if (adaptorMatchesFilter(adapter, 'ready')) result.ready += 1;
+    if (adaptorMatchesFilter(adapter, 'key')) result.key += 1;
+    if (adaptorMatchesFilter(adapter, 'off')) result.off += 1;
+  }
+  return result;
+}
+
+/**
+ * Sub line of the Sources modal header: how many adaptors are on, and how many
+ * need a key. The key part is left out when no adaptor needs one. Counts use
+ * en-US grouping. A value that is not an array counts as an empty list.
+ * @param {object[]} list
+ * @returns {string}
+ */
+export function sourcesSubline(list) {
+  const items = Array.isArray(list) ? list : [];
+  const total = items.length;
+  const on = countActive(items);
+  const missing = items.filter(
+    (adapter) => adapter != null && statusPill(adapter).kind === 'missing',
+  ).length;
+  const base = `${on.toLocaleString('en-US')} of ${total.toLocaleString('en-US')} adaptors on`;
+  if (missing === 0) return base;
+  const word = missing === 1 ? 'needs' : 'need';
+  return `${base} · ${missing.toLocaleString('en-US')} ${word} a key`;
+}
+
+/**
+ * Split adaptor notes into the "not yet tested live" flag and the other notes.
+ * Only strings count. Notes are trimmed and empty notes are removed.
+ * A value that is not an array gives no notes.
+ * @param {string[]} notes
+ * @returns {{untested: boolean, notes: string[]}}
+ */
+export function splitNotes(notes) {
+  if (!Array.isArray(notes)) return { untested: false, notes: [] };
+  let untested = false;
+  const result = [];
+  for (const note of notes) {
+    if (typeof note !== 'string') continue;
+    if (/not yet tested live/i.test(note)) {
+      untested = true;
+      continue;
+    }
+    const text = note.trim();
+    if (text !== '') result.push(text);
+  }
+  return { untested, notes: result };
+}
+
+/** Trailing characters that are not part of a URL. */
+const LINK_TRAIL = ['.', ',', ')'];
+
+/**
+ * Split a text into plain text parts and `http://` / `https://` link parts.
+ * A URL runs to the next white space. Trailing `.`, `,` and `)` characters are
+ * not part of the URL and stay in the text. There are no empty text parts.
+ * A value that is not a non-empty string gives an empty list.
+ * @param {string} text
+ * @returns {Array<{text: string} | {text: string, href: string}>}
+ */
+export function linkParts(text) {
+  if (typeof text !== 'string' || text === '') return [];
+
+  const parts = [];
+  const pattern = /https?:\/\/\S+/g;
+  let pending = '';
+  let last = 0;
+  let match;
+
+  while ((match = pattern.exec(text)) !== null) {
+    let url = match[0];
+    let trail = '';
+    while (url.length > 0 && LINK_TRAIL.includes(url[url.length - 1])) {
+      trail = url[url.length - 1] + trail;
+      url = url.slice(0, -1);
+    }
+
+    pending += text.slice(last, match.index);
+    if (url !== '') {
+      if (pending !== '') {
+        parts.push({ text: pending });
+        pending = '';
+      }
+      parts.push({ text: url, href: url });
+    }
+    pending += trail;
+    last = match.index + match[0].length;
+  }
+
+  pending += text.slice(last);
+  if (pending !== '') parts.push({ text: pending });
+  return parts;
+}
+
+/**
  * Create a DOM element.
  * `attrs` supports `class`, `text`, `dataset`, regular attributes and
  * `on<Event>` listener functions. `children` may contain nodes or strings.

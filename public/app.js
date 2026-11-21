@@ -41,7 +41,7 @@ import {
   backToTopBottom,
   showBackToTop,
 } from './lib.js';
-import { initSettings } from './settings.js';
+import { initSettings, openSources } from './settings.js';
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
@@ -378,7 +378,7 @@ function createChip(source) {
       el('span', { class: 'visually-hidden', id: descriptionId, text: description }),
     );
     button.addEventListener('click', () => {
-      document.getElementById('adaptors-open')?.click();
+      void openSources(source.id);
     });
     chipEls.set(source.id, { button, countEl, usable: false });
     return button;
