@@ -688,3 +688,38 @@ export function savedCount(raw) {
 export function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+/**
+ * Keyboard hint for the search field shortcut.
+ * @param {string} platform
+ * @returns {'⌘K' | 'Ctrl K'}
+ */
+export function shortcutLabel(platform) {
+  if (typeof platform !== 'string') return 'Ctrl K';
+  return /mac|iphone|ipad/i.test(platform) ? '⌘K' : 'Ctrl K';
+}
+
+/**
+ * Whether a keydown event is the search shortcut (Cmd/Ctrl + K).
+ * @param {KeyboardEvent|object|null|undefined} event
+ * @returns {boolean}
+ */
+export function isShortcut(event) {
+  if (!event || typeof event !== 'object') return false;
+  if (event.key !== 'k' && event.key !== 'K') return false;
+  if (Boolean(event.metaKey) === Boolean(event.ctrlKey)) return false;
+  return !event.altKey;
+}
+
+/**
+ * Placeholder for the search field, with the number of usable sources.
+ * @param {number} count
+ * @returns {string}
+ */
+export function searchPlaceholder(count) {
+  const generic = 'Search open libraries — prints, maps, specimens, stars…';
+  if (typeof count !== 'number' || !Number.isFinite(count) || count <= 0) {
+    return generic;
+  }
+  return `Search ${count.toLocaleString('en-US')} open libraries — prints, maps, specimens, stars…`;
+}

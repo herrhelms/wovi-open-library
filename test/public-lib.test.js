@@ -23,8 +23,11 @@ import {
   rememberLimited,
   retryDelay,
   savedCount,
+  isShortcut,
   searchKey,
+  searchPlaceholder,
   serializeSelection,
+  shortcutLabel,
   shouldAutoLoad,
   subtitleText,
   thumbCandidates,
@@ -619,4 +622,72 @@ test('savedCount gives 0 for invalid or non-array JSON', () => {
   assert.equal(savedCount('{"a":1}'), 0);
   assert.equal(savedCount('"text"'), 0);
   assert.equal(savedCount('42'), 0);
+});
+
+test('shortcutLabel uses the command key on Apple platforms', () => {
+  assert.equal(shortcutLabel('MacIntel'), '⌘K');
+  assert.equal(shortcutLabel('macOS'), '⌘K');
+  assert.equal(shortcutLabel('iPhone'), '⌘K');
+  assert.equal(shortcutLabel('iPad'), '⌘K');
+});
+
+test('shortcutLabel uses Ctrl K elsewhere', () => {
+  assert.equal(shortcutLabel('Win32'), 'Ctrl K');
+  assert.equal(shortcutLabel('Linux x86_64'), 'Ctrl K');
+  assert.equal(shortcutLabel(''), 'Ctrl K');
+  assert.equal(shortcutLabel(undefined), 'Ctrl K');
+});
+
+test('isShortcut accepts meta or ctrl with k', () => {
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: true, ctrlKey: false, altKey: false }),
+    true,
+  );
+  assert.equal(
+    isShortcut({ key: 'K', metaKey: false, ctrlKey: true, altKey: false }),
+    true,
+  );
+});
+
+test('isShortcut rejects other combinations', () => {
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: true, ctrlKey: true, altKey: false }),
+    false,
+  );
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: false, ctrlKey: false, altKey: false }),
+    false,
+  );
+  assert.equal(
+    isShortcut({ key: 'k', metaKey: true, ctrlKey: false, altKey: true }),
+    false,
+  );
+  assert.equal(
+    isShortcut({ key: 'j', metaKey: true, ctrlKey: false, altKey: false }),
+    false,
+  );
+});
+
+test('isShortcut handles a missing event', () => {
+  assert.equal(isShortcut(null), false);
+  assert.equal(isShortcut(undefined), false);
+});
+
+test('searchPlaceholder names the number of usable sources', () => {
+  assert.equal(
+    searchPlaceholder(42),
+    'Search 42 open libraries — prints, maps, specimens, stars…',
+  );
+  assert.equal(
+    searchPlaceholder(1234),
+    'Search 1,234 open libraries — prints, maps, specimens, stars…',
+  );
+});
+
+test('searchPlaceholder falls back for counts that are not positive numbers', () => {
+  const generic = 'Search open libraries — prints, maps, specimens, stars…';
+  assert.equal(searchPlaceholder(0), generic);
+  assert.equal(searchPlaceholder(-3), generic);
+  assert.equal(searchPlaceholder(NaN), generic);
+  assert.equal(searchPlaceholder(undefined), generic);
 });

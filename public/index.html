@@ -41,16 +41,20 @@
       <h1 class="visually-hidden">WOVI — World of Visual Inspiration</h1>
 
       <form class="search" role="search" id="search-form">
-        <label class="visually-hidden" for="search-input">Search open image libraries</label>
-        <input
-          class="search-input"
-          id="search-input"
-          type="search"
-          name="q"
-          placeholder="Search images…"
-          autocomplete="off"
-          spellcheck="false"
-        >
+        <label class="sbox">
+          <span class="visually-hidden">Search images</span>
+          <svg class="sbox-icon" aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+          <input
+            class="search-input"
+            id="search-input"
+            type="search"
+            name="q"
+            placeholder="Search open libraries — prints, maps, specimens, stars…"
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <kbd class="kbd" id="search-shortcut" aria-hidden="true">⌘K</kbd>
+        </label>
         <button class="search-submit" type="submit">Search</button>
       </form>
 

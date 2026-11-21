@@ -11,6 +11,7 @@ import {
   estimateCardHeight,
   groupSources,
   isSearchable,
+  isShortcut,
   isUsable,
   itemKey,
   parseSavedSelection,
@@ -20,8 +21,10 @@ import {
   retryDelay,
   savedCount,
   searchKey,
+  searchPlaceholder,
   serializeSelection,
   shouldAutoLoad,
+  shortcutLabel,
   sleep,
   thumbCandidates,
 } from './lib.js';
@@ -38,6 +41,7 @@ const DOWNLOAD_DELAY = 800;
 // ---------- DOM ----------
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
+const searchShortcutEl = document.getElementById('search-shortcut');
 const groupsEl = document.getElementById('source-groups');
 const allButton = document.getElementById('sources-all');
 const noneButton = document.getElementById('sources-none');
@@ -950,6 +954,7 @@ async function reloadSources(adapter) {
   }
 
   registryById = new Map(registry.map((source) => [source.id, source]));
+  updateSearchPlaceholder();
   renderChips();
 
   if (adapter && adapter.enabled === false) {
@@ -1253,6 +1258,55 @@ async function loadGroups() {
   return DEFAULT_GROUPS;
 }
 
+/**
+ * Show the number of usable sources in the search field placeholder.
+ */
+function updateSearchPlaceholder() {
+  if (!searchInput) return;
+  const usable = Array.isArray(registry) ? registry.filter(isUsable).length : 0;
+  searchInput.placeholder = searchPlaceholder(usable);
+}
+
+/**
+ * Show the platform keyboard shortcut in the search field.
+ */
+function updateShortcutLabel() {
+  if (!searchShortcutEl) return;
+  const platform =
+    navigator.userAgentData?.platform || navigator.platform || '';
+  searchShortcutEl.textContent = shortcutLabel(platform);
+}
+
+/**
+ * Whether the focused element is a text field other than the search input.
+ * @returns {boolean}
+ */
+function focusIsOtherTextField() {
+  const active = document.activeElement;
+  if (!active || active === searchInput) return false;
+  const tag = active.tagName;
+  return (
+    tag === 'INPUT' ||
+    tag === 'TEXTAREA' ||
+    tag === 'SELECT' ||
+    active.isContentEditable === true
+  );
+}
+
+/**
+ * Focus the search field from anywhere on the page (Cmd/Ctrl + K).
+ * @param {KeyboardEvent} event
+ */
+function onShortcutKeydown(event) {
+  if (!isShortcut(event)) return;
+  if (document.querySelector('dialog[open]')) return;
+  if (focusIsOtherTextField()) return;
+  event.preventDefault();
+  if (!searchInput) return;
+  searchInput.focus();
+  searchInput.select();
+}
+
 async function init() {
   let sourceListError = '';
   const [sourceResult, groupList] = await Promise.all([
@@ -1273,6 +1327,7 @@ async function init() {
     sourceListError = 'The source list could not be loaded.';
   }
   registryById = new Map(registry.map((source) => [source.id, source]));
+  updateSearchPlaceholder();
 
   updateSavedCount();
   applyUrlState();
@@ -1280,6 +1335,9 @@ async function init() {
     statusLineEl.textContent = sourceListError;
   }
 }
+
+updateShortcutLabel();
+document.addEventListener('keydown', onShortcutKeydown);
 
 searchForm.addEventListener('submit', (event) => {
   event.preventDefault();
