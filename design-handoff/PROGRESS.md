@@ -43,7 +43,7 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 - **Code changes** are written by Hermes (project workflow); Claude plans, checks and ticks this file.
 - **Repo and Sponsors URLs (step 11):** `https://github.com/herrhelms/wovi-open-library` and `https://github.com/sponsors/herrhelms`. Push to the public repo only when the redesign is done.
 - **Explore / Collections (step 2), decided by the user:** nav entries only for now. Explore = the search page (`/`, `aria-current="page"`). Collections has no route: it shows as a disabled entry (no dead link). "Saved n" shows the real count from `localStorage`; its page comes in step 10.
-- **Open question for later steps:** "More like this" data (step 8: no data source exists today).
+- **"More like this":** omitted (user decision, step 8): the app has no data source for similar items.
 
 ## Steps (HANDOFF §3)
 
@@ -54,7 +54,7 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 - [x] 5. Results header + source bar — h1 `{query} · {total} images`, `from {n} of {total} sources`, source bar + legend, empty block with "Show sources". Sort / orientation / colour dropdowns not built (`SHOW_RESULT_FILTERS = false`): no data or API exists.
 - [x] 6. Masonry wall + infinite loading — `display: grid-lanes` behind `@supports`, JS column masonry as fallback (250 / 20 px; 160 / 12 px under 600 px); tiles with scrim overlay, title, Download button, and a Select toggle (keeps the existing multi-select, not in the design); meta row with licence tag; square placeholder until the image size is known (package 74); 5 skeletons after the wall; load row "Pulling more from …" / "That's everything from {n} sources."; selection bar restyled. Save button deferred to step 10. Only the JS fallback was checked (Chrome); grid-lanes needs a check in Safari 26.4+.
 - [x] 7. Back-to-top button — appears after 600 px, moves up above the selection bar, focuses the search field.
-- [ ] 8. Detail view
+- [x] 8. Detail view — `viewer.js`/`viewer.css` rebuilt (package 75): dark stage with on-dark logo, Fit/Actual segmented control (+ `F` key), drag to pan, ±4 filmstrip, hint; 440 px panel (360 under 1000, stacked under 760). Facts: Licence + meaning, Source (via provider), Creator, Date, In sets, Dimensions; attribution box for BY-family licences. Back closes the viewer (`?i=` param; dropped on page load, no deep link). Kept all §5 actions incl. TIFF link and "Open full resolution". Not built: "More like this" (no data), Save button (step 10). Token mapping: white overlays → `color-mix` of `--wovi-surface`, hint `#8E8E87` → `--wovi-ink-muted`, image shadow → `--wovi-shadow-modal`; new meaning string "credit, no changes" for BY-ND (not in the spec table).
 - [ ] 9. Sources modal
 - [ ] 10. Saves (new)
 - [ ] 11. GitHub footer strip
