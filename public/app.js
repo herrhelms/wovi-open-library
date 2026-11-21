@@ -9,6 +9,7 @@ import {
   downloadUrl,
   el,
   estimateCardHeight,
+  groupShortLabel,
   groupSources,
   isSearchable,
   isShortcut,
@@ -26,6 +27,8 @@ import {
   shouldAutoLoad,
   shortcutLabel,
   sleep,
+  sortChipIds,
+  sourceSummary,
   thumbCandidates,
 } from './lib.js';
 import { initSettings } from './settings.js';
@@ -33,6 +36,7 @@ import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
 const OPEN_STORAGE_KEY = 'olf.openOnly';
+const SOURCES_OPEN_KEY = 'wovi:sources-open:v1';
 const SAVES_KEY = 'wovi:saves:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
@@ -42,10 +46,13 @@ const DOWNLOAD_DELAY = 800;
 const searchForm = document.getElementById('search-form');
 const searchInput = document.getElementById('search-input');
 const searchShortcutEl = document.getElementById('search-shortcut');
-const groupsEl = document.getElementById('source-groups');
+const groupsEl = document.getElementById('src-panel');
+const sourcesDisc = document.getElementById('sources-disc');
+const sourcesCountEl = document.getElementById('sources-count');
+const sourcesSummaryEl = document.getElementById('sources-summary');
 const allButton = document.getElementById('sources-all');
 const noneButton = document.getElementById('sources-none');
-const openOnlyInput = document.getElementById('open-only');
+const openOnlySwitch = document.getElementById('sources-licence-switch');
 const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
@@ -80,6 +87,10 @@ const controllers = new Map();
 const retryTimers = new Map();
 const errors = new Map();
 const chipEls = new Map();
+/** @type {Map<string,{sources:object[],chipsEl:HTMLElement,hitsEl:HTMLElement}>} */
+const groupRows = new Map();
+/** True while renderChips builds the fieldsets, so updateChip skips the re-layout. */
+let layingOutSources = false;
 /** @type {Array<{el:HTMLElement,item:object,checkbox:HTMLInputElement,img:HTMLImageElement,key:string,sourceId:string,mediaId:string|null}>} */
 const records = [];
 const displayedKeys = new Set();
@@ -134,7 +145,33 @@ function saveOpenOnly() {
 }
 
 function applyOpenOnlyUi() {
-  if (openOnlyInput) openOnlyInput.checked = openOnly;
+  if (openOnlySwitch) {
+    openOnlySwitch.setAttribute('aria-checked', openOnly ? 'true' : 'false');
+  }
+}
+
+function loadSourcesOpen() {
+  try {
+    return localStorage.getItem(SOURCES_OPEN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function saveSourcesOpen(open) {
+  try {
+    localStorage.setItem(SOURCES_OPEN_KEY, open ? '1' : '0');
+  } catch {
+    // Storage may be blocked or full; the fieldset still works for this session.
+  }
+}
+
+function setSourcesOpen(open, { persist = true } = {}) {
+  if (sourcesDisc) {
+    sourcesDisc.setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+  if (groupsEl) groupsEl.hidden = !open;
+  if (persist) saveSourcesOpen(open);
 }
 
 function defaultSelection() {
@@ -186,13 +223,105 @@ function sourceShownCount(id) {
   return count;
 }
 
+/**
+ * Hits of one source for its chip: the reported total when it is known, else
+ * the number of cards that are shown. A count exists only after a search
+ * finished (`done`).
+ * @param {string} id
+ * @returns {number|null}
+ */
+function chipHits(id) {
+  const state = states.get(id);
+  if (!state || state.status !== 'done') return null;
+  return state.total !== null ? state.total : sourceShownCount(id);
+}
+
+/**
+ * Selected sources that can be searched right now, in registry order, with
+ * their hit counts.
+ * @returns {Array<{name:string,hits:number|null}>}
+ */
+function summaryList() {
+  const list = [];
+  for (const source of registry) {
+    if (!selected.has(source.id)) continue;
+    if (!isSearchable(source, openOnly)) continue;
+    list.push({ name: source.name, hits: chipHits(source.id) });
+  }
+  return list;
+}
+
+/**
+ * Move the chips of one group into hit order. Existing elements are moved, not
+ * recreated, so keyboard focus stays on the same source.
+ * @param {{sources:object[],chipsEl:HTMLElement}} row
+ */
+function sortGroupChips(row) {
+  const ids = row.sources.map((source) => source.id);
+  const hitsById = new Map(ids.map((id) => [id, chipHits(id)]));
+  const sorted = sortChipIds(ids, hitsById);
+
+  let changed = false;
+  let index = 0;
+  for (const id of sorted) {
+    const entry = chipEls.get(id);
+    if (!entry) continue;
+    if (row.chipsEl.children[index] !== entry.button) changed = true;
+    index += 1;
+  }
+  if (!changed) return;
+
+  // Moving nodes can drop focus in some browsers; put it back afterwards.
+  const active = document.activeElement;
+  for (const id of sorted) {
+    const entry = chipEls.get(id);
+    if (entry) row.chipsEl.append(entry.button);
+  }
+  if (active instanceof HTMLElement && row.chipsEl.contains(active)) {
+    active.focus({ preventScroll: true });
+  }
+}
+
+/**
+ * Refresh the header count, the summary line and the per-group hit counts.
+ */
+function refreshSourceMeta() {
+  const total = registry.length;
+  let on = 0;
+  for (const source of registry) {
+    if (!selected.has(source.id)) continue;
+    if (!isUsable(source)) continue;
+    if (openOnly && source.openLicenses === false) continue;
+    on += 1;
+  }
+
+  if (sourcesCountEl) {
+    sourcesCountEl.textContent = `${on.toLocaleString('en-US')} of ${total.toLocaleString('en-US')} on`;
+  }
+  if (sourcesSummaryEl) {
+    sourcesSummaryEl.textContent = sourceSummary(summaryList());
+  }
+
+  for (const [, row] of groupRows) {
+    let hits = 0;
+    for (const source of row.sources) {
+      if (!selected.has(source.id)) continue;
+      if (!isSearchable(source, openOnly)) continue;
+      const value = chipHits(source.id);
+      if (typeof value === 'number') hits += value;
+    }
+    row.hitsEl.textContent = `${hits.toLocaleString('en-US')} hits`;
+    sortGroupChips(row);
+  }
+}
+
 // ---------- Chips ----------
 function needsKeyText(source) {
   return `Set ${source.keyEnv ?? 'the key'} in .env to use ${source.name}.`;
 }
 
 function createChip(source) {
-  const statusEl = el('span', { class: 'chip-status' });
+  const countEl = el('span', { class: 'chip-count' });
   const button = el(
     'button',
     {
@@ -200,48 +329,55 @@ function createChip(source) {
       class: 'chip',
       'aria-pressed': selected.has(source.id) ? 'true' : 'false',
     },
-    [el('span', { class: 'chip-name', text: source.name }), statusEl],
+    [
+      el('span', { class: 'dot', 'aria-hidden': 'true' }),
+      el('span', { class: 'chip-name', text: source.name }),
+      countEl,
+    ],
   );
 
   if (!isUsable(source)) {
     const descriptionId = `source-key-${source.id}`;
-    button.classList.add('chip-needs-key');
+    const description = needsKeyText(source);
+    button.classList.add('key');
     button.removeAttribute('aria-pressed');
     button.setAttribute('aria-disabled', 'true');
     button.setAttribute('aria-describedby', descriptionId);
-    button.title = needsKeyText(source);
-    button.append(el('span', { class: 'chip-needs-key-text', text: 'needs key' }));
+    button.title = description;
+    countEl.remove();
     button.append(
-      el('span', {
-        class: 'visually-hidden',
-        id: descriptionId,
-        text: needsKeyText(source),
-      }),
+      el('span', { class: 'keytag', text: 'KEY' }),
+      el('span', { class: 'visually-hidden', id: descriptionId, text: description }),
     );
-    // Keep the status element for layout consistency but never fill it.
-    chipEls.set(source.id, { button, statusEl, usable: false });
+    button.addEventListener('click', () => {
+      document.getElementById('adaptors-open')?.click();
+    });
+    chipEls.set(source.id, { button, countEl, usable: false });
     return button;
   }
 
   if (openOnly && source.openLicenses === false) {
-    button.classList.add('chip-no-licence');
+    button.classList.add('off');
     button.removeAttribute('aria-pressed');
     button.setAttribute('aria-disabled', 'true');
     button.title = OPEN_DISABLED_TEXT;
-    button.append(el('span', { class: 'visually-hidden', text: OPEN_DISABLED_TEXT }));
-    chipEls.set(source.id, { button, statusEl, usable: false });
+    countEl.remove();
+    button.append(
+      el('span', { class: 'visually-hidden', text: OPEN_DISABLED_TEXT }),
+    );
+    chipEls.set(source.id, { button, countEl, usable: false });
     return button;
   }
 
   button.addEventListener('click', () => toggleSource(source.id));
-  chipEls.set(source.id, { button, statusEl, usable: true });
+  chipEls.set(source.id, { button, countEl, usable: true });
   updateChip(source.id);
   return button;
 }
 
-function createGroupAllButton(rowId, isOn) {
+function createGroupButton(rowId, isOn) {
   return el('button', {
-    class: 'text-button',
+    class: 'mini',
     type: 'button',
     text: isOn ? 'All' : 'None',
     onclick: () => setGroupAll(rowId, isOn),
@@ -249,53 +385,73 @@ function createGroupAllButton(rowId, isOn) {
 }
 
 function renderChips() {
+  if (!groupsEl) return;
+  layingOutSources = true;
   groupsEl.replaceChildren();
   chipEls.clear();
+  groupRows.clear();
 
   const rows = groupSources(registry, groups);
   for (const row of rows) {
-    const chips = el(
-      'div',
-      { class: 'chips' },
-      row.sources.map((source) => createChip(source)),
-    );
-    const actions = el('div', { class: 'source-actions source-actions-group' }, [
-      el('span', { class: 'section-label', text: row.label }),
-      createGroupAllButton(row.id, true),
-      createGroupAllButton(row.id, false),
+    const chipsEl = el('div', { class: 'chips' });
+    const hitsEl = el('span', { class: 'src-group-hits' });
+    const legend = el('legend', {}, [
+      el('span', {
+        class: 'src-group-name',
+        text: groupShortLabel(row.id, row.label),
+      }),
+      el('div', { class: 'src-group-meta' }, [
+        hitsEl,
+        createGroupButton(row.id, true),
+        createGroupButton(row.id, false),
+      ]),
     ]);
-    const groupEl = el(
-      'div',
-      { class: 'source-group', role: 'group', 'aria-label': row.label },
-      [actions, chips],
-    );
+    const groupEl = el('fieldset', { class: 'src-group' }, [legend, chipsEl]);
+    for (const source of row.sources) chipsEl.append(createChip(source));
+    groupRows.set(row.id, { sources: row.sources, chipsEl, hitsEl });
     groupsEl.append(groupEl);
   }
+
+  layingOutSources = false;
+  refreshSourceMeta();
 }
 
 function updateChip(id) {
   const entry = chipEls.get(id);
   if (!entry) return;
-  if (!entry.usable) return;
-  const isOn = selected.has(id);
-  entry.button.setAttribute('aria-pressed', isOn ? 'true' : 'false');
-  entry.button.removeAttribute('title');
-  entry.button.classList.remove('has-error');
 
-  const statusEl = entry.statusEl;
-  statusEl.replaceChildren();
-  const state = sourceState(id);
+  if (entry.usable) {
+    const isOn = selected.has(id);
+    const state = states.get(id);
+    const button = entry.button;
+    const countEl = entry.countEl;
 
-  if (state.status === 'loading') {
-    statusEl.append(el('span', { class: 'spinner', 'aria-label': 'loading' }));
-  } else if (state.status === 'done') {
-    const count = state.total !== null ? state.total : sourceShownCount(id);
-    statusEl.textContent = Number(count).toLocaleString();
-  } else if (state.status === 'error') {
-    statusEl.append(el('span', { class: 'chip-error-dot', 'aria-hidden': 'true' }));
-    entry.button.classList.add('has-error');
-    entry.button.title = state.error || 'Search failed';
+    button.classList.remove('on', 'off', 'zero', 'loading', 'has-error');
+    button.removeAttribute('title');
+    countEl.textContent = '';
+    button.classList.toggle('on', isOn);
+    button.classList.toggle('off', !isOn);
+    button.setAttribute('aria-pressed', isOn ? 'true' : 'false');
+
+    if (isOn && state?.status === 'loading') {
+      button.classList.add('loading');
+    } else if (state?.status === 'error') {
+      button.classList.add('has-error');
+      countEl.textContent =
+        state.code === 'RATE_LIMIT'
+          ? 'limit'
+          : state.code === 'PREPARING'
+            ? 'wait'
+            : 'error';
+      button.title = state.error || 'Search failed';
+    } else if (state?.status === 'done') {
+      const count = chipHits(id);
+      countEl.textContent = Number(count).toLocaleString('en-US');
+      if (isOn && count === 0) button.classList.add('zero');
+    }
   }
+
+  if (!layingOutSources) refreshSourceMeta();
 }
 
 // ---------- Errors ----------
@@ -1114,6 +1270,7 @@ function updateStatus() {
 
 function updateUi() {
   updateStatus();
+  refreshSourceMeta();
 
   const showMore = canLoadMore();
   loadMoreButton.hidden = !showMore;
@@ -1338,6 +1495,7 @@ async function init() {
 
 updateShortcutLabel();
 document.addEventListener('keydown', onShortcutKeydown);
+setSourcesOpen(loadSourcesOpen(), { persist: false });
 
 searchForm.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -1348,9 +1506,16 @@ searchForm.addEventListener('submit', (event) => {
 
 allButton.addEventListener('click', () => setAll(true));
 noneButton.addEventListener('click', () => setAll(false));
-if (openOnlyInput) {
-  openOnlyInput.addEventListener('change', () => {
-    openOnly = openOnlyInput.checked;
+if (sourcesDisc) {
+  sourcesDisc.addEventListener('click', () => {
+    const open = sourcesDisc.getAttribute('aria-expanded') !== 'true';
+    setSourcesOpen(open);
+  });
+}
+if (openOnlySwitch) {
+  openOnlySwitch.addEventListener('click', () => {
+    openOnly = !openOnly;
+    applyOpenOnlyUi();
     saveOpenOnly();
     updateUrl('replace');
     renderChips();

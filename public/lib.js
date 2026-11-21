@@ -723,3 +723,88 @@ export function searchPlaceholder(count) {
   }
   return `Search ${count.toLocaleString('en-US')} open libraries — prints, maps, specimens, stars…`;
 }
+
+/** Short labels for the source groups in the fieldset. */
+const GROUP_SHORT_LABELS = {
+  aggregators: 'Aggregators',
+  museums: 'Museums & galleries',
+  libraries: 'Libraries & archives',
+  science: 'Science & nature',
+};
+
+/**
+ * Short label for a source group, or the API label when there is no short one.
+ * @param {string} id
+ * @param {string} apiLabel
+ * @returns {string}
+ */
+export function groupShortLabel(id, apiLabel) {
+  if (typeof id === 'string' && Object.prototype.hasOwnProperty.call(GROUP_SHORT_LABELS, id)) {
+    return GROUP_SHORT_LABELS[id];
+  }
+  return typeof apiLabel === 'string' ? apiLabel : '';
+}
+
+/**
+ * Read a hit count from a Map or a plain object.
+ * @param {Map<string, number|null>|Record<string, number|null>|null|undefined} hitsById
+ * @param {string} id
+ * @returns {unknown}
+ */
+function readHits(hitsById, id) {
+  if (!hitsById || typeof hitsById !== 'object') return undefined;
+  if (typeof hitsById.get === 'function') return hitsById.get(id);
+  return hitsById[id];
+}
+
+/**
+ * Sort chip ids for display inside a group: ids with a count first, by count
+ * descending (stable for equal counts), then ids without a count in input order.
+ * The input array is not changed.
+ * @param {string[]} ids
+ * @param {Map<string, number|null>|Record<string, number|null>} hitsById
+ * @returns {string[]}
+ */
+export function sortChipIds(ids, hitsById) {
+  const list = Array.isArray(ids) ? ids : [];
+  const ranked = [];
+  const unranked = [];
+
+  list.forEach((id, index) => {
+    const value = readHits(hitsById, id);
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      ranked.push({ id, value, index });
+    } else {
+      unranked.push(id);
+    }
+  });
+
+  ranked.sort((a, b) => b.value - a.value || a.index - b.index);
+  return ranked.map((entry) => entry.id).concat(unranked);
+}
+
+/**
+ * Summary line for the collapsed sources fieldset: the top three sources with
+ * results, by hits, then how many more have results.
+ * @param {Array<{name: string, hits: number|null}>} list selected, usable sources in registry order
+ * @returns {string}
+ */
+export function sourceSummary(list) {
+  if (!Array.isArray(list) || list.length === 0) return 'No sources selected';
+
+  const withResults = [];
+  list.forEach((entry, index) => {
+    const hits = entry?.hits;
+    if (typeof hits !== 'number' || !Number.isFinite(hits) || hits <= 0) return;
+    withResults.push({ name: entry.name, hits, index });
+  });
+
+  if (withResults.length === 0) return '';
+
+  withResults.sort((a, b) => b.hits - a.hits || a.index - b.index);
+  const names = withResults.slice(0, 3).map((entry) => entry.name);
+  const rest = withResults.length - 3;
+  return rest > 0
+    ? `${names.join(', ')} + ${rest} more with results`
+    : names.join(', ');
+}
