@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  attributionText,
   backToTopBottom,
   columnCount,
   countActive,
@@ -10,6 +11,7 @@ import {
   downloadUrl,
   estimateCardHeight,
   everythingText,
+  filmstripRange,
   filterAdapters,
   firstLoaded,
   groupShortLabel,
@@ -22,6 +24,8 @@ import {
   isUsable,
   itemKey,
   keyStatus,
+  licenceMeaning,
+  needsAttribution,
   parseSavedSelection,
   pickColumn,
   placeholderTone,
@@ -33,6 +37,7 @@ import {
   isShortcut,
   searchKey,
   searchPlaceholder,
+  searchWithoutItem,
   serializeSelection,
   shortcutLabel,
   sortChipIds,
@@ -45,6 +50,7 @@ import {
   viewerPlan,
   showBackToTop,
   wallLayout,
+  withItemParam,
 } from '../public/lib.js';
 
 const source = (id, extra = {}) => ({
@@ -874,4 +880,79 @@ test('backToTopBottom', () => {
   assert.equal(backToTopBottom(64, NaN), 76);
   assert.equal(backToTopBottom(0, 24, 16), 16);
   assert.equal(backToTopBottom(-5, 24), 28);
+});
+
+test('licenceMeaning reads the licence text and the URL', () => {
+  assert.equal(licenceMeaning('Public Domain Mark 1.0', '', true), 'no restrictions');
+  assert.equal(licenceMeaning('CC0 1.0', '', true), 'no restrictions');
+  assert.equal(
+    licenceMeaning('', 'https://creativecommons.org/publicdomain/zero/1.0/', true),
+    'no restrictions',
+  );
+  assert.equal(licenceMeaning('No known copyright restrictions', '', true), 'no restrictions');
+  assert.equal(licenceMeaning('CC BY 4.0', '', true), 'credit required');
+  assert.equal(
+    licenceMeaning('', 'https://creativecommons.org/licenses/by/4.0/', true),
+    'credit required',
+  );
+  assert.equal(licenceMeaning('CC-BY-SA', '', true), 'credit & share alike');
+  assert.equal(
+    licenceMeaning('CC BY-SA 4.0', 'https://creativecommons.org/licenses/by-sa/4.0/', true),
+    'credit & share alike',
+  );
+  assert.equal(licenceMeaning('cc by-nc 3.0', '', false), 'credit, non-commercial');
+  assert.equal(licenceMeaning('CC BY-NC-SA 4.0', '', false), 'credit, non-commercial');
+  assert.equal(licenceMeaning('CC BY-ND 4.0', '', false), 'credit, no changes');
+  assert.equal(licenceMeaning('Standby license', '', false), 'check with source');
+  assert.equal(licenceMeaning('', '', false), 'check with source');
+});
+
+test('needsAttribution is true only for the BY family', () => {
+  assert.equal(needsAttribution('CC BY 4.0', ''), true);
+  assert.equal(needsAttribution('CC BY-NC-ND 4.0', ''), true);
+  assert.equal(
+    needsAttribution('', 'https://creativecommons.org/licenses/by-sa/4.0/'),
+    true,
+  );
+  assert.equal(needsAttribution('CC0 1.0', ''), false);
+  assert.equal(needsAttribution('Public Domain', ''), false);
+  assert.equal(needsAttribution('', ''), false);
+  assert.equal(needsAttribution('Standby', ''), false);
+});
+
+test('attributionText builds the credit line', () => {
+  assert.equal(
+    attributionText({ title: ' Moon ', creator: 'NASA', source: 'NASA Images', license: 'CC BY 4.0' }),
+    '\u201cMoon\u201d, NASA, via NASA Images, CC BY 4.0',
+  );
+  assert.equal(
+    attributionText({ title: '', creator: '', source: 'Met', license: 'CC BY 4.0' }),
+    '\u201cUntitled\u201d, via Met, CC BY 4.0',
+  );
+});
+
+test('filmstripRange clamps the window around the current item', () => {
+  assert.deepEqual(filmstripRange(0, 20), { start: 0, end: 5 });
+  assert.deepEqual(filmstripRange(10, 20), { start: 6, end: 15 });
+  assert.deepEqual(filmstripRange(19, 20), { start: 15, end: 20 });
+  assert.deepEqual(filmstripRange(1, 3), { start: 0, end: 3 });
+  assert.deepEqual(filmstripRange(2, 10, 1), { start: 1, end: 4 });
+  assert.deepEqual(filmstripRange(-1, 10), { start: 0, end: 0 });
+  assert.deepEqual(filmstripRange(10, 10), { start: 0, end: 0 });
+  assert.deepEqual(filmstripRange(NaN, 10), { start: 0, end: 0 });
+  assert.deepEqual(filmstripRange(0, 0), { start: 0, end: 0 });
+});
+
+test('withItemParam sets and removes the i parameter', () => {
+  assert.equal(withItemParam('?q=cat', 'met:42'), '?q=cat&i=met%3A42');
+  assert.equal(withItemParam('?i=old&q=cat', 'new'), '?i=new&q=cat');
+  assert.equal(withItemParam('q=cat&open=1', 'x'), '?q=cat&open=1&i=x');
+  assert.equal(withItemParam('?q=cat&i=x', ''), '?q=cat');
+  assert.equal(withItemParam('?i=x', null), '');
+  assert.equal(withItemParam('', ''), '');
+});
+
+test('searchWithoutItem drops the i parameter', () => {
+  assert.equal(searchWithoutItem('?q=cat&i=x&open=1'), '?q=cat&open=1');
+  assert.equal(searchWithoutItem(''), '');
 });

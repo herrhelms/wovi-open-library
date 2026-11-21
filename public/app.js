@@ -27,6 +27,7 @@ import {
   retryDelay,
   savedCount,
   searchKey,
+  searchWithoutItem,
   searchPlaceholder,
   serializeSelection,
   shouldAutoLoad,
@@ -1689,6 +1690,10 @@ function updateUi() {
 }
 
 // ---------- URL ----------
+// Last search applied without the viewer's `i` parameter. The viewer changes
+// only `i`, so popstate can skip a full search re-apply in that case.
+let lastSearchWithoutItem = searchWithoutItem(location.search);
+
 function updateUrl(mode) {
   const params = new URLSearchParams();
   if (query) params.set('q', query);
@@ -1701,9 +1706,11 @@ function updateUrl(mode) {
   } catch {
     // History can be unavailable in some embeddings; ignore.
   }
+  lastSearchWithoutItem = searchWithoutItem(location.search);
 }
 
 function applyUrlState() {
+  lastSearchWithoutItem = searchWithoutItem(location.search);
   const params = new URLSearchParams(location.search);
   if (params.has('q') || params.has('sources')) {
     openOnly = params.get('open') === '1';
@@ -1977,7 +1984,10 @@ if (typeof ResizeObserver === 'function') {
   resizeObserver.observe(resultsEl);
 }
 
-window.addEventListener('popstate', applyUrlState);
+window.addEventListener('popstate', () => {
+  if (searchWithoutItem(location.search) === lastSearchWithoutItem) return;
+  applyUrlState();
+});
 
 /**
  * Show the number of saved items in the header nav.
@@ -2000,5 +2010,15 @@ window.addEventListener('storage', (event) => {
 });
 
 initSettings({ onChange: onAdapterChange });
+
+// There is no deep link to a viewer item: drop `i` before the first read.
+try {
+  if (new URLSearchParams(location.search).has('i')) {
+    const search = searchWithoutItem(location.search);
+    history.replaceState(null, '', `${location.pathname}${search}${location.hash}`);
+  }
+} catch {
+  // History can be unavailable in some embeddings; ignore.
+}
 
 init();

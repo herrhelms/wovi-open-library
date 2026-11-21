@@ -2,9 +2,26 @@
  * Full-screen viewer dialog for Open Library Fetch.
  * One dialog instance is created on first use and then reused.
  */
-import { downloadUrl, el, firstLoaded, imageCandidates, isUpgrade, viewerPlan } from './lib.js';
+import {
+  attributionText,
+  downloadUrl,
+  el,
+  filmstripRange,
+  firstLoaded,
+  imageCandidates,
+  isUpgrade,
+  itemKey,
+  licenceMeaning,
+  needsAttribution,
+  placeholderTone,
+  searchWithoutItem,
+  thumbCandidates,
+  viewerPlan,
+  withItemParam,
+} from './lib.js';
 
-const COPY_RESET_MS = 1500;
+const COPY_RESET_MS = 1400;
+const SVG_NS = 'http://www.w3.org/2000/svg';
 
 let dialog = null;
 let dom = null;
@@ -12,8 +29,44 @@ let state = null;
 let sourceNamesPromise = null;
 let loadToken = 0;
 let loadController = null;
-let copyTimer = 0;
+const copyTimers = new Map();
 let previouslyFocused = null;
+let pushed = false;
+let drag = null;
+let dragEndedAt = 0;
+
+// ---------- Icons ----------
+
+/**
+ * Inline stroke icon: 2 px stroke, round caps, currentColor.
+ * @param {string[]} paths
+ * @param {number} [size]
+ * @param {number} [strokeWidth]
+ * @returns {SVGSVGElement}
+ */
+function icon(paths, size = 18, strokeWidth = 2) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', String(strokeWidth));
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const d of paths) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+  }
+  return svg;
+}
+
+const CHEVRON_LEFT = ['m15 18-6-6 6-6'];
+const CHEVRON_RIGHT = ['m9 18 6-6-6-6'];
+const CLOSE_ICON = ['M6 6l12 12M18 6 6 18'];
+const DOWNLOAD_ICON = ['M12 3v12m0 0-5-5m5 5 5-5M5 21h14'];
 
 // ---------- Source names ----------
 
@@ -41,75 +94,161 @@ function getSourceNames() {
   return sourceNamesPromise;
 }
 
+/**
+ * Source name to show for an item, before and after the names arrive.
+ * @param {object} item
+ * @param {Map<string, string>|null} names
+ * @returns {string}
+ */
+function sourceNameOf(item, names) {
+  const fallback = item.source || 'Unknown source';
+  if (!names) return fallback;
+  return names.get(item.source) || fallback;
+}
+
 // ---------- Dialog construction ----------
 
 /**
  * Create the dialog once. All item data is inserted later with DOM methods.
  */
 function buildDialog() {
-  const image = el('img', { class: 'viewer-image', alt: '', hidden: true });
-  const spinner = el('span', { class: 'spinner viewer-spinner', 'aria-hidden': 'true' });
-  const error = el('p', { class: 'viewer-error', hidden: true });
-  error.textContent = 'Image could not be loaded';
+  // Stage top bar
+  const logoText = el('span', { class: 'viewer-logo-mark', 'aria-hidden': 'true' }, [
+    el('span', { class: 'viewer-logo-telescope', text: '\uD83D\uDD2D' }),
+    document.createTextNode('WOVI'),
+  ]);
+  const divider = el('span', { class: 'viewer-logo-divider', 'aria-hidden': 'true' });
+  const tagline = el('span', { class: 'viewer-logo-tagline', 'aria-hidden': 'true' }, [
+    document.createTextNode('World of'),
+    el('br'),
+    document.createTextNode('Visual Inspiration'),
+  ]);
+  const logo = el(
+    'a',
+    { class: 'viewer-logo', href: '/', 'aria-label': 'WOVI, back to results' },
+    [logoText, divider, tagline],
+  );
 
-  const canvas = el('div', { class: 'viewer-canvas' }, [image, spinner, error]);
+  const fit = el('button', {
+    class: 'viewer-seg',
+    type: 'button',
+    'aria-pressed': 'true',
+    text: 'Fit',
+  });
+  const actual = el('button', {
+    class: 'viewer-seg',
+    type: 'button',
+    'aria-pressed': 'false',
+    text: 'Actual size',
+  });
+  const zoom = el('div', { class: 'viewer-zoom', role: 'group', 'aria-label': 'Zoom' }, [
+    fit,
+    actual,
+  ]);
 
+  const position = el('span', { class: 'viewer-position' });
+
+  const top = el('div', { class: 'viewer-top' }, [logo, zoom, position]);
+
+  // Stage middle row
   const prev = el('button', {
     class: 'viewer-nav viewer-prev',
     type: 'button',
-    'aria-label': 'Previous item',
+    'aria-label': 'Previous image',
   });
-  prev.append(el('span', { class: 'viewer-nav-glyph', 'aria-hidden': 'true', text: '\u2039' }));
+  prev.append(icon(CHEVRON_LEFT, 22));
 
   const next = el('button', {
     class: 'viewer-nav viewer-next',
     type: 'button',
-    'aria-label': 'Next item',
+    'aria-label': 'Next image',
   });
-  next.append(el('span', { class: 'viewer-nav-glyph', 'aria-hidden': 'true', text: '\u203a' }));
+  next.append(icon(CHEVRON_RIGHT, 22));
+
+  const image = el('img', { class: 'viewer-image', alt: '', hidden: true });
+  const spinner = el('span', { class: 'spinner viewer-spinner', 'aria-hidden': 'true' });
+  const error = el('p', { class: 'viewer-error', hidden: true });
+  error.textContent = 'Image could not be loaded';
+  const canvas = el('div', { class: 'viewer-canvas is-fit' }, [image, spinner, error]);
+
+  const middle = el('div', { class: 'viewer-middle' }, [prev, canvas, next]);
+
+  const strip = el('div', { class: 'viewer-strip' });
+  const hint = el('div', {
+    class: 'viewer-hint',
+    'aria-hidden': 'true',
+    text: '\u2190 \u2192 browse \u00b7 esc close',
+  });
 
   const stage = el('section', { class: 'viewer-stage', 'aria-label': 'Image stage' }, [
-    canvas,
-    prev,
-    next,
+    top,
+    middle,
+    strip,
+    hint,
   ]);
 
+  // Panel
+  const eyebrow = el('span', { class: 'viewer-eyebrow' });
   const close = el('button', {
     class: 'viewer-close',
     type: 'button',
-    'aria-label': 'Close viewer',
-    text: '\u00d7',
+    'aria-label': 'Close',
   });
+  close.append(icon(CLOSE_ICON, 18));
+  const head = el('div', { class: 'viewer-panel-head' }, [eyebrow, close]);
 
-  const panelInner = el('div', { class: 'viewer-panel-inner' });
-  const panel = el('aside', { class: 'viewer-panel' }, [close, panelInner]);
+  const body = el('div', { class: 'viewer-panel-body' });
+  const panel = el('aside', { class: 'viewer-panel' }, [head, body]);
 
   const layout = el('div', { class: 'viewer-layout' }, [stage, panel]);
-  const node = el('dialog', { class: 'viewer', 'aria-label': 'Image viewer' }, [layout]);
+  const node = el('dialog', { class: 'viewer', 'aria-labelledby': 'viewer-title' }, [layout]);
 
   document.body.append(node);
 
   dom = {
     dialog: node,
     stage,
+    logo,
+    fit,
+    actual,
+    position,
+    middle,
     canvas,
     image,
     spinner,
     error,
     prev,
     next,
+    strip,
+    eyebrow,
     close,
     panel,
-    panelInner,
+    body,
   };
 
   prev.addEventListener('click', () => step(-1));
   next.addEventListener('click', () => step(1));
   close.addEventListener('click', () => node.close());
-  image.addEventListener('click', () => {
+  logo.addEventListener('click', (event) => {
+    event.preventDefault();
+    node.close();
+  });
+  fit.addEventListener('click', () => setZoom('fit'));
+  actual.addEventListener('click', () => setZoom('actual'));
+  canvas.addEventListener('click', (event) => {
+    // A drag that moved must not toggle the zoom.
+    if (Date.now() - dragEndedAt < 300) return;
+    if (event.target !== image) return;
     if (image.hidden || image.classList.contains('is-empty')) return;
     toggleZoom();
   });
+  canvas.addEventListener('pointerdown', onPointerDown);
+  canvas.addEventListener('pointermove', onPointerMove);
+  canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerUp);
+  // A pointer that leaves the canvas before a drag starts still ends the drag.
+  window.addEventListener('pointerup', onPointerUp);
+  window.addEventListener('pointercancel', onPointerUp);
 
   node.addEventListener('keydown', onKeydown);
   node.addEventListener('close', onClose);
@@ -118,24 +257,42 @@ function buildDialog() {
 }
 
 /**
- * Arrow keys move between items, except while typing in a text field.
+ * Navigation keys: arrows for items, `f` for the zoom, Esc closes natively.
  * @param {KeyboardEvent} event
  */
 function onKeydown(event) {
-  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
-  if (event.altKey || event.ctrlKey || event.metaKey) return;
-  const target = event.target;
   if (
-    target instanceof HTMLElement &&
-    (target.isContentEditable ||
-      target.tagName === 'INPUT' ||
-      target.tagName === 'TEXTAREA' ||
-      target.tagName === 'SELECT')
+    targetIsTyping(event.target) ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.metaKey
   ) {
     return;
   }
-  event.preventDefault();
-  step(event.key === 'ArrowLeft' ? -1 : 1);
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    event.preventDefault();
+    step(event.key === 'ArrowLeft' ? -1 : 1);
+    return;
+  }
+  if (event.key === 'f' || event.key === 'F') {
+    event.preventDefault();
+    toggleZoom();
+  }
+}
+
+/**
+ * Whether the event target is a text field or editable region.
+ * @param {EventTarget|null} target
+ * @returns {boolean}
+ */
+function targetIsTyping(target) {
+  if (!(target instanceof HTMLElement)) return false;
+  return (
+    target.isContentEditable ||
+    target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT'
+  );
 }
 
 function onClose() {
@@ -144,13 +301,71 @@ function onClose() {
     loadController.abort();
     loadController = null;
   }
-  if (copyTimer) {
-    clearTimeout(copyTimer);
-    copyTimer = 0;
-  }
+  resetCopyButtons();
+  drag = null;
+  dragEndedAt = 0;
   if (previouslyFocused instanceof HTMLElement && previouslyFocused.isConnected) {
     previouslyFocused.focus();
   }
+  if (pushed) {
+    pushed = false;
+    try {
+      history.back();
+    } catch {
+      // History can be unavailable in some embeddings; ignore.
+    }
+  }
+}
+
+// ---------- URL ----------
+
+/**
+ * Current URL with the `i` parameter set to one item.
+ * @param {string} uid
+ * @returns {string}
+ */
+function viewerUrl(uid) {
+  return `${location.pathname}${withItemParam(location.search, uid)}${location.hash}`;
+}
+
+/**
+ * Replace the history entry so it points at the current item.
+ * @param {object} item
+ */
+function replaceItemUrl(item) {
+  if (!pushed) return;
+  try {
+    history.replaceState({ woviViewer: true }, '', viewerUrl(itemKey(item)));
+  } catch {
+    // History can be unavailable in some embeddings; ignore.
+  }
+}
+
+/**
+ * Push a history entry for the viewer and set the item parameter.
+ * @param {object} item
+ */
+function pushItemUrl(item) {
+  try {
+    history.pushState(
+      { woviViewer: true },
+      '',
+      viewerUrl(itemKey(item)),
+    );
+    pushed = true;
+  } catch {
+    pushed = false;
+  }
+}
+
+/**
+ * Back closes the viewer: when the item parameter is gone, close the dialog.
+ */
+function onPopState() {
+  if (!dom || !dom.dialog.open) return;
+  if (new URLSearchParams(location.search).has('i')) return;
+  pushed = false;
+  dom.dialog.close();
 }
 
 // ---------- Image loading ----------
@@ -300,12 +515,124 @@ function applyZoom() {
   const actual = state?.zoom === 'actual';
   dom.canvas.classList.toggle('is-actual', actual);
   dom.canvas.classList.toggle('is-fit', !actual);
+  dom.fit.setAttribute('aria-pressed', actual ? 'false' : 'true');
+  dom.actual.setAttribute('aria-pressed', actual ? 'true' : 'false');
+}
+
+/**
+ * Set the zoom mode and reset the canvas scroll when fitting.
+ * @param {'fit'|'actual'} mode
+ */
+function setZoom(mode) {
+  if (!state) return;
+  state.zoom = mode === 'actual' ? 'actual' : 'fit';
+  if (state.zoom === 'fit') {
+    dom.canvas.scrollLeft = 0;
+    dom.canvas.scrollTop = 0;
+  }
+  applyZoom();
 }
 
 function toggleZoom() {
   if (!state) return;
-  state.zoom = state.zoom === 'actual' ? 'fit' : 'actual';
-  applyZoom();
+  setZoom(state.zoom === 'actual' ? 'fit' : 'actual');
+}
+
+// ---------- Drag to pan ----------
+
+/**
+ * Start a drag in Actual mode.
+ * @param {PointerEvent} event
+ */
+function onPointerDown(event) {
+  if (!state || state.zoom !== 'actual') return;
+  if (event.button !== 0) return;
+  drag = {
+    id: event.pointerId,
+    x: event.clientX,
+    y: event.clientY,
+    left: dom.canvas.scrollLeft,
+    top: dom.canvas.scrollTop,
+    moved: false,
+  };
+  dom.canvas.classList.add('is-dragging');
+}
+
+/**
+ * Move the canvas while dragging.
+ * @param {PointerEvent} event
+ */
+function onPointerMove(event) {
+  if (!drag || event.pointerId !== drag.id) return;
+  const dx = event.clientX - drag.x;
+  const dy = event.clientY - drag.y;
+  if (!drag.moved && (Math.abs(dx) > 4 || Math.abs(dy) > 4)) {
+    drag.moved = true;
+    // Capture only once the drag starts, so a click without movement still
+    // reaches the image and toggles the zoom.
+    try {
+      dom.canvas.setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer capture is optional.
+    }
+  }
+  if (!drag.moved) return;
+  dom.canvas.scrollLeft = drag.left - dx;
+  dom.canvas.scrollTop = drag.top - dy;
+}
+
+/**
+ * End a drag. A drag that moved must not toggle the zoom.
+ * @param {PointerEvent} event
+ */
+function onPointerUp(event) {
+  if (!drag || event.pointerId !== drag.id) return;
+  dragEndedAt = drag.moved ? Date.now() : 0;
+  drag = null;
+  dom.canvas.classList.remove('is-dragging');
+  try {
+    dom.canvas.releasePointerCapture(event.pointerId);
+  } catch {
+    // Pointer capture is optional.
+  }
+}
+
+// ---------- Filmstrip ----------
+
+/**
+ * Rebuild the filmstrip for the current item.
+ * @param {object[]} list
+ * @param {number} index
+ */
+function renderStrip(list, index) {
+  const hadFocus = dom.strip.contains(document.activeElement);
+  const { start, end } = filmstripRange(index, list.length);
+  const total = list.length.toLocaleString('en-US');
+  const buttons = [];
+  for (let i = start; i < end; i += 1) {
+    const item = list[i];
+    const current = i === index;
+    const button = el('button', {
+      class: current ? 'viewer-thumb is-current' : 'viewer-thumb',
+      type: 'button',
+      'aria-label': `Image ${(i + 1).toLocaleString('en-US')} of ${total}`,
+    });
+    if (current) button.setAttribute('aria-current', 'true');
+    button.style.backgroundColor = `var(--wovi-ph-${placeholderTone(i)})`;
+    const src = thumbCandidates(item)[0];
+    if (typeof src === 'string' && src !== '') {
+      const thumb = el('img', { src, alt: '', loading: 'lazy' });
+      thumb.addEventListener('error', () => thumb.remove());
+      button.append(thumb);
+    }
+    button.addEventListener('click', () => show(i));
+    buttons.push(button);
+  }
+  dom.strip.replaceChildren(...buttons);
+  if (hadFocus) {
+    const current = buttons[index - start];
+    if (current) current.focus();
+  }
 }
 
 // ---------- Panel ----------
@@ -315,61 +642,141 @@ function toggleZoom() {
  * @param {object} item
  */
 function renderPanel(item) {
-  if (copyTimer) {
-    clearTimeout(copyTimer);
-    copyTimer = 0;
-  }
+  resetCopyButtons();
 
-  const panel = dom.panelInner;
-  panel.replaceChildren();
+  const body = dom.body;
+  body.replaceChildren();
 
-  const sourceLabel = el('p', {
-    class: 'viewer-source',
-    text: item.source || 'Unknown source',
-  });
-  panel.append(sourceLabel);
+  let resolvedName = sourceNameOf(item, null);
+  const sourceEl = dom.eyebrow;
+  sourceEl.textContent = resolvedName;
 
-  panel.append(
-    el('h2', {
-      class: 'viewer-title',
-      text: item.title || 'Untitled',
-    }),
+  body.append(
+    el('h2', { class: 'viewer-title', id: 'viewer-title', text: item.title || 'Untitled' }),
   );
 
-  const bylineParts = [item.creator, item.date].filter(
-    (value) => typeof value === 'string' && value.trim() !== '',
-  );
-  if (bylineParts.length > 0) {
-    panel.append(el('p', { class: 'viewer-byline', text: bylineParts.join(' \u00b7 ') }));
+  const description =
+    typeof item.description === 'string' ? item.description.trim() : '';
+  let showMoreButton = null;
+  let descriptionEl = null;
+  if (description !== '') {
+    descriptionEl = el('p', { class: 'viewer-description', text: description });
+    body.append(descriptionEl);
   }
 
-  if (typeof item.description === 'string' && item.description.trim() !== '') {
-    panel.append(
-      el('div', { class: 'viewer-block' }, [
-        el('p', { class: 'viewer-description', text: item.description }),
-      ]),
+  // Actions
+  const actions = el('div', { class: 'viewer-actions' });
+
+  let downloadControl;
+  if (item.directDownload === true && typeof item.full === 'string' && item.full !== '') {
+    downloadControl = el(
+      'a',
+      {
+        class: 'button-primary viewer-download viewer-download-direct',
+        href: item.full,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+      },
+      [icon(DOWNLOAD_ICON, 18, 2.2), document.createTextNode('Open full resolution')],
+    );
+  } else {
+    downloadControl = el('button', { class: 'button-primary viewer-download', type: 'button' }, [
+      icon(DOWNLOAD_ICON, 18, 2.2),
+      document.createTextNode('Download full resolution'),
+    ]);
+    downloadControl.addEventListener('click', () => startDownload(item));
+  }
+  actions.append(downloadControl);
+
+  if (typeof item.fullTiff === 'string' && item.fullTiff !== '') {
+    actions.append(
+      el('a', {
+        class: 'viewer-tiff-link',
+        href: downloadUrl(item, item.fullTiff),
+        download: true,
+        text: 'Download TIFF (very large)',
+      }),
     );
   }
 
-  // Definition list
+  const copyButton = el('button', {
+    class: 'viewer-secondary viewer-copy',
+    type: 'button',
+    text: 'Copy image URL',
+  });
+  copyButton.addEventListener('click', () => copyUrl(item, copyButton));
+
+  let pageLink = null;
+  if (item.pageUrl) {
+    pageLink = el(
+      'a',
+      {
+        class: 'viewer-secondary viewer-page-link',
+        href: item.pageUrl,
+        target: '_blank',
+        rel: 'noopener',
+      },
+      [document.createTextNode(`View on ${resolvedName} \u2197`)],
+    );
+  } else {
+    copyButton.classList.add('is-wide');
+  }
+
+  const actionGrid = el('div', { class: 'viewer-actions-grid' }, [copyButton, pageLink]);
+  actions.append(actionGrid);
+  body.append(actions);
+
+  // Facts
   const facts = el('dl', { class: 'viewer-facts' });
-  const addFact = (label, value) => {
+  const addFact = (label, ...values) => {
     facts.append(el('dt', { text: label }));
-    const dd = el('dd', {}, [value]);
-    facts.append(dd);
-    return dd;
+    facts.append(el('dd', {}, values));
   };
 
   const provider =
-    typeof item.provider === 'string' && item.provider.trim() !== ''
-      ? item.provider.trim()
-      : null;
+    typeof item.provider === 'string' && item.provider.trim() !== '' ? item.provider.trim() : '';
   const withProvider = (name) => (provider ? `${name} via ${provider}` : name);
 
-  const sourceValue = addFact(
-    'Source',
-    document.createTextNode(withProvider(item.source || 'Unknown source')),
-  );
+  const licenseText = typeof item.license === 'string' ? item.license.trim() : '';
+  const licenseUrl = typeof item.licenseUrl === 'string' ? item.licenseUrl.trim() : '';
+  if (licenseText !== '' || licenseUrl !== '') {
+    const meaning = licenceMeaning(licenseText, licenseUrl, item.open === true);
+    let licenceEl;
+    if (licenseUrl !== '') {
+      licenceEl = el('a', {
+        href: licenseUrl,
+        target: '_blank',
+        rel: 'noopener',
+        text: licenseText || licenseUrl,
+      });
+    } else {
+      licenceEl = document.createTextNode(licenseText);
+    }
+    addFact(
+      'Licence',
+      licenceEl,
+      el('span', { class: 'viewer-fact-soft', text: ` \u00b7 ${meaning}` }),
+    );
+  } else if (item.open !== true) {
+    addFact(
+      'Licence',
+      el('span', {
+        class: 'viewer-fact-soft',
+        text: `Rights reserved \u00b7 ${licenceMeaning('', '', false)}`,
+      }),
+    );
+  }
+
+  const sourceValue = el('dd', {}, [document.createTextNode(withProvider(resolvedName))]);
+  facts.append(el('dt', { text: 'Source' }));
+  facts.append(sourceValue);
+
+  if (typeof item.creator === 'string' && item.creator.trim() !== '') {
+    addFact('Creator', document.createTextNode(item.creator.trim()));
+  }
+  if (typeof item.date === 'string' && item.date.trim() !== '') {
+    addFact('Date', document.createTextNode(item.date.trim()));
+  }
 
   if (Array.isArray(item.sets)) {
     const setNames = item.sets
@@ -380,114 +787,108 @@ function renderPanel(item) {
     }
   }
 
-  if (item.license || item.licenseUrl) {
-    if (item.licenseUrl) {
-      addFact(
-        'License',
-        el('a', {
-          href: item.licenseUrl,
-          target: '_blank',
-          rel: 'noopener',
-          text: item.license || item.licenseUrl,
-        }),
-      );
-    } else {
-      addFact('License', document.createTextNode(item.license));
-    }
-  }
-
   const width = Number(item.width);
   const height = Number(item.height);
   if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
-    addFact('Pixel size', document.createTextNode(`${width} \u00d7 ${height} px`));
-  }
-
-  if (facts.childElementCount > 0) {
-    panel.append(el('div', { class: 'viewer-block' }, [facts]));
-  }
-
-  if (typeof item.note === 'string' && item.note.trim() !== '') {
-    panel.append(
-      el('p', { class: 'viewer-note', text: item.note.trim() }),
+    addFact(
+      'Dimensions',
+      document.createTextNode(
+        `${width.toLocaleString('en-US')} \u00d7 ${height.toLocaleString('en-US')} px`,
+      ),
     );
   }
 
-  // Page link
-  let pageLink = null;
-  if (item.pageUrl) {
-    pageLink = el('a', {
-      class: 'viewer-page-link',
-      href: item.pageUrl,
-      target: '_blank',
-      rel: 'noopener',
-      text: `View on ${item.source || 'source'}`,
-    });
-    panel.append(el('div', { class: 'viewer-block' }, [pageLink]));
+  if (facts.childElementCount > 0) {
+    body.append(facts);
   }
 
-  // Download and copy
-  let downloadControl;
-  if (item.directDownload === true && typeof item.full === 'string' && item.full !== '') {
-    downloadControl = el('a', {
-      class: 'button-primary viewer-download viewer-download-direct',
-      href: item.full,
-      target: '_blank',
-      rel: 'noopener noreferrer',
-      text: 'Open full resolution',
-    });
-  } else {
-    downloadControl = el('button', {
-      class: 'button-primary viewer-download',
-      type: 'button',
-      text: 'Download full resolution',
-    });
-    downloadControl.addEventListener('click', () => startDownload(item));
+  if (typeof item.note === 'string' && item.note.trim() !== '') {
+    body.append(el('p', { class: 'viewer-note', text: item.note.trim() }));
   }
 
-  let tiffLink = null;
-  if (typeof item.fullTiff === 'string' && item.fullTiff !== '') {
-    tiffLink = el('a', {
-      class: 'viewer-tiff-link',
-      href: downloadUrl(item, item.fullTiff),
-      download: true,
-      text: 'Download TIFF (very large)',
-    });
+  // Attribution box
+  const attribution = buildAttribution(item);
+  if (attribution) {
+    body.append(attribution.node);
   }
 
-  const copyButton = el('button', {
-    class: 'viewer-button',
-    type: 'button',
-    text: 'Copy image URL',
-  });
-  copyButton.addEventListener('click', () => copyUrl(item, copyButton));
+  // "Show more" for a clamped description. Measured after layout, because the
+  // dialog is not rendered yet on the first open.
+  if (descriptionEl) {
+    const measure = () => {
+      if (!state || state.list[state.index] !== item) return;
+      if (!descriptionEl.isConnected) return;
+      if (descriptionEl.scrollHeight <= descriptionEl.clientHeight + 1) return;
+      if (showMoreButton) return;
+      showMoreButton = el('button', {
+        class: 'viewer-text-action',
+        type: 'button',
+        'aria-expanded': 'false',
+        text: 'Show more',
+      });
+      showMoreButton.addEventListener('click', () => {
+        const open = descriptionEl.classList.toggle('is-open');
+        showMoreButton.textContent = open ? 'Show less' : 'Show more';
+        showMoreButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      descriptionEl.after(showMoreButton);
+    };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(measure);
+    else measure();
+  }
 
-  const zoomButton = el('button', {
-    class: 'viewer-button',
-    type: 'button',
-    text: 'Fit / Actual size',
-  });
-  zoomButton.addEventListener('click', () => toggleZoom());
-
-  panel.append(
-    el('div', { class: 'viewer-block viewer-actions' }, [
-      downloadControl,
-      tiffLink,
-      el('div', { class: 'viewer-action-row' }, [copyButton, zoomButton]),
-    ]),
-  );
-
-  const position = el('p', { class: 'viewer-position' });
-  panel.append(position);
-
-  // Fill source-dependent text now (fallback) and update when names arrive.
-  updatePosition();
+  // Fill source-dependent text when the names arrive.
   getSourceNames().then((names) => {
     if (!state || state.list[state.index] !== item) return;
-    const name = names.get(item.source) || item.source || 'source';
-    sourceLabel.textContent = name;
-    sourceValue.textContent = withProvider(name);
-    if (pageLink) pageLink.textContent = `View on ${name}`;
+    resolvedName = sourceNameOf(item, names);
+    sourceEl.textContent = resolvedName;
+    sourceValue.textContent = withProvider(resolvedName);
+    if (pageLink) pageLink.textContent = `View on ${resolvedName} \u2197`;
+    if (attribution) attribution.setSource(resolvedName);
   });
+}
+
+/**
+ * Attribution card, or null when the licence does not need credit.
+ * @param {object} item
+ * @returns {{node: HTMLElement, setSource: (name: string) => void}|null}
+ */
+function buildAttribution(item) {
+  if (!needsAttribution(item.license, item.licenseUrl)) return null;
+  let sourceName = sourceNameOf(item, null);
+  const license = typeof item.license === 'string' ? item.license : '';
+  const text = () => attributionText({
+    title: item.title,
+    creator: item.creator,
+    source: sourceName,
+    license,
+  });
+
+  const paragraph = el('p', { class: 'viewer-attribution-text', text: text() });
+  const copyButton = el('button', {
+    class: 'viewer-text-action',
+    type: 'button',
+    text: 'Copy',
+  });
+  copyButton.addEventListener('click', () =>
+    copyValue(text(), copyButton, 'Copy'),
+  );
+
+  const node = el('div', { class: 'viewer-attribution' }, [
+    el('div', { class: 'viewer-attribution-head' }, [
+      el('span', { class: 'viewer-attribution-label', text: 'Attribution' }),
+      copyButton,
+    ]),
+    paragraph,
+  ]);
+
+  return {
+    node,
+    setSource(name) {
+      sourceName = name;
+      paragraph.textContent = text();
+    },
+  };
 }
 
 function startDownload(item) {
@@ -502,7 +903,7 @@ function startDownload(item) {
 async function copyUrl(item, button) {
   const value = item.full || item.preview || '';
   if (!value) {
-    flashCopy(button, 'Copy failed');
+    flashCopy(button, 'Copy failed', 'Copy image URL');
     return;
   }
   try {
@@ -510,29 +911,76 @@ async function copyUrl(item, button) {
       throw new Error('Clipboard unavailable');
     }
     await navigator.clipboard.writeText(value);
-    flashCopy(button, 'Copied');
+    flashCopy(button, 'Copied \u2713', 'Copy image URL');
   } catch {
-    flashCopy(button, 'Copy failed');
+    flashCopy(button, 'Copy failed', 'Copy image URL');
   }
 }
 
-function flashCopy(button, message) {
-  if (copyTimer) clearTimeout(copyTimer);
+/**
+ * Copy a value and show the feedback on the button.
+ * @param {string} value
+ * @param {HTMLElement} button
+ * @param {string} label
+ */
+async function copyValue(value, button, label) {
+  try {
+    if (!navigator.clipboard || typeof navigator.clipboard.writeText !== 'function') {
+      throw new Error('Clipboard unavailable');
+    }
+    await navigator.clipboard.writeText(value);
+    flashCopy(button, 'Copied \u2713', label);
+  } catch {
+    flashCopy(button, 'Copy failed', label);
+  }
+}
+
+/**
+ * Show a temporary copy message on a button.
+ * @param {HTMLElement} button
+ * @param {string} message
+ * @param {string} label text to restore
+ */
+function flashCopy(button, message, label) {
+  // Another button may still be showing its feedback: restore it at once.
+  resetCopyButtons();
   button.textContent = message;
-  copyTimer = window.setTimeout(() => {
-    copyTimer = 0;
-    if (button.isConnected) button.textContent = 'Copy image URL';
+  const timer = window.setTimeout(() => {
+    copyTimers.delete(button);
+    if (button.isConnected) button.textContent = label;
   }, COPY_RESET_MS);
+  copyTimers.set(button, { timer, label });
 }
 
-function updatePosition() {
-  if (!state || !dom) return;
-  const position = dom.panelInner.querySelector('.viewer-position');
-  if (position) {
-    position.textContent = `${state.index + 1} of ${state.list.length}`;
+/**
+ * Restore every button with pending copy feedback and cancel its timer.
+ */
+function resetCopyButtons() {
+  for (const [button, entry] of copyTimers) {
+    clearTimeout(entry.timer);
+    if (button.isConnected) button.textContent = entry.label;
   }
-  dom.prev.disabled = state.index <= 0;
-  dom.next.disabled = state.index >= state.list.length - 1;
+  copyTimers.clear();
+}
+
+/**
+ * Update the position, the nav buttons and the logo link.
+ */
+function updateChrome() {
+  if (!state || !dom) return;
+  const total = state.list.length;
+  dom.position.textContent = `${(state.index + 1).toLocaleString('en-US')} / ${total.toLocaleString('en-US')}`;
+  const hadPrevFocus = document.activeElement === dom.prev;
+  const hadNextFocus = document.activeElement === dom.next;
+  dom.prev.hidden = state.index <= 0;
+  dom.next.hidden = state.index >= total - 1;
+  // Keep focus on a visible control when the focused arrow disappears.
+  if ((hadPrevFocus && dom.prev.hidden) || (hadNextFocus && dom.next.hidden)) {
+    const other = hadPrevFocus ? dom.next : dom.prev;
+    if (!other.hidden) other.focus();
+    else dom.close.focus();
+  }
+  dom.logo.href = `${location.pathname}${searchWithoutItem(location.search)}`;
 }
 
 // ---------- Navigation ----------
@@ -543,13 +991,18 @@ function show(index) {
   state.index = nextIndex;
   state.zoom = 'fit';
   applyZoom();
+  dom.canvas.scrollLeft = 0;
+  dom.canvas.scrollTop = 0;
+  dom.panel.scrollTop = 0;
 
   const item = list[nextIndex];
   if (!item) return;
 
   renderPanel(item);
   loadImage(item);
-  updatePosition();
+  renderStrip(list, nextIndex);
+  updateChrome();
+  replaceItemUrl(item);
 }
 
 function step(delta) {
@@ -569,6 +1022,7 @@ export function openViewer(list, index) {
   const startIndex = Number.isInteger(index) ? index : 0;
   if (!dialog) {
     dialog = buildDialog();
+    window.addEventListener('popstate', onPopState);
   }
 
   const hadFocus = document.activeElement;
@@ -582,9 +1036,12 @@ export function openViewer(list, index) {
     zoom: 'fit',
   };
 
+  const wasOpen = dialog.open;
   show(state.index);
 
-  if (!dialog.open) {
+  if (!wasOpen) {
+    const item = state.list[state.index];
+    if (item) pushItemUrl(item);
     dialog.showModal();
   }
   dom.close.focus();
