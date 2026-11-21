@@ -662,6 +662,10 @@ function createCard(item, key, sourceId, mediaId) {
   const imageBox = el('div', { class: 'tile-img' });
   if (hasSize) {
     imageBox.style.aspectRatio = `${Math.round(width)} / ${Math.round(height)}`;
+  } else {
+    // Unknown size: keep the placeholder at the square shape that
+    // estimateCardHeight assumes, so the box is never 0 px high.
+    imageBox.style.aspectRatio = '1 / 1';
   }
   imageBox.style.background = `var(--wovi-ph-${placeholderTone(records.length)})`;
 
@@ -691,6 +695,16 @@ function createCard(item, key, sourceId, mediaId) {
   });
 
   img.addEventListener('load', () => {
+    const naturalWidth = Number(img.naturalWidth);
+    const naturalHeight = Number(img.naturalHeight);
+    if (
+      Number.isFinite(naturalWidth) &&
+      Number.isFinite(naturalHeight) &&
+      naturalWidth > 0 &&
+      naturalHeight > 0
+    ) {
+      imageBox.style.aspectRatio = `${naturalWidth} / ${naturalHeight}`;
+    }
     if (item.thumbCached === true) return;
     if (typeof mediaId !== 'string' || mediaId === '') return;
     if (candidates[candidateIndex] !== item.thumbSource) return;

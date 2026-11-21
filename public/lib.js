@@ -151,7 +151,10 @@ export function pickColumn(heights) {
 /**
  * Rough height of a card in a column of the given width.
  * Uses the image aspect ratio when the item has a positive width and height,
- * else a square image. Adds 72 px for the card text.
+ * else a square image. Adds 32 px for the meta row:
+ * `.tile-meta` padding-top 9 px + the tallest child `.lic`
+ * (11 px font × line-height 1.5 = 16.5 px + 4 px padding + 2 px border = 22.5 px),
+ * rounded up to 32 px.
  * @param {object|null|undefined} item
  * @param {number} columnWidth
  * @returns {number}
@@ -165,9 +168,9 @@ export function estimateCardHeight(item, columnWidth) {
     width > 0 &&
     height > 0
   ) {
-    return (columnWidth * height) / width + 72;
+    return (columnWidth * height) / width + 32;
   }
-  return columnWidth + 72;
+  return columnWidth + 32;
 }
 
 /**
