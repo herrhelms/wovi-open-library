@@ -9,6 +9,7 @@ import {
   downloadUrl,
   el,
   estimateCardHeight,
+  everythingText,
   groupShortLabel,
   groupSources,
   imagesText,
@@ -19,6 +20,8 @@ import {
   itemKey,
   parseSavedSelection,
   pickColumn,
+  placeholderTone,
+  pullingText,
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
@@ -33,6 +36,7 @@ import {
   sourceBarSegments,
   sourceSummary,
   thumbCandidates,
+  wallLayout,
 } from './lib.js';
 import { initSettings } from './settings.js';
 import { openViewer } from './viewer.js';
@@ -72,6 +76,8 @@ const noResultsSourcesButton = document.getElementById('no-results-sources');
 const statusLineEl = document.getElementById('status-line');
 const savedCountEl = document.getElementById('saved-count');
 const resultsEl = document.getElementById('results');
+const wallSkeletonsEl = document.getElementById('wall-skeletons');
+const loadRowEl = document.getElementById('load-row');
 const loadMoreButton = document.getElementById('load-more');
 const sentinelEl = document.getElementById('sentinel');
 const selectionBarEl = document.getElementById('selection-bar');
@@ -104,7 +110,7 @@ const chipEls = new Map();
 const groupRows = new Map();
 /** True while renderChips builds the fieldsets, so updateChip skips the re-layout. */
 let layingOutSources = false;
-/** @type {Array<{el:HTMLElement,item:object,checkbox:HTMLInputElement,img:HTMLImageElement,key:string,sourceId:string,mediaId:string|null}>} */
+/** @type {Array<{el:HTMLElement,item:object,selectButton:HTMLButtonElement,img:HTMLImageElement,key:string,sourceId:string,mediaId:string|null}>} */
 const records = [];
 const displayedKeys = new Set();
 const displayedMedia = new Set();
@@ -116,6 +122,11 @@ const warmSent = new Set();
 let tokenCounter = 0;
 let masonryEl = null;
 let masonryCols = [];
+/** Native `display: grid-lanes` takes over the column placement when available. */
+const nativeWall =
+  typeof CSS !== 'undefined' &&
+  typeof CSS.supports === 'function' &&
+  CSS.supports('display', 'grid-lanes');
 let resizeTimer = 0;
 /** Search key → Map(source id → { records, state }) */
 const cardCache = new Map();
@@ -490,8 +501,9 @@ function updateSelectionUi() {
   selectionCountEl.textContent = `${count} selected`;
 
   for (const [key, record] of cardsByKey) {
-    record.el.classList.toggle('selected', selection.has(key));
-    record.checkbox.checked = selection.has(key);
+    const isOn = selection.has(key);
+    record.el.classList.toggle('selected', isOn);
+    record.selectButton.setAttribute('aria-pressed', isOn ? 'true' : 'false');
   }
 
   if (count > 0 && !downloading) {
@@ -508,34 +520,90 @@ function toggleSelection(key, isOn) {
 }
 
 // ---------- Cards ----------
-function metaLine(item) {
-  const parts = [];
-  if (item.creator) parts.push(String(item.creator));
-  if (item.date) parts.push(String(item.date));
-  return parts.join(' · ');
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/**
+ * Inline stroke icon: 2 px stroke, round caps, currentColor.
+ * @param {string[]} paths
+ * @param {number} [size]
+ * @returns {SVGSVGElement}
+ */
+function icon(paths, size = 18) {
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('width', String(size));
+  svg.setAttribute('height', String(size));
+  svg.setAttribute('viewBox', '0 0 24 24');
+  svg.setAttribute('fill', 'none');
+  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('stroke-width', '2');
+  svg.setAttribute('stroke-linecap', 'round');
+  svg.setAttribute('stroke-linejoin', 'round');
+  svg.setAttribute('aria-hidden', 'true');
+  for (const d of paths) {
+    const path = document.createElementNS(SVG_NS, 'path');
+    path.setAttribute('d', d);
+    svg.append(path);
+  }
+  return svg;
+}
+
+const DOWNLOAD_ICON = ['M12 3v12m0 0-5-5m5 5 5-5M5 21h14'];
+const CHECK_ICON = ['m5 13 4 4L19 7'];
+
+/**
+ * Open the full resolution of a tile in the same way as the viewer: direct
+ * download items open in a new tab, everything else goes through /api/download.
+ * @param {object} item
+ */
+function downloadItem(item) {
+  if (item.directDownload === true && typeof item.full === 'string' && item.full !== '') {
+    window.open(item.full, '_blank', 'noopener,noreferrer');
+    return;
+  }
+  const link = el('a', { href: downloadUrl(item), download: '' });
+  document.body.append(link);
+  link.click();
+  link.remove();
+}
+
+/**
+ * Licence text of one item, with the "Rights reserved" fallback for closed items.
+ * @param {object} item
+ * @returns {{text:string, reserved:boolean}}
+ */
+function licenceInfo(item) {
+  const text = typeof item.license === 'string' ? item.license.trim() : '';
+  if (text !== '') return { text, reserved: false };
+  if (item.open !== true) return { text: 'Rights reserved', reserved: true };
+  return { text: '', reserved: false };
 }
 
 function createCard(item, key, sourceId, mediaId) {
   const dataset = { uid: key, source: sourceId };
   if (mediaId !== null) dataset.mediaId = mediaId;
-  const article = el('article', { class: 'card', dataset });
-  const checkbox = el('input', {
-    type: 'checkbox',
-    'aria-label': `Select ${item.title || 'item'}`,
-  });
-  const checkWrap = el('label', { class: 'card-check' }, [checkbox]);
+  const article = el('article', { class: 'tile', dataset });
+  const title = item.title || 'Untitled';
+
+  const width = Number(item.width);
+  const height = Number(item.height);
+  const hasSize =
+    Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0;
+
+  const imageBox = el('div', { class: 'tile-img' });
+  if (hasSize) {
+    imageBox.style.aspectRatio = `${Math.round(width)} / ${Math.round(height)}`;
+  }
+  imageBox.style.background = `var(--wovi-ph-${placeholderTone(records.length)})`;
 
   const candidates = thumbCandidates(item);
   const img = el('img', {
-    class: 'card-media',
+    class: 'tile-media',
     src: candidates[0],
-    alt: item.title || '',
+    alt: title,
     loading: 'lazy',
     decoding: 'async',
   });
-  const width = Number(item.width);
-  const height = Number(item.height);
-  if (Number.isFinite(width) && Number.isFinite(height) && width > 0 && height > 0) {
+  if (hasSize) {
     img.setAttribute('width', String(Math.round(width)));
     img.setAttribute('height', String(Math.round(height)));
   }
@@ -567,23 +635,67 @@ function createCard(item, key, sourceId, mediaId) {
     }
   });
 
-  const bodyChildren = [
-    el('h3', { class: 'card-title', text: item.title || 'Untitled' }),
-  ];
-  const meta = metaLine(item);
-  if (meta) bodyChildren.push(el('p', { class: 'card-meta', text: meta }));
-  bodyChildren.push(el('p', { class: 'card-source', text: sourceName(item.source) }));
-
-  const openButton = el('button', { type: 'button', class: 'card-open' }, [
-    img,
-    el('div', { class: 'card-body' }, bodyChildren),
-  ]);
+  const openButton = el('button', {
+    type: 'button',
+    class: 'tile-open',
+    'aria-label': title,
+  });
   openButton.addEventListener('click', () => openCard(key));
 
-  checkbox.addEventListener('change', () => toggleSelection(key, checkbox.checked));
-  article.append(checkWrap, openButton);
+  const selectButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'ibtn tile-select',
+      'aria-pressed': selection.has(key) ? 'true' : 'false',
+      'aria-label': `Select ${title}`,
+    },
+    [icon(CHECK_ICON)],
+  );
+  selectButton.addEventListener('click', () => {
+    toggleSelection(key, selectButton.getAttribute('aria-pressed') !== 'true');
+  });
 
-  return { el: article, item, checkbox, img, key, sourceId, mediaId };
+  const downloadButton = el(
+    'button',
+    {
+      type: 'button',
+      class: 'ibtn tile-download',
+      'aria-label': 'Download full resolution',
+    },
+    [icon(DOWNLOAD_ICON)],
+  );
+  downloadButton.addEventListener('click', () => downloadItem(item));
+
+  const overlayText = el('div', { class: 'tile-ov-text', 'aria-hidden': 'true' }, [
+    el('span', { class: 'tile-title', text: title }),
+    el('span', { class: 'tile-ov-source', text: sourceName(item.source) }),
+  ]);
+
+  const overlay = el('div', { class: 'tile-ov' }, [
+    el('div', { class: 'tile-ov-top' }, [selectButton, downloadButton]),
+    overlayText,
+  ]);
+
+  imageBox.append(img, openButton, overlay);
+
+  const licence = licenceInfo(item);
+  const metaChildren = [
+    el('span', { class: 'tile-source', text: sourceName(item.source) }),
+  ];
+  if (licence.text !== '') {
+    const tag = el('span', {
+      class: licence.reserved ? 'lic lic-rr' : 'lic',
+      text: licence.text,
+      title: licence.text,
+    });
+    metaChildren.push(tag);
+  }
+  const meta = el('div', { class: 'tile-meta' }, metaChildren);
+
+  article.append(imageBox, meta);
+
+  return { el: article, item, selectButton, img, key, sourceId, mediaId };
 }
 
 function visibleRecords() {
@@ -607,18 +719,28 @@ function openCard(key) {
 
 // ---------- Masonry grid ----------
 function masonryGap() {
-  if (!masonryEl) return 0;
+  if (!masonryEl) return wallLayout(window.innerWidth).gap;
   const style = getComputedStyle(masonryEl);
   const raw = style.columnGap || style.gap || '';
   const value = Number.parseFloat(raw);
-  return Number.isFinite(value) && value >= 0 ? value : 0;
+  if (Number.isFinite(value) && value >= 0) return value;
+  return wallLayout(window.innerWidth).gap;
 }
 
+/**
+ * Build the wall. In native `grid-lanes` mode the cards go straight into
+ * `.masonry`; otherwise one `.masonry-col` per column holds them.
+ */
 function createMasonry() {
   masonryEl = el('div', { class: 'masonry' });
   masonryCols = [];
   resultsEl.append(masonryEl);
-  const count = columnCount(resultsEl.clientWidth, 240, masonryGap());
+  if (nativeWall) return;
+  const layout = wallLayout(window.innerWidth);
+  const count = Math.min(
+    layout.maxColumns,
+    columnCount(resultsEl.clientWidth, layout.minColumn, masonryGap()),
+  );
   for (let index = 0; index < count; index += 1) {
     const column = el('div', { class: 'masonry-col' });
     masonryCols.push(column);
@@ -648,30 +770,34 @@ function addItems(sourceId, items) {
 }
 
 /**
- * Put cards into the columns, shortest column first. Reads the column heights
- * one time. New cards use the estimated height. Restored cards also use their
- * real height when the browser can give one.
+ * Put cards into the wall. In native mode they keep their insertion order; in
+ * JS mode they go to the shortest column, whose heights are read one time.
+ * New cards use the estimated height; restored cards also use their real height
+ * when the browser can give one.
  * @param {Array<{item:object,key:string,mediaId:string|null,sourceId?:string,record?:object}>} entries
  * @param {{realHeights?:boolean}} [options]
  */
 function placeEntries(entries, { realHeights = false } = {}) {
   if (!Array.isArray(entries) || entries.length === 0) return;
-  if (!masonryEl || masonryCols.length === 0) createMasonry();
+  if (!masonryEl) createMasonry();
+  if (!nativeWall && masonryCols.length === 0) createMasonry();
 
-  const heights = masonryCols.map((column) => column.offsetHeight);
+  const heights = nativeWall ? [] : masonryCols.map((column) => column.offsetHeight);
   const firstWidth = masonryCols[0]?.clientWidth ?? 0;
   const columnWidth = firstWidth > 0 ? firstWidth : resultsEl.clientWidth;
   const gap = masonryGap();
 
   for (const entry of entries) {
-    const columnIndex = pickColumn(heights);
+    const columnIndex = nativeWall ? 0 : pickColumn(heights);
     const record =
       entry.record ??
       createCard(entry.item, entry.key, entry.sourceId, entry.mediaId);
-    masonryCols[columnIndex].append(record.el);
+    if (nativeWall) masonryEl.append(record.el);
+    else masonryCols[columnIndex].append(record.el);
     records.push(record);
     cardsByKey.set(record.key, record);
 
+    if (nativeWall) continue;
     let height = 0;
     if (realHeights) height = record.el.offsetHeight;
     if (!(height > 0)) height = estimateCardHeight(entry.item, columnWidth);
@@ -679,10 +805,15 @@ function placeEntries(entries, { realHeights = false } = {}) {
   }
 }
 
+/** Re-lay the JS column wall after a resize. Native mode does nothing. */
 function reflowMasonry() {
-  if (!masonryEl) return;
+  if (!masonryEl || nativeWall) return;
+  const layout = wallLayout(window.innerWidth);
   const gap = masonryGap();
-  const count = columnCount(resultsEl.clientWidth, 240, gap);
+  const count = Math.min(
+    layout.maxColumns,
+    columnCount(resultsEl.clientWidth, layout.minColumn, gap),
+  );
   if (count === masonryCols.length) return;
 
   const heights = records.map((record) => record.el.offsetHeight);
@@ -713,7 +844,7 @@ function removeSourceCards(id) {
     // The record is no longer in cardsByKey, so updateSelectionUi cannot reset it.
     // Clear the visual selection state here, so a later restore starts unselected.
     record.el.classList.remove('selected');
-    record.checkbox.checked = selection.has(record.key);
+    record.selectButton.setAttribute('aria-pressed', 'false');
   }
   updateSelectionUi();
 }
@@ -959,7 +1090,7 @@ function resetSearchState() {
   // selection map is cleared, so a later restore starts unselected.
   for (const record of records) {
     record.el.classList.remove('selected');
-    record.checkbox.checked = false;
+    record.selectButton.setAttribute('aria-pressed', 'false');
   }
   records.length = 0;
   displayedKeys.clear();
@@ -1366,9 +1497,10 @@ function updateStatus() {
     if (state.status === 'loading') loading += 1;
   }
 
+  // The infinite-load row is the live loading message; the status line stays
+  // quiet while sources are loading.
   if (loading > 0) {
-    const count = searchable.length;
-    statusLineEl.textContent = `Searching ${count} source${count === 1 ? '' : 's'}…`;
+    statusLineEl.textContent = '';
     return;
   }
 
@@ -1381,12 +1513,86 @@ function updateStatus() {
   statusLineEl.textContent = '';
 }
 
+// ---------- Wall chrome ----------
+const SKELETON_HEIGHTS = [200, 260, 340, 220, 300];
+
+/** Show five skeleton tiles while at least one searched source is loading. */
+function updateSkeletons() {
+  if (!wallSkeletonsEl) return;
+  const loading =
+    Boolean(query) &&
+    searchableSelected().some((source) => sourceState(source.id).status === 'loading');
+  wallSkeletonsEl.hidden = !loading;
+  if (!loading) {
+    wallSkeletonsEl.replaceChildren();
+    return;
+  }
+  if (wallSkeletonsEl.childElementCount === SKELETON_HEIGHTS.length) return;
+  wallSkeletonsEl.replaceChildren(
+    ...SKELETON_HEIGHTS.map((height) => {
+      const tile = el('div', { class: 'wall-skeleton' });
+      tile.style.height = `${height}px`;
+      return tile;
+    }),
+  );
+}
+
+/** Text of the infinite-load row: pulling names, the exhausted line, or nothing. */
+function updateLoadRow() {
+  if (!loadRowEl) return;
+  const searchable = searchableSelected();
+  const loadingNames = searchable
+    .filter((source) => sourceState(source.id).status === 'loading')
+    .map((source) => source.name);
+
+  if (query && loadingNames.length > 0) {
+    const text = pullingText(loadingNames);
+    if (text === '') {
+      loadRowEl.hidden = true;
+      loadRowEl.replaceChildren();
+      return;
+    }
+    loadRowEl.hidden = false;
+    loadRowEl.replaceChildren(
+      el('span', { class: 'load-dots', 'aria-hidden': 'true' }, [
+        el('span', { class: 'load-dot' }),
+        el('span', { class: 'load-dot' }),
+        el('span', { class: 'load-dot' }),
+      ]),
+      el('span', { text }),
+    );
+    return;
+  }
+
+  const withHits = searchable.filter((source) => {
+    const hits = chipHits(source.id);
+    return typeof hits === 'number' && Number.isFinite(hits) && hits > 0;
+  }).length;
+  const exhausted =
+    Boolean(query) &&
+    loadingNames.length === 0 &&
+    !canLoadMore() &&
+    !searchable.some((source) => sourceState(source.id).hasMore) &&
+    visibleRecords().length > 0;
+
+  if (exhausted) {
+    loadRowEl.hidden = false;
+    loadRowEl.replaceChildren(el('span', { text: everythingText(withHits) }));
+    return;
+  }
+
+  loadRowEl.hidden = true;
+  loadRowEl.replaceChildren();
+}
+
 function updateUi() {
   updateStatus();
   const searchable = searchableSelected();
   updateResultsHeader();
   updateNoResults(searchable);
   refreshSourceMeta();
+  updateSkeletons();
+  updateLoadRow();
 
   const showMore = canLoadMore();
   loadMoreButton.hidden = !showMore;

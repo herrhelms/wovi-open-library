@@ -8,6 +8,7 @@ import {
   distribute,
   downloadUrl,
   estimateCardHeight,
+  everythingText,
   filterAdapters,
   firstLoaded,
   groupShortLabel,
@@ -22,6 +23,8 @@ import {
   keyStatus,
   parseSavedSelection,
   pickColumn,
+  placeholderTone,
+  pullingText,
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
@@ -39,6 +42,7 @@ import {
   thumbCandidates,
   VIEWER_PROBE_TIMEOUT_MS,
   viewerPlan,
+  wallLayout,
 } from '../public/lib.js';
 
 const source = (id, extra = {}) => ({
@@ -819,4 +823,37 @@ test('sourceBarSegments builds the bar segments', () => {
       { name: '1 other source', hits: 2, share: 0.2, tone: 'rest' },
     ],
   );
+});
+
+test('pullingText', () => {
+  assert.equal(pullingText([]), '');
+  assert.equal(pullingText(['A']), 'Pulling more from A');
+  assert.equal(pullingText(['A', 'B']), 'Pulling more from A and B');
+  assert.equal(pullingText(['A', 'B', 'C']), 'Pulling more from A, B and 1 other');
+  assert.equal(
+    pullingText(['A', 'B', 'C', 'D', 'E']),
+    'Pulling more from A, B and 3 others',
+  );
+});
+
+test('everythingText', () => {
+  assert.equal(everythingText(1), 'That’s everything from 1 source.');
+  assert.equal(everythingText(12), 'That’s everything from 12 sources.');
+  assert.equal(everythingText(1200), 'That’s everything from 1,200 sources.');
+});
+
+test('wallLayout', () => {
+  assert.deepEqual(wallLayout(1440), { minColumn: 250, gap: 20, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(601), { minColumn: 250, gap: 20, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(600), { minColumn: 160, gap: 12, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(390), { minColumn: 160, gap: 12, maxColumns: Infinity });
+  assert.deepEqual(wallLayout(380), { minColumn: 160, gap: 12, maxColumns: 1 });
+  assert.deepEqual(wallLayout(NaN), { minColumn: 250, gap: 20, maxColumns: Infinity });
+});
+
+test('placeholderTone', () => {
+  assert.equal(placeholderTone(0), 1);
+  assert.equal(placeholderTone(9), 10);
+  assert.equal(placeholderTone(10), 1);
+  assert.equal(placeholderTone(-1), 1);
 });
