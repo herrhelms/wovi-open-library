@@ -37,6 +37,8 @@ import {
   sourceSummary,
   thumbCandidates,
   wallLayout,
+  backToTopBottom,
+  showBackToTop,
 } from './lib.js';
 import { initSettings } from './settings.js';
 import { openViewer } from './viewer.js';
@@ -84,6 +86,7 @@ const selectionBarEl = document.getElementById('selection-bar');
 const selectionCountEl = document.getElementById('selection-count');
 const downloadSelectedButton = document.getElementById('download-selected');
 const clearSelectionButton = document.getElementById('selection-clear');
+const backToTopButton = document.getElementById('back-to-top');
 
 // ---------- State ----------
 /** @type {Array<{id:string,name:string,homepage:string,needsKey:boolean,keyConfigured:boolean}>} */
@@ -509,6 +512,73 @@ function updateSelectionUi() {
   if (count > 0 && !downloading) {
     downloadSelectedButton.textContent = 'Download selected';
   }
+
+  updateBackToTopPosition();
+}
+
+// ---------- Back to top ----------
+const narrowQuery = window.matchMedia('(max-width: 600px)');
+const reduceMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+/**
+ * Keep the back-to-top button above the selection bar when that bar shows.
+ */
+function updateBackToTopPosition() {
+  if (!backToTopButton) return;
+  const base = narrowQuery.matches ? 16 : 28;
+  let height = 0;
+  let bottom = 0;
+  if (!selectionBarEl.hidden) {
+    height = selectionBarEl.offsetHeight;
+    const raw = parseFloat(window.getComputedStyle(selectionBarEl).bottom);
+    bottom = Number.isFinite(raw) ? raw : 0;
+  }
+  backToTopButton.style.bottom = `${backToTopBottom(height, bottom, base)}px`;
+}
+
+/**
+ * Show or hide the back-to-top button for a scroll position.
+ * @param {number} scrollY
+ */
+function applyBackToTop(scrollY) {
+  if (!backToTopButton) return;
+  const visible = showBackToTop(scrollY);
+  backToTopButton.classList.toggle('is-visible', visible);
+  if (visible) {
+    backToTopButton.removeAttribute('tabindex');
+    backToTopButton.removeAttribute('aria-hidden');
+  } else {
+    if (document.activeElement === backToTopButton) {
+      searchInput.focus({ preventScroll: true });
+    }
+    backToTopButton.setAttribute('tabindex', '-1');
+    backToTopButton.setAttribute('aria-hidden', 'true');
+  }
+}
+
+if (backToTopButton) {
+  let backToTopFrame = 0;
+  const checkBackToTop = () => {
+    backToTopFrame = 0;
+    applyBackToTop(window.scrollY);
+  };
+  window.addEventListener(
+    'scroll',
+    () => {
+      if (backToTopFrame) return;
+      backToTopFrame = requestAnimationFrame(checkBackToTop);
+    },
+    { passive: true },
+  );
+  window.addEventListener('resize', updateBackToTopPosition);
+  checkBackToTop();
+  updateBackToTopPosition();
+
+  backToTopButton.addEventListener('click', () => {
+    const reduced = reduceMotionQuery.matches;
+    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    searchInput.focus({ preventScroll: true });
+  });
 }
 
 function toggleSelection(key, isOn) {
@@ -1601,6 +1671,7 @@ function updateUi() {
   selectionBarEl.hidden = count === 0;
   selectionCountEl.textContent = `${count} selected`;
   resultsEl.classList.toggle('has-selection', count > 0);
+  updateBackToTopPosition();
 }
 
 // ---------- URL ----------

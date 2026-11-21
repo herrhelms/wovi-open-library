@@ -950,3 +950,33 @@ export function placeholderTone(index) {
   if (typeof index !== 'number' || !Number.isInteger(index) || index < 0) return 1;
   return (index % 10) + 1;
 }
+
+/**
+ * Whether the back-to-top button shows for a scroll position.
+ * Only a finite number greater than 600 counts.
+ * @param {number} scrollY
+ * @returns {boolean}
+ */
+export function showBackToTop(scrollY) {
+  return typeof scrollY === 'number' && Number.isFinite(scrollY) && scrollY > 600;
+}
+
+/**
+ * Bottom offset in px for the back-to-top button, so it clears the selection
+ * bar when that bar is visible. A bar height that is not a finite number > 0
+ * means no bar; a non-finite or negative bar bottom counts as 0.
+ * @param {number} barHeight
+ * @param {number} barBottom
+ * @param {number} [base]
+ * @returns {number}
+ */
+export function backToTopBottom(barHeight, barBottom, base = 28) {
+  if (typeof barHeight !== 'number' || !Number.isFinite(barHeight) || barHeight <= 0) {
+    return base;
+  }
+  const bottom =
+    typeof barBottom === 'number' && Number.isFinite(barBottom) && barBottom > 0
+      ? barBottom
+      : 0;
+  return bottom + barHeight + 12;
+}
