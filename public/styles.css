@@ -1362,6 +1362,61 @@ body:has(.selection-bar:not([hidden])) .site-main {
   gap: var(--wovi-s-2);
 }
 
+/* ---------- Back to top ---------- */
+
+.totop {
+  position: fixed;
+  right: var(--wovi-s-7);
+  bottom: var(--wovi-s-7);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  appearance: none;
+  border: 1px solid var(--wovi-line-strong);
+  border-radius: var(--wovi-r-pill);
+  background: color-mix(in srgb, var(--wovi-panel) 90%, transparent);
+  backdrop-filter: blur(10px);
+  color: var(--wovi-ink);
+  cursor: pointer;
+  box-shadow: var(--wovi-shadow-float);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity var(--wovi-base) var(--wovi-ease),
+    transform var(--wovi-base) var(--wovi-ease),
+    background var(--wovi-fast) var(--wovi-ease),
+    border-color var(--wovi-fast) var(--wovi-ease),
+    color var(--wovi-fast) var(--wovi-ease);
+}
+
+.totop svg {
+  width: 18px;
+  height: 18px;
+}
+
+.totop.is-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.totop:hover {
+  background: var(--wovi-ink);
+  border-color: var(--wovi-ink);
+  color: var(--wovi-surface);
+}
+
+@media (max-width: 600px) {
+  .totop {
+    right: var(--wovi-s-4);
+    bottom: var(--wovi-s-4);
+  }
+}
+
 /* ---------- Wall breakpoints ---------- */
 
 @media (max-width: 600px) {

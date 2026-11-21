@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  backToTopBottom,
   columnCount,
   countActive,
   DEFAULT_GROUPS,
@@ -42,6 +43,7 @@ import {
   thumbCandidates,
   VIEWER_PROBE_TIMEOUT_MS,
   viewerPlan,
+  showBackToTop,
   wallLayout,
 } from '../public/lib.js';
 
@@ -856,4 +858,20 @@ test('placeholderTone', () => {
   assert.equal(placeholderTone(9), 10);
   assert.equal(placeholderTone(10), 1);
   assert.equal(placeholderTone(-1), 1);
+});
+
+test('showBackToTop', () => {
+  assert.equal(showBackToTop(0), false);
+  assert.equal(showBackToTop(600), false);
+  assert.equal(showBackToTop(601), true);
+  assert.equal(showBackToTop(NaN), false);
+  assert.equal(showBackToTop(undefined), false);
+});
+
+test('backToTopBottom', () => {
+  assert.equal(backToTopBottom(0, 0), 28);
+  assert.equal(backToTopBottom(64, 24), 100);
+  assert.equal(backToTopBottom(64, NaN), 76);
+  assert.equal(backToTopBottom(0, 24, 16), 16);
+  assert.equal(backToTopBottom(-5, 24), 28);
 });
