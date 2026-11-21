@@ -607,6 +607,15 @@ html:has(#adaptors-dialog[open]) {
 
 /* ---------- Load error ---------- */
 
+.src-loading {
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  padding: 24px 28px;
+  font-size: var(--wovi-fs-14);
+  color: var(--wovi-ink-3);
+}
+
 .src-load-error {
   flex: 1;
   min-height: 0;
