@@ -58,20 +58,30 @@
         <button class="search-submit" type="submit">Search</button>
       </form>
 
-      <div class="source-bar">
-        <div class="source-group" role="group" aria-label="Sources">
-          <div class="source-actions">
-            <span class="section-label">Sources</span>
-            <button class="text-button" type="button" id="sources-all">All</button>
-            <button class="text-button" type="button" id="sources-none">None</button>
+      <fieldset class="sources">
+        <legend>
+          <div class="sources-head">
+            <button class="disc" type="button" id="sources-disc" aria-expanded="false" aria-controls="src-panel">
+              <span class="disc-caret" aria-hidden="true">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"></path></svg>
+              </span>
+              <span class="disc-label">Sources</span>
+              <span class="sources-count" id="sources-count">0 of 0 on</span>
+            </button>
+            <span class="sources-summary" id="sources-summary">No sources selected</span>
+            <div class="sources-tools">
+              <button class="switch" type="button" id="sources-licence-switch" role="switch" aria-checked="false">
+                <span class="track" aria-hidden="true"><span class="knob"></span></span>
+                <span>Open licences only</span>
+              </button>
+              <span class="sources-divider" aria-hidden="true"></span>
+              <button class="ghost" type="button" id="sources-all">All</button>
+              <button class="ghost" type="button" id="sources-none">None</button>
+            </div>
           </div>
-          <label class="open-only-label" for="open-only">
-            <input type="checkbox" id="open-only">
-            <span>Open licences only</span>
-          </label>
-        </div>
-        <div class="source-groups" id="source-groups"></div>
-      </div>
+        </legend>
+        <div class="sources-body" id="src-panel" hidden></div>
+      </fieldset>
 
       <ul class="error-list" id="error-list" aria-live="polite"></ul>
 

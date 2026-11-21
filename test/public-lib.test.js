@@ -10,6 +10,7 @@ import {
   estimateCardHeight,
   filterAdapters,
   firstLoaded,
+  groupShortLabel,
   groupSources,
   imageCandidates,
   isSearchable,
@@ -28,6 +29,8 @@ import {
   searchPlaceholder,
   serializeSelection,
   shortcutLabel,
+  sortChipIds,
+  sourceSummary,
   shouldAutoLoad,
   subtitleText,
   thumbCandidates,
@@ -690,4 +693,63 @@ test('searchPlaceholder falls back for counts that are not positive numbers', ()
   assert.equal(searchPlaceholder(-3), generic);
   assert.equal(searchPlaceholder(NaN), generic);
   assert.equal(searchPlaceholder(undefined), generic);
+});
+
+test('sourceSummary names the top sources with results', () => {
+  assert.equal(sourceSummary([]), 'No sources selected');
+  assert.equal(sourceSummary(null), 'No sources selected');
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: null },
+      { name: 'B', hits: 0 },
+    ]),
+    '',
+  );
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: 5 },
+      { name: 'B', hits: 50 },
+      { name: 'C', hits: 0 },
+    ]),
+    'B, A',
+  );
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: 1 },
+      { name: 'B', hits: 4 },
+      { name: 'C', hits: 3 },
+      { name: 'D', hits: 2 },
+      { name: 'E', hits: 9 },
+    ]),
+    'E, B, C + 2 more with results',
+  );
+  assert.equal(
+    sourceSummary([
+      { name: 'A', hits: 3 },
+      { name: 'B', hits: 3 },
+      { name: 'C', hits: 3 },
+    ]),
+    'A, B, C',
+  );
+});
+
+test('sortChipIds puts counted ids first and keeps the rest in input order', () => {
+  assert.deepEqual(
+    sortChipIds(['a', 'b', 'c', 'd'], new Map([['a', 2], ['b', null], ['c', 10]])),
+    ['c', 'a', 'b', 'd'],
+  );
+  assert.deepEqual(sortChipIds(['a', 'b'], { a: 1, b: 1 }), ['a', 'b']);
+  assert.deepEqual(sortChipIds([], new Map()), []);
+
+  const ids = ['a', 'b', 'c'];
+  sortChipIds(ids, new Map([['c', 4]]));
+  assert.deepEqual(ids, ['a', 'b', 'c']);
+});
+
+test('groupShortLabel uses the short group labels', () => {
+  assert.equal(groupShortLabel('museums', 'Museums and galleries'), 'Museums & galleries');
+  assert.equal(groupShortLabel('aggregators', 'Open-licence aggregators'), 'Aggregators');
+  assert.equal(groupShortLabel('libraries', 'Libraries and archives'), 'Libraries & archives');
+  assert.equal(groupShortLabel('science', 'Science, nature and medicine'), 'Science & nature');
+  assert.equal(groupShortLabel('other', 'Other'), 'Other');
 });
