@@ -1,6 +1,6 @@
 {
   "name": "wovi-open-library",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "WOVI — World of Visual Inspiration: search 51 open image libraries at once and download the highest resolution.",
   "private": true,
   "license": "MIT",
