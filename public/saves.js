@@ -5,6 +5,7 @@
 import {
   addSave,
   backToTopBottom,
+  clearAllText,
   el,
   isSaved,
   itemKey,
@@ -35,6 +36,14 @@ let noticeOpen = false;
 let noticeResolve = null;
 /** @type {HTMLElement|null} */
 let noticeTrigger = null;
+
+/** @type {HTMLDialogElement|null} */
+let confirmEl = null;
+let confirmOpen = false;
+/** @type {((value: boolean) => void)|null} */
+let confirmResolve = null;
+/** @type {HTMLElement|null} */
+let confirmTrigger = null;
 
 /** @type {HTMLElement|null} */
 let toastEl = null;
@@ -127,6 +136,22 @@ export function savedIds() {
 export function isItemSaved(item) {
   if (!item || typeof item !== 'object') return false;
   return isSaved(readSaves(), itemKey(item));
+}
+
+/**
+ * Remove every save, keeping the first-save acknowledgement. False when
+ * `localStorage` throws; nothing changes then.
+ * @returns {boolean}
+ */
+export function clearSaves() {
+  if (!storageWorks()) return false;
+  try {
+    localStorage.removeItem(SAVES_KEY);
+  } catch {
+    return false;
+  }
+  notify([]);
+  return true;
 }
 
 // ---------- Change listeners ----------
@@ -511,6 +536,123 @@ function openNotice(trigger) {
 
   const confirm = noticeEl.querySelector('.save-notice-primary');
   if (confirm instanceof HTMLElement) confirm.focus();
+  return promise;
+}
+
+// ---------- Clear-all confirm ----------
+
+/**
+ * Build the clear-all confirm dialog once.
+ * @returns {HTMLDialogElement}
+ */
+function buildConfirm() {
+  const title = el('h2', {
+    class: 'save-notice-title',
+    id: 'save-confirm-title',
+    text: 'Clear all saves?',
+  });
+  const body = el('p', { class: 'save-notice-body', id: 'save-confirm-desc' });
+
+  const cancel = el('button', {
+    class: 'save-notice-btn save-notice-secondary',
+    type: 'button',
+    text: 'Cancel',
+  });
+  const confirm = el('button', {
+    class: 'save-notice-btn save-notice-primary',
+    type: 'button',
+    text: 'Clear all',
+  });
+
+  const actions = el('div', { class: 'save-notice-actions' }, [cancel, confirm]);
+  const inner = el('div', { class: 'save-notice-inner' }, [title, body, actions]);
+
+  const dialog = el(
+    'dialog',
+    {
+      class: 'save-notice save-confirm',
+      'aria-labelledby': 'save-confirm-title',
+      'aria-describedby': 'save-confirm-desc',
+    },
+    [inner],
+  );
+  dialog.setAttribute('role', 'dialog');
+  dialog.setAttribute('aria-modal', 'true');
+
+  cancel.addEventListener('click', () => settleConfirm(false));
+  confirm.addEventListener('click', () => settleConfirm(true));
+  dialog.addEventListener('cancel', (event) => {
+    event.preventDefault();
+    settleConfirm(false);
+  });
+  dialog.addEventListener('click', (event) => {
+    if (event.target !== dialog) return;
+    const box = dialog.getBoundingClientRect();
+    const outside =
+      event.clientX < box.left ||
+      event.clientX > box.right ||
+      event.clientY < box.top ||
+      event.clientY > box.bottom;
+    if (outside) settleConfirm(false);
+  });
+
+  document.body.append(dialog);
+  return dialog;
+}
+
+/**
+ * Close the confirm, give focus back and resolve the waiting choice.
+ * @param {boolean} confirmed
+ */
+function settleConfirm(confirmed) {
+  if (!confirmEl || !confirmOpen) return;
+  confirmOpen = false;
+  const resolve = confirmResolve;
+  confirmResolve = null;
+  const trigger = confirmTrigger;
+  confirmTrigger = null;
+
+  if (confirmEl.open) confirmEl.close();
+  if (trigger instanceof HTMLElement && trigger.isConnected) {
+    trigger.focus({ preventScroll: true });
+  }
+  if (resolve) resolve(confirmed === true);
+}
+
+/**
+ * Ask before clearing all saves. Resolves with true only on "Clear all".
+ * @param {number} n number of saves, for the confirm text
+ * @param {HTMLElement|null} [trigger]
+ * @returns {Promise<boolean>}
+ */
+export function confirmClearAll(n, trigger = null) {
+  if (confirmOpen) return Promise.resolve(false);
+  if (!confirmEl) confirmEl = buildConfirm();
+  confirmOpen = true;
+  confirmTrigger = trigger instanceof HTMLElement ? trigger : null;
+
+  const promise = new Promise((resolve) => {
+    confirmResolve = resolve;
+  });
+
+  const desc = confirmEl.querySelector('.save-notice-body');
+  if (desc) desc.textContent = clearAllText(n);
+  const primary = confirmEl.querySelector('.save-notice-primary');
+  const cancel = confirmEl.querySelector('.save-notice-secondary');
+  if (primary instanceof HTMLButtonElement) primary.disabled = !(Number(n) > 0);
+
+  try {
+    confirmEl.showModal();
+  } catch {
+    confirmOpen = false;
+    const resolve = confirmResolve;
+    confirmResolve = null;
+    confirmTrigger = null;
+    if (resolve) resolve(false);
+    return promise;
+  }
+
+  if (cancel instanceof HTMLElement) cancel.focus();
   return promise;
 }
 

@@ -1470,3 +1470,26 @@ export function savedViewText(n) {
   const value = typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
   return `View saved (${value.toLocaleString('en-US')})`;
 }
+
+/**
+ * Confirmation text before clearing all saves. A value that is not a finite
+ * number greater than 0 counts as 0.
+ * @param {number} n
+ * @returns {string}
+ */
+export function clearAllText(n) {
+  const value = typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  const images =
+    value === 1 ? '1 saved image' : `${value.toLocaleString('en-US')} saved images`;
+  return `This removes ${images} from this browser. You can’t undo this.`;
+}
+
+/**
+ * Pretty JSON of the stored saves list, for the Export JSON download. A value
+ * that is not an array becomes an empty list.
+ * @param {object[]} list
+ * @returns {string}
+ */
+export function savesExportJson(list) {
+  return JSON.stringify(Array.isArray(list) ? list : [], null, 2);
+}

@@ -41,6 +41,8 @@ import {
   removeSave,
   snapshotItem,
   savedViewText,
+  clearAllText,
+  savesExportJson,
   isShortcut,
   searchKey,
   searchPlaceholder,
@@ -1229,4 +1231,28 @@ test('savedViewText formats the count', () => {
   assert.equal(savedViewText(3), 'View saved (3)');
   assert.equal(savedViewText(1234), 'View saved (1,234)');
   assert.equal(savedViewText(undefined), 'View saved (0)');
+});
+
+test('clearAllText formats the count', () => {
+  assert.equal(
+    clearAllText(3),
+    'This removes 3 saved images from this browser. You can’t undo this.',
+  );
+  assert.equal(
+    clearAllText(1),
+    'This removes 1 saved image from this browser. You can’t undo this.',
+  );
+  assert.ok(clearAllText(1200).includes('1,200 saved images'));
+  assert.ok(clearAllText(undefined).includes('0 saved images'));
+  assert.ok(clearAllText(-4).includes('0 saved images'));
+});
+
+test('savesExportJson writes pretty JSON', () => {
+  assert.equal(
+    savesExportJson([{ id: 'a' }]),
+    '[\n  {\n    "id": "a"\n  }\n]',
+  );
+  assert.equal(savesExportJson(null), '[]');
+  assert.equal(savesExportJson('x'), '[]');
+  assert.equal(savesExportJson([]), '[]');
 });

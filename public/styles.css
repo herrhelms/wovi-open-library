@@ -775,6 +775,10 @@ h1 {
   display: none;
 }
 
+.error-list[hidden] {
+  display: none;
+}
+
 .error-list li {
   font-size: var(--wovi-fs-13);
   color: var(--wovi-ink-3);
@@ -802,6 +806,10 @@ h1 {
 
 .results-header:has(.results-title.visually-hidden) {
   margin-bottom: 0;
+}
+
+.results-header[hidden] {
+  display: none;
 }
 
 .results-title {
@@ -907,6 +915,51 @@ h1 {
   .results-title {
     font-size: 32px;
   }
+}
+
+/* ---------- Saved page ---------- */
+
+.saved-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--wovi-s-2);
+  margin-bottom: var(--wovi-s-5);
+}
+
+.saved-header[hidden] {
+  display: none;
+}
+
+.saved-sub {
+  margin: 0;
+  font-size: var(--wovi-fs-14);
+  color: var(--wovi-ink-3);
+}
+
+.saved-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: var(--wovi-s-1);
+}
+
+.saved-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--wovi-s-3);
+  padding: var(--space-6) 0;
+}
+
+.saved-empty[hidden] {
+  display: none;
+}
+
+.saved-empty p {
+  margin: 0;
+  font-size: var(--wovi-fs-16);
+  color: var(--wovi-ink-3);
 }
 
 /* ---------- Empty state ---------- */
@@ -1508,6 +1561,8 @@ body:has(.selection-bar:not([hidden])) .site-main {
   .sources-head,
   .sources-tools,
   .results-header,
+  .saved-header,
+  .saved-actions,
   .source-legend,
   .load-row,
   .selection-bar,
@@ -1516,6 +1571,8 @@ body:has(.selection-bar:not([hidden])) .site-main {
   }
 
   .results-sub,
+  .saved-sub,
+  .saved-empty p,
   .status-line,
   .no-results-text,
   .empty-text,
