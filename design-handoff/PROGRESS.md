@@ -47,7 +47,7 @@ Fonts today: Google Fonts `<link>` (Fraunces + Inter) in `index.html`.
 ## Steps (HANDOFF §3)
 
 - [x] 1. Tokens + fonts — `public/tokens.css` (copy of `design/tokens.css` without `@import`), Geist + Geist Mono `<link>` in `index.html`, old variables in `styles.css` now point to WOVI tokens, dark mode and old hex/rgba values removed (`styles.css`, `viewer.css`, `settings.css`). Deferred: the viewer stage stays light until step 8 (dark text on it would fail contrast now).
-- [ ] 2. App shell + header
+- [x] 2. App shell + header — `index.html` (sticky `.app-header`, logo link, `nav` Explore / Collections (disabled) / Saved n (disabled until step 10) / Sources = old Adaptors button), `.page` container (1600 / 32 px), visually hidden h1 until step 5; `styles.css` (`.ghost`, logo, nav); `savedCount()` in `lib.js` + `storage` listener. Note: nav items are 40 px tall (components.md: min-height 40, border-box); the reference renders them 56 px because it has no `box-sizing: border-box`, so its header is 85 px vs. 69 px here.
 - [ ] 3. Search bar
 - [ ] 4. Sources fieldset
 - [ ] 5. Results header + source bar
