@@ -27,6 +27,16 @@ html:has(.save-notice[open]) {
   backdrop-filter: blur(4px);
 }
 
+.save-confirm {
+  width: min(420px, 100vw - 32px);
+}
+
+.save-confirm .save-notice-btn:disabled {
+  background: var(--wovi-line-strong);
+  color: var(--wovi-ink-3);
+  cursor: default;
+}
+
 .save-notice-inner {
   padding: 28px;
 }

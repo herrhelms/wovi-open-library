@@ -25,6 +25,7 @@ import {
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  savesExportJson,
   searchKey,
   searchWithoutItem,
   searchPlaceholder,
@@ -32,6 +33,7 @@ import {
   shouldAutoLoad,
   shortcutLabel,
   sleep,
+  snapshotItem,
   sortChipIds,
   sourceBarSegments,
   sourceSummary,
@@ -41,7 +43,15 @@ import {
   showBackToTop,
 } from './lib.js';
 import { initSettings, openSources } from './settings.js';
-import { onSavesChange, readSaves, savedIds, toggleSave } from './saves.js';
+import {
+  clearSaves,
+  confirmClearAll,
+  onSavesChange,
+  readSaves,
+  savedIds,
+  showToast,
+  toggleSave,
+} from './saves.js';
 import { openViewer } from './viewer.js';
 
 const STORAGE_KEY = 'olf.sources';
@@ -50,6 +60,9 @@ const SOURCES_OPEN_KEY = 'wovi:sources-open:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
 const DOWNLOAD_DELAY = 800;
+/** The Saved page (one route, served by `GET /saved`). */
+const SAVED_PATH = '/saved';
+const isSavedPage = location.pathname === SAVED_PATH;
 // The results header can show sort, orientation and colour dropdowns, but the
 // search API has no data for them, so the controls stay off (no dead controls).
 const SHOW_RESULT_FILTERS = false;
@@ -69,6 +82,15 @@ const errorListEl = document.getElementById('error-list');
 const emptyStateEl = document.getElementById('empty-state');
 const examplesEl = document.getElementById('examples');
 const resultsTitleEl = document.getElementById('results-title');
+const resultsHeaderEl = document.querySelector('.results-header');
+const sourcesFieldset = document.querySelector('fieldset.sources');
+const savedHeaderEl = document.getElementById('saved-header');
+const savedTitleEl = document.getElementById('saved-title');
+const savedExportButton = document.getElementById('saved-export');
+const savedClearButton = document.getElementById('saved-clear');
+const savedEmptyEl = document.getElementById('saved-empty');
+const savedNavEl = document.getElementById('saved-open');
+const exploreNavEl = document.querySelector('.main-nav a[href="/"]');
 const resultsSubEl = document.getElementById('results-sub');
 const sourceBarEl = document.getElementById('source-bar');
 const sourceLegendEl = document.getElementById('source-legend');
@@ -231,8 +253,15 @@ function sourceState(id) {
   return state;
 }
 
+/**
+ * Source names of the saved snapshots, for sources the registry does not know
+ * (for example after a source was removed).
+ * @type {Map<string, string>}
+ */
+const savedSourceNames = new Map();
+
 function sourceName(id) {
-  return registryById.get(id)?.name ?? id;
+  return registryById.get(id)?.name ?? savedSourceNames.get(id) ?? id;
 }
 
 function searchableSelected() {
@@ -483,6 +512,7 @@ function updateChip(id) {
 
 // ---------- Errors ----------
 function renderErrors() {
+  if (isSavedPage) return;
   errorListEl.replaceChildren();
   for (const [id, info] of errors) {
     if (!selected.has(id)) continue;
@@ -724,6 +754,12 @@ function createCard(item, key, sourceId, mediaId) {
       img.src = candidates[candidateIndex];
       return;
     }
+    // On the Saved page the tile stays (with its placeholder) so the user can
+    // still unsave it.
+    if (isSavedPage) {
+      img.remove();
+      return;
+    }
     article.hidden = true;
     if (selection.delete(key)) updateSelectionUi();
     updateUi();
@@ -939,8 +975,8 @@ function placeEntries(entries, { realHeights = false } = {}) {
   }
 }
 
-/** Re-lay the JS column wall after a resize. Native mode does nothing. */
-function reflowMasonry() {
+/** Re-lay the JS column wall after a resize or a tile change. Native mode does nothing. */
+function reflowMasonry({ force = false } = {}) {
   if (!masonryEl || nativeWall) return;
   const layout = wallLayout(window.innerWidth);
   const gap = masonryGap();
@@ -948,7 +984,7 @@ function reflowMasonry() {
     layout.maxColumns,
     columnCount(resultsEl.clientWidth, layout.minColumn, gap),
   );
-  if (count === masonryCols.length) return;
+  if (count === masonryCols.length && !force) return;
 
   const heights = records.map((record) => record.el.offsetHeight);
   masonryEl.replaceChildren();
@@ -1513,6 +1549,7 @@ function sourcesWithHits(list) {
  */
 function updateResultsHeader() {
   if (!resultsTitleEl) return;
+  if (isSavedPage) return;
 
   if (!query) {
     resultsTitleEl.classList.add('visually-hidden');
@@ -1589,6 +1626,7 @@ function updateResultsHeader() {
  */
 function updateNoResults(searchable) {
   if (!noResultsEl) return;
+  if (isSavedPage) return;
 
   const show =
     query !== '' &&
@@ -1610,6 +1648,7 @@ function updateNoResults(searchable) {
 
 // ---------- Status ----------
 function updateStatus() {
+  if (isSavedPage) return;
   if (!query) {
     statusLineEl.textContent = '';
     return;
@@ -1653,6 +1692,7 @@ const SKELETON_HEIGHTS = [200, 260, 340, 220, 300];
 /** Show five skeleton tiles while at least one searched source is loading. */
 function updateSkeletons() {
   if (!wallSkeletonsEl) return;
+  if (isSavedPage) return;
   const loading =
     Boolean(query) &&
     searchableSelected().some((source) => sourceState(source.id).status === 'loading');
@@ -1674,6 +1714,7 @@ function updateSkeletons() {
 /** Text of the infinite-load row: pulling names, the exhausted line, or nothing. */
 function updateLoadRow() {
   if (!loadRowEl) return;
+  if (isSavedPage) return;
   const searchable = searchableSelected();
   const loadingNames = searchable
     .filter((source) => sourceState(source.id).status === 'loading')
@@ -1724,11 +1765,11 @@ function updateUi() {
   const searchable = searchableSelected();
   updateResultsHeader();
   updateNoResults(searchable);
-  refreshSourceMeta();
+  if (!isSavedPage) refreshSourceMeta();
   updateSkeletons();
   updateLoadRow();
 
-  const showMore = canLoadMore();
+  const showMore = !isSavedPage && canLoadMore();
   loadMoreButton.hidden = !showMore;
 
   const count = selection.size;
@@ -1860,6 +1901,161 @@ async function downloadSelected() {
   if (skippedNote) statusLineEl.textContent = skippedNote;
 }
 
+// ---------- Saved page ----------
+
+/**
+ * Show the Saved-page header, the nav state and the stored tiles.
+ */
+function setupSavedPage() {
+  document.title = 'Saved — WOVI';
+  if (exploreNavEl) exploreNavEl.removeAttribute('aria-current');
+  if (savedNavEl) savedNavEl.setAttribute('aria-current', 'page');
+
+  const hidden = [
+    sourcesFieldset,
+    errorListEl,
+    resultsHeaderEl,
+    statusLineEl,
+    noResultsEl,
+    emptyStateEl,
+    wallSkeletonsEl,
+    loadRowEl,
+    loadMoreButton,
+  ];
+  for (const node of hidden) {
+    if (node) node.hidden = true;
+  }
+  if (savedHeaderEl) savedHeaderEl.hidden = false;
+
+  buildSavedWall();
+  updateSavedHeading();
+  updateSavedEmpty();
+  updateSavedClearButton();
+}
+
+/**
+ * Build the wall from the stored snapshots, newest first.
+ */
+function buildSavedWall() {
+  const entries = [];
+  const seen = new Set();
+  const saves = readSaves();
+  for (const snapshot of saves) {
+    if (snapshot.sourceName && !savedSourceNames.has(snapshot.source)) {
+      savedSourceNames.set(snapshot.source, snapshot.sourceName);
+    }
+  }
+  for (const snapshot of saves) {
+    const item = snapshotItem(snapshot);
+    if (!item) continue;
+    const key = itemKey(item);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const mediaId =
+      typeof item.mediaId === 'string' && item.mediaId !== '' ? item.mediaId : null;
+    const sourceId = typeof item.source === 'string' ? item.source : '';
+    entries.push({ item, key, mediaId, sourceId });
+  }
+  placeEntries(entries);
+}
+
+/**
+ * Show the saved count in the Saved-page h1.
+ */
+function updateSavedHeading() {
+  if (!savedTitleEl) return;
+  const n = visibleRecords().length;
+  savedTitleEl.replaceChildren(
+    document.createTextNode('Saved '),
+    el('span', { class: 'results-total', text: `· ${imagesText(n)}` }),
+  );
+}
+
+/**
+ * Show the empty state when no saved tile is visible.
+ */
+function updateSavedEmpty() {
+  if (!savedEmptyEl) return;
+  savedEmptyEl.hidden = visibleRecords().length > 0;
+}
+
+/**
+ * Disable the Clear-all button when there are no saves. When it becomes
+ * disabled while focused, move focus to the Explore link of the empty state.
+ */
+function updateSavedClearButton() {
+  if (!savedClearButton) return;
+  const hasSaves = readSaves().length > 0;
+  const wasDisabled = savedClearButton.disabled;
+  savedClearButton.disabled = !hasSaves;
+  if (!hasSaves && !wasDisabled && document.activeElement === savedClearButton) {
+    const exploreLink = savedEmptyEl?.querySelector('a');
+    if (exploreLink instanceof HTMLElement) exploreLink.focus({ preventScroll: true });
+  }
+}
+
+/**
+ * Hide saved tiles that are no longer saved, show ones that are again, then
+ * re-lay the wall and update the heading and the empty state.
+ * @param {object[]} list saved snapshots
+ */
+function syncSavedWall(list) {
+  const ids = new Set((Array.isArray(list) ? list : []).map((snapshot) => snapshot?.id));
+  for (const record of records) {
+    const show = ids.has(record.key);
+    record.el.hidden = !show;
+    if (!show && selection.delete(record.key)) {
+      record.el.classList.remove('selected');
+      record.selectButton.setAttribute('aria-pressed', 'false');
+    }
+  }
+  reflowMasonry({ force: true });
+  updateSelectionUi();
+  updateSavedHeading();
+  updateSavedEmpty();
+  updateSavedClearButton();
+}
+
+/**
+ * Download the stored snapshots as pretty JSON.
+ */
+function exportSaves() {
+  const blob = new Blob([savesExportJson(readSaves())], {
+    type: 'application/json',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = el('a', { href: url, download: 'wovi-saves.json' });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  // Give the browser a moment to start the download before releasing the URL.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
+/**
+ * Ask before removing every save, then empty the wall.
+ * @param {HTMLElement|null} trigger
+ */
+async function clearAllSaves(trigger) {
+  const n = readSaves().length;
+  const confirmed = await confirmClearAll(n, trigger);
+  if (!confirmed) return;
+
+  if (!clearSaves()) {
+    showToast({ text: "Saving isn't available in this browser." });
+    return;
+  }
+
+  for (const record of records) record.el.hidden = true;
+  selection.clear();
+  reflowMasonry({ force: true });
+  updateSelectionUi();
+  updateSavedHeading();
+  updateSavedEmpty();
+  updateSavedClearButton();
+  showToast({ text: 'Saves cleared' });
+}
+
 // ---------- Init ----------
 async function loadGroups() {
   try {
@@ -1950,6 +2146,11 @@ async function init() {
   updateSearchPlaceholder();
 
   updateSavedCount();
+  if (isSavedPage) {
+    setupSavedPage();
+    updateUi();
+    return;
+  }
   applyUrlState();
   if (sourceListError && statusLineEl.textContent === '') {
     statusLineEl.textContent = sourceListError;
@@ -1964,6 +2165,10 @@ searchForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const value = searchInput.value.trim();
   if (!value) return;
+  if (isSavedPage) {
+    location.assign(`/?q=${encodeURIComponent(value)}`);
+    return;
+  }
   runSearch(value, { urlMode: 'push' });
 });
 
@@ -2034,6 +2239,7 @@ if (typeof ResizeObserver === 'function') {
 }
 
 window.addEventListener('popstate', () => {
+  if (isSavedPage) return;
   if (searchWithoutItem(location.search) === lastSearchWithoutItem) return;
   applyUrlState();
 });
@@ -2051,7 +2257,17 @@ function updateSavedCount(list) {
 onSavesChange((list) => {
   updateSavedCount(list);
   updateTileSaves();
+  if (isSavedPage) syncSavedWall(list);
 });
+
+if (savedExportButton) {
+  savedExportButton.addEventListener('click', exportSaves);
+}
+if (savedClearButton) {
+  savedClearButton.addEventListener('click', () => {
+    void clearAllSaves(savedClearButton);
+  });
+}
 
 initSettings({ onChange: onAdapterChange });
 

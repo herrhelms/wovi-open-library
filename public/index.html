@@ -85,6 +85,20 @@
       <ul class="error-list" id="error-list" aria-live="polite"></ul>
 
       <main class="site-main">
+        <header class="saved-header" id="saved-header" hidden>
+          <h1 class="results-title" id="saved-title">Saved</h1>
+          <p class="saved-sub">Stored in this browser only.</p>
+          <div class="saved-actions">
+            <button class="ghost" type="button" id="saved-export">Export JSON</button>
+            <button class="ghost" type="button" id="saved-clear">Clear all</button>
+          </div>
+        </header>
+
+        <section class="saved-empty" id="saved-empty" hidden>
+          <p>Nothing saved yet. Use the bookmark on any image.</p>
+          <a class="ghost" href="/">Explore</a>
+        </section>
+
         <header class="results-header">
           <h1 class="results-title visually-hidden" id="results-title">WOVI — World of Visual Inspiration</h1>
           <p class="results-sub" id="results-sub" hidden></p>

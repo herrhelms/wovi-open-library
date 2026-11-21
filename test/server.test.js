@@ -546,6 +546,28 @@ test('static files and content types', async () => {
   assert.equal(missing.status, 404);
 });
 
+test('GET /saved serves the index page', async () => {
+  const index = await fetch(`${fixture.base}/`);
+  const indexBody = await index.text();
+
+  const saved = await fetch(`${fixture.base}/saved`);
+  assert.equal(saved.status, 200);
+  assert.match(saved.headers.get('content-type'), /^text\/html/);
+  assert.equal(await saved.text(), indexBody);
+
+  const withQuery = await fetch(`${fixture.base}/saved?i=a%3A1`);
+  assert.equal(withQuery.status, 200);
+  assert.match(withQuery.headers.get('content-type'), /^text\/html/);
+});
+
+test('only /saved serves the index page', async () => {
+  for (const path of ['/saved/', '/saved/x', '/savedx']) {
+    const res = await fetch(`${fixture.base}${path}`);
+    assert.equal(res.status, 404, `${path} -> ${res.status}`);
+    assert.ok(!(await res.text()).includes('<h1>hi</h1>'), path);
+  }
+});
+
 test('path traversal is blocked', async () => {
   for (const path of ['/../secret.txt', '/%2e%2e/secret.txt', '/..%2fsecret.txt']) {
     const res = await rawRequest(fixture.port, path);
