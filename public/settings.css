@@ -289,6 +289,7 @@ html:has(#adaptors-dialog[open]) {
 }
 
 .src-more {
+  position: relative;
   appearance: none;
   border: 0;
   background-color: transparent;
@@ -299,6 +300,12 @@ html:has(#adaptors-dialog[open]) {
   color: var(--wovi-green);
   cursor: pointer;
   text-decoration: underline;
+}
+
+.src-more::after {
+  content: '';
+  position: absolute;
+  inset: -12px -6px;
 }
 
 .src-warn {
