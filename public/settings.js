@@ -36,6 +36,16 @@ let adapters = [];
 let groups = [];
 /** @type {Array<{folder:string,error:string}>} */
 let invalid = [];
+/** Whether the adaptor list is in memory. */
+let dataLoaded = false;
+/** Message of the last failed `GET /api/adapters`. @type {string|null} */
+let dataError = null;
+/** Shared running `GET /api/adapters`, or `null`. @type {Promise<boolean>|null} */
+let loadPromise = null;
+/** Token of the current open session. */
+let session = 0;
+/** Adaptor id the current session should focus once the data arrives. @type {string|null} */
+let pendingFocusId = null;
 
 /** Row elements by adaptor id. @type {Map<string, HTMLElement>} */
 let rowById = new Map();
@@ -555,18 +565,31 @@ function createInvalidSection() {
   ]);
 }
 
+/**
+ * Build the content shown when the adaptor list could not be loaded.
+ * @param {string} message
+ * @returns {HTMLElement}
+ */
 function createErrorContent(message) {
   return el('div', { class: 'src-modal' }, [
-    el('div', { class: 'src-head' }, [
-      el('div', { class: 'src-head-top' }, [
-        el('div', {}, [
-          el('h2', { class: 'src-title', id: 'adaptors-title', text: 'Sources' }),
-        ]),
-        closeButton(),
-      ]),
-    ]),
+    createHead(),
     el('p', { class: 'src-load-error', role: 'alert', text: message }),
     createFooter(),
+  ]);
+}
+
+/**
+ * Build the shared dialog header with the title and the close button.
+ * @returns {HTMLElement}
+ */
+function createHead() {
+  return el('div', { class: 'src-head' }, [
+    el('div', { class: 'src-head-top' }, [
+      el('div', {}, [
+        el('h2', { class: 'src-title', id: 'adaptors-title', text: 'Sources' }),
+      ]),
+      closeButton(),
+    ]),
   ]);
 }
 
@@ -581,6 +604,18 @@ function closeButton() {
     },
     [icon(CLOSE_ICON, 18)],
   );
+}
+
+/**
+ * Build the content shown while the adaptor list is still loading.
+ * @returns {HTMLElement}
+ */
+function createLoadingContent() {
+  return el('div', { class: 'src-modal' }, [
+    createHead(),
+    el('p', { class: 'src-loading', role: 'status', text: 'Loading sources…' }),
+    createFooter(),
+  ]);
 }
 
 function createFooter() {
@@ -724,57 +759,96 @@ function fillDialog() {
 }
 
 /**
- * Load the adaptor list and build the dialog.
- * @returns {Promise<boolean>} whether the list loaded
+ * Fetch `GET /api/adapters` once and keep the answer in memory.
+ * A running fetch is shared, so no second request is sent meanwhile.
+ * @returns {Promise<boolean>} whether the list is loaded
  */
-async function loadDialog() {
-  if (!dialog) return false;
+function ensureData() {
+  if (dataLoaded) return Promise.resolve(true);
+  if (loadPromise) return loadPromise;
 
-  try {
-    const response = await fetch('/api/adapters');
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const data = await response.json();
+  loadPromise = (async () => {
+    try {
+      const response = await fetch('/api/adapters');
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
 
-    groups = Array.isArray(data?.groups) ? data.groups : [];
-    adapters = Array.isArray(data?.adapters) ? data.adapters : [];
-    invalid = Array.isArray(data?.invalid) ? data.invalid : [];
+      groups = Array.isArray(data?.groups) ? data.groups : [];
+      adapters = Array.isArray(data?.adapters) ? data.adapters : [];
+      invalid = Array.isArray(data?.invalid) ? data.invalid : [];
+      dataLoaded = true;
+      dataError = null;
+      return true;
+    } catch (error) {
+      dataLoaded = false;
+      dataError = error?.message || 'The adaptor list could not be loaded.';
+      return false;
+    } finally {
+      loadPromise = null;
+    }
+  })();
 
-    fillDialog();
-    return true;
-  } catch (error) {
-    adapters = [];
-    groups = [];
-    invalid = [];
-    clearCopyTimers();
-    dialog.replaceChildren(
-      createErrorContent(error?.message || 'The adaptor list could not be loaded.'),
-    );
-    return false;
-  }
+  return loadPromise;
 }
 
 /**
  * Open the dialog, at one adaptor row when an id is given.
+ * Uses the adaptor list in memory; a first open shows a loading line and
+ * fills the dialog as soon as the shared fetch answers.
  * @param {string|null} adaptorId
  * @returns {Promise<void>}
  */
 async function openSettings(adaptorId = null) {
   if (!dialog || !openButton) return;
+  const id = typeof adaptorId === 'string' ? adaptorId : null;
+
   if (dialog.open) {
-    if (typeof adaptorId === 'string') focusRow(adaptorId);
+    if (id !== null) {
+      pendingFocusId = id;
+      focusRow(id);
+    }
     return;
   }
 
   returnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-  openButton.disabled = true;
+  const token = ++session;
 
-  try {
-    const loaded = await loadDialog();
+  if (dataLoaded) {
+    fillDialog();
     dialog.showModal();
-    if (loaded && typeof adaptorId === 'string') focusRow(adaptorId);
-  } finally {
-    openButton.disabled = false;
+    if (id !== null) focusRow(id);
+    return;
   }
+
+  pendingFocusId = id;
+  dialog.replaceChildren(createLoadingContent());
+  dialog.showModal();
+
+  const loaded = await ensureData();
+  if (token !== session || !dialog.open) return;
+
+  const active = document.activeElement;
+  const wasDone =
+    active instanceof HTMLElement &&
+    dialog.contains(active) &&
+    active.classList.contains('src-done');
+  const focusId = pendingFocusId;
+
+  if (loaded) {
+    fillDialog();
+    if (focusId !== null) {
+      focusRow(focusId);
+    } else {
+      const target = dialog.querySelector(wasDone ? '.src-done' : '.src-close');
+      if (target instanceof HTMLElement) target.focus();
+    }
+    return;
+  }
+
+  clearCopyTimers();
+  dialog.replaceChildren(createErrorContent(dataError || 'The adaptor list could not be loaded.'));
+  const target = dialog.querySelector(wasDone ? '.src-done' : '.src-close');
+  if (target instanceof HTMLElement) target.focus();
 }
 
 /**
@@ -830,6 +904,8 @@ export function initSettings({ onChange } = {}) {
   );
 
   if (!openButton || !dialog) return;
+
+  void ensureData();
 
   openButton.addEventListener('click', () => {
     void openSettings(null);
