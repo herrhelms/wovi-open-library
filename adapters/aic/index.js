@@ -1,9 +1,9 @@
-import { fetchJson } from '../../lib/http.js';
+import { fetchJson, USER_AGENT } from '../../lib/http.js';
 import { cleanText } from '../../lib/util.js';
 
 export const id = 'aic';
 
-export const AIC_USER_AGENT = 'OpenLibraryFetch/0.1 (local research tool)';
+export const AIC_USER_AGENT = USER_AGENT;
 
 const SEARCH_URL = 'https://api.artic.edu/api/v1/artworks/search';
 const IIIF_URL = 'https://www.artic.edu/iiif/2';

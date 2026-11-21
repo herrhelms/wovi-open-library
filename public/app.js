@@ -22,9 +22,9 @@ import {
   pickColumn,
   placeholderTone,
   pullingText,
-  rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  retryWaitText,
   savesExportJson,
   searchKey,
   searchWithoutItem,
@@ -247,6 +247,7 @@ function sourceState(id) {
       code: null,
       retries: 0,
       rateLimitRetries: 0,
+      timeoutRetries: 0,
     };
     states.set(id, state);
   }
@@ -498,7 +499,10 @@ function updateChip(id) {
           ? 'limit'
           : state.code === 'PREPARING'
             ? 'wait'
-            : 'error';
+            : state.code === 'TIMEOUT' &&
+                typeof errors.get(id)?.waitSeconds === 'number'
+              ? 'wait'
+              : 'error';
       button.title = state.error || 'Search failed';
     } else if (state?.status === 'done') {
       const count = chipHits(id);
@@ -519,7 +523,7 @@ function renderErrors() {
     const li = el('li', {}, [el('strong', { text: sourceName(id) })]);
     const text =
       typeof info.waitSeconds === 'number' && Number.isFinite(info.waitSeconds)
-        ? rateLimitWaitText(info.message, info.waitSeconds)
+        ? retryWaitText(info.code, info.message, info.waitSeconds)
         : info.message;
     li.append(document.createTextNode(` ${text}`));
     errorListEl.append(li);
@@ -1160,6 +1164,7 @@ async function loadSource(id, page, token, gen) {
     state.page = page;
     state.retries = 0;
     state.rateLimitRetries = 0;
+    state.timeoutRetries = 0;
     errors.delete(id);
 
     if (Array.isArray(data.items)) addItems(id, data.items);
@@ -1183,9 +1188,14 @@ async function loadSource(id, page, token, gen) {
               state.rateLimitRetries,
               Math.random(),
             )
-          : null;
+          : state.code === 'TIMEOUT'
+            ? retryDelay('TIMEOUT', null, state.timeoutRetries, Math.random())
+            : null;
 
-    if (typeof delay === 'number' && state.code === 'RATE_LIMIT') {
+    if (
+      typeof delay === 'number' &&
+      (state.code === 'RATE_LIMIT' || state.code === 'TIMEOUT')
+    ) {
       errors.set(id, {
         message: state.error,
         code: state.code,
@@ -1199,6 +1209,7 @@ async function loadSource(id, page, token, gen) {
 
     if (typeof delay === 'number') {
       if (state.code === 'RATE_LIMIT') state.rateLimitRetries += 1;
+      else if (state.code === 'TIMEOUT') state.timeoutRetries += 1;
       else state.retries += 1;
       scheduleRetry(id, page, token, gen, delay);
     }
@@ -1238,6 +1249,7 @@ function startLoad(id, page, gen) {
   const state = sourceState(id);
   if (state.status === 'loading') return;
   state.rateLimitRetries = 0;
+  state.timeoutRetries = 0;
   const token = newToken(id);
   loadSource(id, page, token, gen);
 }

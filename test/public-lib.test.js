@@ -33,6 +33,7 @@ import {
   rateLimitWaitText,
   rememberLimited,
   retryDelay,
+  retryWaitText,
   savedCount,
   makeSnapshot,
   parseSaves,
@@ -601,11 +602,19 @@ test('countActive counts enabled adaptors', () => {
 });
 
 test('retryDelay computes the rate limit delay', () => {
-  assert.equal(retryDelay('RATE_LIMIT', 12, 0, 0), 15000);
-  assert.equal(retryDelay('RATE_LIMIT', 20, 0, 0), 20000);
-  assert.equal(retryDelay('RATE_LIMIT', 20, 1, 0.5), 21500);
-  assert.equal(retryDelay('RATE_LIMIT', null, 2, 0.999), 17997);
-  assert.equal(retryDelay('RATE_LIMIT', 5, 3, 0), null);
+  assert.equal(retryDelay('RATE_LIMIT', 12, 0, 0), 12000);
+  assert.equal(retryDelay('RATE_LIMIT', null, 0, 0), 10000);
+  assert.equal(retryDelay('RATE_LIMIT', 5, 0, 0), 10000);
+  assert.equal(retryDelay('RATE_LIMIT', 20, 1, 0.5), 31500);
+  assert.equal(retryDelay('RATE_LIMIT', null, 4, 0), 30000);
+  assert.equal(retryDelay('RATE_LIMIT', 30, 4, 0.999), 60000);
+  assert.equal(retryDelay('RATE_LIMIT', 5, 5, 0), null);
+});
+
+test('retryDelay computes the timeout delay', () => {
+  assert.equal(retryDelay('TIMEOUT', null, 0, 0), 8000);
+  assert.equal(retryDelay('TIMEOUT', null, 1, 0.5), 17500);
+  assert.equal(retryDelay('TIMEOUT', null, 2, 0), null);
 });
 
 test('retryDelay keeps the PREPARING behaviour', () => {
@@ -625,6 +634,25 @@ test('rateLimitWaitText names Wikimedia Commons', () => {
       17,
     ),
     'Wikimedia Commons rate limit reached. Trying again in 17 s.',
+  );
+});
+
+test('retryWaitText names a timeout', () => {
+  assert.equal(
+    retryWaitText('TIMEOUT', 'commons.wikimedia.org did not answer in 20 s', 8),
+    'commons.wikimedia.org did not answer in 20 s. Trying again in 8 s.',
+  );
+  assert.equal(retryWaitText('TIMEOUT', null, 8), 'Search timed out. Trying again in 8 s.');
+});
+
+test('retryWaitText uses the rate limit text for RATE_LIMIT', () => {
+  assert.equal(
+    retryWaitText(
+      'RATE_LIMIT',
+      'Wikimedia Commons rate limit reached. Try again in a minute.',
+      12,
+    ),
+    'Wikimedia Commons rate limit reached. Trying again in 12 s.',
   );
 });
 
