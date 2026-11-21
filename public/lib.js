@@ -890,3 +890,63 @@ export function sourceSummary(list) {
     ? `${names.join(', ')} + ${rest} more with results`
     : names.join(', ');
 }
+
+/**
+ * Loading line for the infinite-load row: the sources that are loading now.
+ * `[]` gives an empty string.
+ * @param {string[]} names
+ * @returns {string}
+ */
+export function pullingText(names) {
+  const list = Array.isArray(names)
+    ? names.filter((name) => typeof name === 'string' && name !== '')
+    : [];
+  if (list.length === 0) return '';
+  if (list.length === 1) return `Pulling more from ${list[0]}`;
+  if (list.length === 2) return `Pulling more from ${list[0]} and ${list[1]}`;
+  const rest = list.length - 2;
+  return `Pulling more from ${list[0]}, ${list[1]} and ${rest} other${rest === 1 ? '' : 's'}`;
+}
+
+/**
+ * Exhausted line for the infinite-load row.
+ * @param {number} n
+ * @returns {string}
+ */
+export function everythingText(n) {
+  const count = typeof n === 'number' && Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+  return count === 1
+    ? 'That’s everything from 1 source.'
+    : `That’s everything from ${count.toLocaleString('en-US')} sources.`;
+}
+
+/**
+ * Column rules of the wall for a viewport width. A value that is not a finite
+ * number counts as a wide screen.
+ * @param {number} viewportWidth
+ * @returns {{minColumn:number, gap:number, maxColumns:number}}
+ */
+export function wallLayout(viewportWidth) {
+  if (
+    typeof viewportWidth !== 'number' ||
+    !Number.isFinite(viewportWidth) ||
+    viewportWidth > 600
+  ) {
+    return { minColumn: 250, gap: 20, maxColumns: Infinity };
+  }
+  if (viewportWidth > 380) {
+    return { minColumn: 160, gap: 12, maxColumns: Infinity };
+  }
+  return { minColumn: 160, gap: 12, maxColumns: 1 };
+}
+
+/**
+ * Placeholder tone (1 to 10) for a tile, by its insertion index.
+ * Anything other than an integer >= 0 gives 1.
+ * @param {number} index
+ * @returns {number}
+ */
+export function placeholderTone(index) {
+  if (typeof index !== 'number' || !Number.isInteger(index) || index < 0) return 1;
+  return (index % 10) + 1;
+}
