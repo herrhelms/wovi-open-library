@@ -126,7 +126,8 @@ Empty values count as "not set".
 <details>
 <summary><b>Rate limits</b></summary>
 
-- **Wikimedia Commons** (34 sources) limits how fast one client may ask. WOVI sends one Commons request at a time, waits as Commons asks (`Retry-After`) and retries; the browser keeps at most two Commons searches open and starts the other sources first. Commons results arrive one after another over up to ~30 seconds.
+- **Wikimedia Commons** (34 sources) limits how fast one client may ask. WOVI sends one Commons request at a time. When Commons asks it to wait (`Retry-After`), WOVI answers at once and the browser tries that source again later. The browser keeps at most four searches open, at most two of them for Commons, and starts the other sources first. Commons results arrive one after another over up to ~30 seconds, and Commons sources load more pages more slowly than the others.
+- **Scrolling** loads the next page of each source that is ready. A slow, retrying or rate-limited source does not hold the others back.
 - **Smithsonian** with `DEMO_KEY`: ~30 requests per hour — add a personal key.
 - **Openverse** without a key: ~20 requests per minute, 200 per day, results stop near 240.
 - **iNaturalist**: max 60 requests per minute.
