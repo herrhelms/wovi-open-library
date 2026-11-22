@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "archives-nz",
+  "name": "Archives New Zealand (via Wikimedia Commons)",
+  "homepage": "https://www.archives.govt.nz",
+  "group": "libraries",
+  "order": 419,
+  "description": "Archives New Zealand images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_Archives_New_Zealand\""
+  }
+}

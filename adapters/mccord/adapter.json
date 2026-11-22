@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "mccord",
+  "name": "McCord Stewart Museum (via Wikimedia Commons)",
+  "homepage": "https://www.musee-mccord-stewart.ca",
+  "group": "museums",
+  "order": 288,
+  "description": "McCord Stewart Museum images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_McCord_Museum\""
+  }
+}

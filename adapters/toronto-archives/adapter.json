@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "toronto-archives",
+  "name": "City of Toronto Archives (via Wikimedia Commons)",
+  "homepage": "https://www.toronto.ca/city-government/accountability-operations-customer-service/access-city-information-or-records/city-of-toronto-archives/",
+  "group": "libraries",
+  "order": 423,
+  "description": "City of Toronto Archives images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_the_City_of_Toronto_Archives\""
+  }
+}

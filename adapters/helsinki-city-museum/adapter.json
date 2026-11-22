@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "helsinki-city-museum",
+  "name": "Helsinki City Museum (via Wikimedia Commons)",
+  "homepage": "https://www.helsinginkaupunginmuseo.fi",
+  "group": "museums",
+  "order": 286,
+  "description": "Helsinki City Museum images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Files_from_the_Helsinki_City_Museum\""
+  }
+}

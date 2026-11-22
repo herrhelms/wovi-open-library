@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "npm-taiwan",
+  "name": "National Palace Museum (Taiwan) (via Wikimedia Commons)",
+  "homepage": "https://www.npm.gov.tw",
+  "group": "museums",
+  "order": 283,
+  "description": "National Palace Museum (Taiwan) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"National_Palace_Museum_Open_Data\""
+  }
+}

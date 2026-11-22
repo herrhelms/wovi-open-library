@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "cmh",
+  "name": "Canadian Museum of History (via Wikimedia Commons)",
+  "homepage": "https://www.historymuseum.ca",
+  "group": "museums",
+  "order": 287,
+  "description": "Canadian Museum of History images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_Canadian_Museum_of_History\""
+  }
+}

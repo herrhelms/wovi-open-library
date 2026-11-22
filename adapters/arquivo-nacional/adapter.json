@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "arquivo-nacional",
+  "name": "Arquivo Nacional (Brazil) (via Wikimedia Commons)",
+  "homepage": "https://www.gov.br/arquivonacional",
+  "group": "libraries",
+  "order": 415,
+  "description": "Arquivo Nacional (Brazil) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Photographs_in_Arquivo_Nacional_(Brazil)\""
+  }
+}
