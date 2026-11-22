@@ -240,6 +240,12 @@ test('isAllowedHost', () => {
   assert.equal(isAllowedHost('princeton.edu'), false);
   assert.equal(isAllowedHost('evil-nb.no'), false);
   assert.equal(isAllowedHost('nb.no.evil.com'), false);
+  assert.equal(isAllowedHost('kb-images.kb.dk'), true);
+  assert.equal(isAllowedHost('www.webumenia.sk'), true);
+  assert.equal(isAllowedHost('fortepan.download'), true);
+  assert.equal(isAllowedHost('fortepan.hu'), true);
+  assert.equal(isAllowedHost('babel.banrepcultural.org'), true);
+  assert.equal(isAllowedHost('evilkb.dk'), false);
   assert.equal(isAllowedHost('127.0.0.1'), false);
   assert.equal(isAllowedHost('localhost'), false);
   assert.equal(isAllowedHost(''), false);
