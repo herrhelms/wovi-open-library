@@ -1403,22 +1403,33 @@ function loadMore() {
 }
 
 /**
- * Run `autoLoad` when the sentinel sits near the viewport, for a source that
- * answered while the user is already close to the end of the wall.
+ * Run `autoLoad('answer')` when the sentinel sits near the viewport, for a
+ * source that answered while the user is already close to the end of the wall.
+ * Only a sentinel-triggered step may count as a step without gain.
  */
 function autoLoadIfNear() {
   if (isSavedPage) return;
   if (sentinelEl.getClientRects().length === 0) return;
   const distance = sentinelEl.getBoundingClientRect().top - window.innerHeight;
-  if (distance <= AUTO_LOAD_MARGIN) autoLoad();
+  if (distance <= AUTO_LOAD_MARGIN) autoLoad('answer');
 }
 
 /**
- * Sentinel-triggered loading. Stops when pages no longer add visible cards,
- * so sources with broken thumbnails cannot cause endless requests.
+ * Automatic loading with a trigger of `'sentinel'` or `'answer'`. Stops when
+ * pages no longer add visible cards, so sources with broken thumbnails cannot
+ * cause endless requests; only sentinel steps count as steps without gain.
  */
-function autoLoad() {
+function autoLoad(trigger) {
+  const kind = trigger === 'sentinel' ? 'sentinel' : 'answer';
   const visibleNow = visibleRecords().length;
+
+  if (
+    typeof visibleAtLastAutoLoad === 'number' &&
+    visibleNow > visibleAtLastAutoLoad
+  ) {
+    autoLoadsWithoutGain = 0;
+  }
+
   const mayLoad = shouldAutoLoad({
     visibleNow,
     visibleAtLastAutoLoad,
@@ -1438,8 +1449,12 @@ function autoLoad() {
   if (!loadMore()) return;
 
   autoLoadStopped = false;
-  autoLoadsWithoutGain = noGain ? autoLoadsWithoutGain + 1 : 0;
   visibleAtLastAutoLoad = visibleNow;
+  if (noGain) {
+    if (kind === 'sentinel') autoLoadsWithoutGain += 1;
+  } else {
+    autoLoadsWithoutGain = 0;
+  }
 }
 
 function canLoadMore() {
@@ -1885,7 +1900,8 @@ function updateUi() {
   updateSkeletons();
   updateLoadRow();
 
-  const showMore = !isSavedPage && activeLoads === 0 && canLoadMore();
+  const showMore =
+    !isSavedPage && canLoadMore() && (activeLoads === 0 || autoLoadStopped);
   loadMoreButton.hidden = !showMore;
 
   const count = selection.size;
@@ -2336,7 +2352,7 @@ examplesEl.addEventListener('click', (event) => {
 if (typeof IntersectionObserver === 'function') {
   const observer = new IntersectionObserver(
     (entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) autoLoad();
+      if (entries.some((entry) => entry.isIntersecting)) autoLoad('sentinel');
     },
     { rootMargin: `${AUTO_LOAD_MARGIN}px` },
   );
