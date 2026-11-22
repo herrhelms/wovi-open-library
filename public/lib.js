@@ -55,6 +55,97 @@ export function isSearchable(source, openOnly) {
   return true;
 }
 
+/** Most Commons-backed search requests the app keeps open at once. */
+export const COMMONS_REQUEST_LIMIT = 2;
+
+/**
+ * Whether a source is served by the Wikimedia Commons subtree.
+ * @param {object|null|undefined} source
+ * @returns {boolean}
+ */
+export function isCommonsBacked(source) {
+  if (!source || typeof source !== 'object') return false;
+  return source.base === 'commons-subset' || source.id === 'commons';
+}
+
+/**
+ * New list with the sources that are not Commons-backed first, then the
+ * Commons-backed sources. The order inside each part is unchanged.
+ * @param {object[]} sources
+ * @returns {object[]}
+ */
+export function commonsLast(sources) {
+  const list = Array.isArray(sources) ? sources : [];
+  const other = [];
+  const commons = [];
+  for (const source of list) {
+    if (isCommonsBacked(source)) commons.push(source);
+    else other.push(source);
+  }
+  return other.concat(commons);
+}
+
+/**
+ * First-in, first-out request queue with a limit of active requests.
+ * `request(start)` gives a ticket and calls `start` at once while the limit is
+ * not reached, else when a slot frees up. `release(ticket)` frees an active
+ * ticket or removes a waiting one. `clear()` drops all waiting tickets and
+ * forgets the active ones. No DOM, timers or network.
+ * @param {number} limit
+ * @returns {{request: (start: () => void) => number, release: (ticket: number) => void, clear: () => void, activeCount: () => number, waitingCount: () => number}}
+ */
+export function createRequestQueue(limit) {
+  const max =
+    typeof limit === 'number' && Number.isFinite(limit) && limit >= 1
+      ? Math.floor(limit)
+      : 1;
+  let nextTicket = 1;
+  const active = new Set();
+  const waiting = [];
+
+  const startWaiting = () => {
+    while (active.size < max && waiting.length > 0) {
+      const entry = waiting.shift();
+      active.add(entry.ticket);
+      entry.start();
+    }
+  };
+
+  return {
+    request(start) {
+      const ticket = nextTicket;
+      nextTicket += 1;
+      const run = typeof start === 'function' ? start : () => {};
+      if (active.size < max) {
+        active.add(ticket);
+        run();
+      } else {
+        waiting.push({ ticket, start: run });
+      }
+      return ticket;
+    },
+    release(ticket) {
+      if (active.has(ticket)) {
+        active.delete(ticket);
+        startWaiting();
+        return;
+      }
+      const index = waiting.findIndex((entry) => entry.ticket === ticket);
+      if (index >= 0) waiting.splice(index, 1);
+    },
+    clear() {
+      waiting.length = 0;
+      active.clear();
+    },
+    activeCount() {
+      return active.size;
+    },
+    waitingCount() {
+      return waiting.length;
+    },
+  };
+}
+
 /**
  * Image URLs to try for one item, best first, without duplicates.
  * @param {object} item
