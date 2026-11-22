@@ -5,19 +5,36 @@ export const id = 'japan-search';
 
 const SEARCH_URL = 'https://jpsearch.go.jp/api/item/search/jps-cross';
 const ITEM_URL = 'https://jpsearch.go.jp/api/item';
-const PAGE_SIZE = 24;
 const ID_PATTERN = /^[A-Za-z0-9_.-]+$/;
 const IIIF_THUMB_PATTERN = /\/full\/\d+,\/0\/default\.jpg$/;
 
-export const LICENSE = 'Public domain';
-export const LICENSE_URL = 'https://creativecommons.org/publicdomain/mark/1.0/';
+export const RIGHTS = ['pdm', 'cc0', 'ccby', 'ccbysa'];
+export const PAGE_SIZE_PER_RIGHT = 6;
 
-export function buildSearchUrl(q, page) {
-  const currentPage = Math.max(1, Number(page) || 1);
-  const from = (currentPage - 1) * PAGE_SIZE;
+export const LICENSES = {
+  pdm: {
+    license: 'Public domain',
+    licenseUrl: 'https://creativecommons.org/publicdomain/mark/1.0/',
+  },
+  cc0: {
+    license: 'CC0',
+    licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/',
+  },
+  ccby: { license: 'CC BY', licenseUrl: null },
+  ccbysa: { license: 'CC BY-SA', licenseUrl: null },
+};
+
+function pageNumber(page) {
+  return Math.max(1, Number(page) || 1);
+}
+
+export function buildSearchUrl(q, page, rights) {
+  const currentPage = pageNumber(page);
+  const from = (currentPage - 1) * PAGE_SIZE_PER_RIGHT;
+  const rightsType = RIGHTS.includes(rights) ? rights : 'pdm';
   return (
     `${SEARCH_URL}?keyword=${encodeURIComponent(q ?? '')}` +
-    `&f-rights=pdm&f-contents=image&size=${PAGE_SIZE}&from=${from}`
+    `&f-rights=${rightsType}&f-contents=thumb&size=${PAGE_SIZE_PER_RIGHT}&from=${from}`
   );
 }
 
@@ -25,6 +42,18 @@ function iiifBase(url) {
   const match = url.match(IIIF_THUMB_PATTERN);
   if (!match) return null;
   return url.slice(0, url.length - match[0].length);
+}
+
+function colbaseLargeUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.host !== 'colbase.nich.go.jp') return null;
+    if (!parsed.pathname.includes('/slideshow_s/')) return null;
+    parsed.pathname = parsed.pathname.replace('/slideshow_s/', '/');
+    return parsed.toString();
+  } catch {
+    return null;
+  }
 }
 
 function creatorOf(common) {
@@ -63,24 +92,27 @@ export function normalize(entry) {
   if (!entry || typeof entry !== 'object') return null;
   const common = entry.common ?? {};
 
-  if (
-    typeof common.contentsRightsType === 'string' &&
-    common.contentsRightsType !== '' &&
-    common.contentsRightsType !== 'pdm'
-  ) {
+  const rightsType = common.contentsRightsType;
+  if (typeof rightsType !== 'string' || !RIGHTS.includes(rightsType)) {
     return null;
   }
+  const licence = LICENSES[rightsType];
 
   const imageUrl = firstString(common.contentsUrl) ?? firstString(common.thumbnailUrl);
   if (imageUrl === null) return null;
 
   const thumbnail = firstString(common.thumbnailUrl);
   const base = thumbnail === null ? null : iiifBase(thumbnail);
+  const colbaseLarge = colbaseLargeUrl(imageUrl);
 
   let thumb;
   let preview;
   let full;
-  if (base !== null) {
+  if (colbaseLarge !== null) {
+    thumb = thumbnail ?? imageUrl;
+    preview = colbaseLarge;
+    full = colbaseLarge;
+  } else if (base !== null) {
     thumb = `${base}/full/400,/0/default.jpg`;
     preview = `${base}/full/1600,/0/default.jpg`;
     full = `${base}/full/full/0/default.jpg`;
@@ -111,8 +143,8 @@ export function normalize(entry) {
     full,
     width: null,
     height: null,
-    license: LICENSE,
-    licenseUrl: LICENSE_URL,
+    license: licence.license,
+    licenseUrl: licence.licenseUrl,
     pageUrl: pageUrlOf(common, itemId),
     provider: firstString(common.ownerOrg) ?? firstString(common.provider) ?? null,
   };
@@ -122,16 +154,38 @@ export function parseSearch(json, page) {
   const rawItems = Array.isArray(json?.list) ? json.list : [];
   const items = rawItems.map((entry) => normalize(entry)).filter((item) => item !== null);
   const total = Number.isFinite(json?.hit) ? json.hit : null;
-  const currentPage = Math.max(1, Number(page) || 1);
-  const hasMore = total === null ? false : (currentPage - 1) * PAGE_SIZE + rawItems.length < total;
+  const currentPage = pageNumber(page);
+  const hasMore =
+    total === null ? false : (currentPage - 1) * PAGE_SIZE_PER_RIGHT + rawItems.length < total;
 
   return { total, hasMore, items };
 }
 
 export async function search(q, page, deps = {}) {
   const doFetch = deps.fetchJson ?? fetchJson;
-  const json = await doFetch(buildSearchUrl(q, page));
-  return parseSearch(json, page);
+  const currentPage = pageNumber(page);
+
+  const results = await Promise.allSettled(
+    RIGHTS.map((rights) => doFetch(buildSearchUrl(q, currentPage, rights))),
+  );
+
+  const answered = results.filter((result) => result.status === 'fulfilled');
+  if (answered.length === 0) {
+    throw results[0].reason;
+  }
+
+  let total = 0;
+  let hasMore = false;
+  const items = [];
+  results.forEach((result) => {
+    if (result.status !== 'fulfilled') return;
+    const parsed = parseSearch(result.value, currentPage);
+    total += Number.isFinite(parsed.total) ? parsed.total : 0;
+    if (parsed.hasMore) hasMore = true;
+    items.push(...parsed.items);
+  });
+
+  return { total, hasMore, items };
 }
 
 export async function resolveDownload(itemId, deps = {}) {
