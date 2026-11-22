@@ -11,6 +11,8 @@ const FINGERPRINTS = {
     '8F:AF:7D:2E:2C:B4:70:9B:B8:E0:B3:36:66:BF:75:A5:DD:45:B5:DE:48:0F:8E:A8:D4:BF:E6:BE:BC:17:F2:ED',
   'harica-tls-rsa-root-ca-2021.pem':
     'D9:5D:0E:8E:DA:79:52:5B:F9:BE:B1:1B:14:D2:10:0D:32:94:98:5F:0C:62:D9:FA:BD:9C:D9:99:EC:CB:7B:1D',
+  'geotrust-ev-rsa-ca-g2.pem':
+    '2D:14:0F:20:B8:A9:6E:2B:4D:2F:1C:C5:AC:A5:E5:A1:E7:DC:56:A7:49:1E:51:09:06:96:0F:38:D2:D2:1A:EF',
 };
 
 const compact = (pem) => pem.replace(/\s+/g, '');
@@ -30,7 +32,7 @@ for (const file of EXTRA_CA_FILES) {
   });
 }
 
-test('importing lib/http.js installs both roots in the default list', async () => {
+test('importing lib/http.js installs all extra certificates in the default list', async () => {
   await import('../lib/http.js');
 
   const installed = tls.getCACertificates('default').map(compact);
@@ -46,7 +48,7 @@ test('installExtraRootCAs is idempotent and does not grow the list', () => {
   const second = installExtraRootCAs();
 
   assert.deepEqual(first, second);
-  assert.equal(first.added, 2);
+  assert.equal(first.added, 3);
   assert.equal(first.skipped, null);
   assert.equal(tls.getCACertificates('default').length, before);
 });
