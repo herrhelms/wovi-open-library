@@ -189,10 +189,9 @@ lib/                   shared code: loader, HTTP, Commons limiter, caches, licen
 lib/bases/             shared factories for config-only sources
 public/                the frontend: plain HTML, CSS and ES modules, no build
 test/                  unit tests and fixtures
-design-handoff/        the WOVI design system, specs and reference screens
 ```
 
-The UI follows the WOVI design in [`design-handoff/`](design-handoff/HANDOFF.md) (tokens, components, screens).
+The design tokens (colours, type, spacing) live in `public/tokens.css`.
 
 ## Disclaimer
 
