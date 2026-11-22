@@ -23,6 +23,7 @@ import {
   isUsable,
   itemKey,
   parseSavedSelection,
+  pausedRetryDelay,
   pickColumn,
   pickLoadTargets,
   placeholderTone,
@@ -1198,6 +1199,7 @@ async function loadSource(id, page, token, gen) {
       error.retryAfterSeconds = Number.isFinite(data?.retryAfterSeconds)
         ? data.retryAfterSeconds
         : null;
+      error.paused = data?.paused === true;
       throw error;
     }
 
@@ -1223,19 +1225,22 @@ async function loadSource(id, page, token, gen) {
     state.code = error?.code ?? null;
     state.hasMore = false;
 
+    const pausedLimit = state.code === 'RATE_LIMIT' && error?.paused === true;
     const delay =
       state.code === 'PREPARING'
         ? retryDelay('PREPARING', null, state.retries, Math.random())
-        : state.code === 'RATE_LIMIT'
-          ? retryDelay(
-              'RATE_LIMIT',
-              error?.retryAfterSeconds ?? null,
-              state.rateLimitRetries,
-              Math.random(),
-            )
-          : state.code === 'TIMEOUT'
-            ? retryDelay('TIMEOUT', null, state.timeoutRetries, Math.random())
-            : null;
+        : pausedLimit
+          ? pausedRetryDelay(error?.retryAfterSeconds ?? null, Math.random())
+          : state.code === 'RATE_LIMIT'
+            ? retryDelay(
+                'RATE_LIMIT',
+                error?.retryAfterSeconds ?? null,
+                state.rateLimitRetries,
+                Math.random(),
+              )
+            : state.code === 'TIMEOUT'
+              ? retryDelay('TIMEOUT', null, state.timeoutRetries, Math.random())
+              : null;
 
     if (
       typeof delay === 'number' &&
@@ -1253,9 +1258,9 @@ async function loadSource(id, page, token, gen) {
     updateChip(id);
 
     if (typeof delay === 'number') {
-      if (state.code === 'RATE_LIMIT') state.rateLimitRetries += 1;
+      if (state.code === 'RATE_LIMIT' && !pausedLimit) state.rateLimitRetries += 1;
       else if (state.code === 'TIMEOUT') state.timeoutRetries += 1;
-      else state.retries += 1;
+      else if (state.code !== 'RATE_LIMIT') state.retries += 1;
       scheduleRetry(id, page, token, gen, delay);
     }
   } finally {

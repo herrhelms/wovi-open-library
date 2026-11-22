@@ -1096,6 +1096,30 @@ export function retryDelay(code, retryAfterSeconds, attempt, random) {
 }
 
 /**
+ * Delay before the next automatic retry after a fail-fast "Commons is paused"
+ * answer. Such a retry does not use up the rate-limit retries.
+ * `random` is a number in [0, 1), as from `Math.random()`.
+ * @param {number|null|undefined} retryAfterSeconds
+ * @param {number} random
+ * @returns {number}
+ */
+export function pausedRetryDelay(retryAfterSeconds, random) {
+  const seconds =
+    typeof retryAfterSeconds === 'number' &&
+    Number.isFinite(retryAfterSeconds) &&
+    retryAfterSeconds > 0
+      ? retryAfterSeconds
+      : 0;
+  const r =
+    typeof random === 'number' && Number.isFinite(random) && random >= 0 && random < 1
+      ? random
+      : 0;
+  const base = Math.max(seconds * 1000, 2000);
+  const delay = base + Math.floor(r * 3000);
+  return Number.isFinite(delay) ? delay : 2000;
+}
+
+/**
  * Error list text while a rate limit retry waits.
  * @param {string|null|undefined} message
  * @param {number} seconds

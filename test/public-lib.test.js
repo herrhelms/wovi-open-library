@@ -31,6 +31,7 @@ import {
   licenceMeaning,
   needsAttribution,
   parseSavedSelection,
+  pausedRetryDelay,
   pickColumn,
   pickLoadTargets,
   placeholderTone,
@@ -632,6 +633,31 @@ test('retryDelay keeps the PREPARING behaviour', () => {
 test('retryDelay gives null for other codes', () => {
   assert.equal(retryDelay('HTTP', 10, 0, 0), null);
   assert.equal(retryDelay(null, null, 0, 0), null);
+});
+
+test('pausedRetryDelay uses the Retry-After seconds', () => {
+  assert.equal(pausedRetryDelay(20, 0), 20000);
+});
+
+test('pausedRetryDelay falls back to 2000 ms without usable seconds', () => {
+  assert.equal(pausedRetryDelay(null, 0), 2000);
+  assert.equal(pausedRetryDelay(undefined, 0), 2000);
+  assert.equal(pausedRetryDelay(NaN, 0), 2000);
+  assert.equal(pausedRetryDelay(-4, 0), 2000);
+  assert.equal(pausedRetryDelay(1, 0), 2000);
+});
+
+test('pausedRetryDelay adds jitter below 3000 ms', () => {
+  assert.equal(pausedRetryDelay(5, 0.5), 6500);
+  const high = pausedRetryDelay(5, 0.999);
+  assert.ok(high >= 5000);
+  assert.ok(high < 8000);
+});
+
+test('pausedRetryDelay ignores an unusable random value', () => {
+  assert.equal(pausedRetryDelay(5, NaN), 5000);
+  assert.equal(pausedRetryDelay(5, 2), 5000);
+  assert.equal(pausedRetryDelay(5, -1), 5000);
 });
 
 test('rateLimitWaitText names Wikimedia Commons', () => {
