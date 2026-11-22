@@ -92,67 +92,6 @@ export function commonsLast(sources) {
 }
 
 /**
- * First-in, first-out request queue with a limit of active requests.
- * `request(start)` gives a ticket and calls `start` at once while the limit is
- * not reached, else when a slot frees up. `release(ticket)` frees an active
- * ticket or removes a waiting one. `clear()` drops all waiting tickets and
- * forgets the active ones. No DOM, timers or network.
- * @param {number} limit
- * @returns {{request: (start: () => void) => number, release: (ticket: number) => void, clear: () => void, activeCount: () => number, waitingCount: () => number}}
- */
-export function createRequestQueue(limit) {
-  const max =
-    typeof limit === 'number' && Number.isFinite(limit) && limit >= 1
-      ? Math.floor(limit)
-      : 1;
-  let nextTicket = 1;
-  const active = new Set();
-  const waiting = [];
-
-  const startWaiting = () => {
-    while (active.size < max && waiting.length > 0) {
-      const entry = waiting.shift();
-      active.add(entry.ticket);
-      entry.start();
-    }
-  };
-
-  return {
-    request(start) {
-      const ticket = nextTicket;
-      nextTicket += 1;
-      const run = typeof start === 'function' ? start : () => {};
-      if (active.size < max) {
-        active.add(ticket);
-        run();
-      } else {
-        waiting.push({ ticket, start: run });
-      }
-      return ticket;
-    },
-    release(ticket) {
-      if (active.has(ticket)) {
-        active.delete(ticket);
-        startWaiting();
-        return;
-      }
-      const index = waiting.findIndex((entry) => entry.ticket === ticket);
-      if (index >= 0) waiting.splice(index, 1);
-    },
-    clear() {
-      waiting.length = 0;
-      active.clear();
-    },
-    activeCount() {
-      return active.size;
-    },
-    waitingCount() {
-      return waiting.length;
-    },
-  };
-}
-
-/**
  * First-in, first-out search queue with two limits: `total` active requests of
  * all kinds, and of these at most `commons` Commons-backed requests.
  * `request(start, { commons })` gives a ticket and calls `start` at once while
