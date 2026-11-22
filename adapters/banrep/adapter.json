@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "banrep",
+  "name": "Banco de la República (Colombia)",
+  "homepage": "https://www.banrepcultural.org/biblioteca-virtual",
+  "group": "libraries",
+  "order": 413,
+  "description": "Banco de la República: public domain photos and maps from 5 historic collections.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Public domain items from 5 historic collections (photos, maps). Spanish search terms work best (for example retrato, luna).",
+    "Compound objects (several pages) are not shown: the IIIF server gives no image for them."
+  ]
+}
