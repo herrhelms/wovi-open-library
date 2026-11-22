@@ -205,7 +205,7 @@ npm test                                 # all tests
 `test/adapters.test.js` checks the loader and all real adaptors:
 
 - every `adapters/*/adapter.json` is valid and `invalid` is empty,
-- the count is 51 and the group list has 4 groups,
+- the count is 75 and the group list has 4 groups,
 - each folder has `adapter.json` and `index.js` or a `base`,
 - each `process.env` name in adaptor code is the adaptor's `key.env` or `PORT`.
 

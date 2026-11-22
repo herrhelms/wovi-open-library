@@ -160,7 +160,7 @@ test('every real adapter.json is valid and invalid is empty', async () => {
     return statSync(join(dir, name)).isDirectory();
   }).length;
   assert.equal(adapters.length, folderCount);
-  assert.ok(adapters.length >= 51);
+  assert.equal(adapters.length, 75);
   assert.equal(groups.length, 4);
   for (const source of adapters) {
     assert.ok(ADAPTER_ID_PATTERN.test(source.id));
@@ -177,7 +177,7 @@ test('every adaptor folder has an adapter.json and code or a base', () => {
     if (name.startsWith('_') || name.startsWith('.')) return false;
     return statSync(join(dir, name)).isDirectory();
   });
-  assert.ok(folders.length >= 51);
+  assert.equal(folders.length, 75);
   for (const folder of folders) {
     const config = JSON.parse(readFileSync(join(dir, folder, 'adapter.json'), 'utf8'));
     assert.equal(config.id, folder);
@@ -222,9 +222,9 @@ test('each process.env name in adaptor code is the adaptor key or PORT', () => {
   }
 });
 
-test('the real registry keeps the known sources in order', async () => {
+test('the real registry keeps the current 75 sources in order', async () => {
   const ids = sources.map((source) => source.id);
-  assert.ok(ids.length >= 51);
+  assert.equal(ids.length, 75);
   assert.equal(new Set(ids).size, ids.length);
   assert.equal(ids[0], 'commons');
   assert.equal(ids.at(-1), 'nhm');

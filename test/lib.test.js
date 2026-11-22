@@ -232,6 +232,8 @@ test('sources registry', () => {
     'pixabay',
     'pexels',
     'unsplash',
+    'pikiwiki',
+    'kogl',
     'met',
     'smithsonian',
     'rijksmuseum',
@@ -247,6 +249,14 @@ test('sources registry', () => {
     'auckland',
     'princeton',
     'harvard',
+    'webumenia',
+    'museu-paulista',
+    'npm-taiwan',
+    'awm',
+    'nationalmuseum',
+    'helsinki-city-museum',
+    'cmh',
+    'mccord',
     'loc',
     'nypl',
     'british-library',
@@ -260,6 +270,20 @@ test('sources registry', () => {
     'nb-norway',
     'digital-commonwealth',
     'rumsey',
+    'kb-denmark',
+    'fortepan',
+    'banrep',
+    'nli',
+    'arquivo-nacional',
+    'ims',
+    'agn-argentina',
+    'slnsw',
+    'archives-nz',
+    'finnish-heritage',
+    'banq',
+    'lac',
+    'toronto-archives',
+    'nac-poland',
     'nasa',
     'esa-hubble',
     'esa-webb',
@@ -271,16 +295,11 @@ test('sources registry', () => {
     'gbif',
     'nhm',
   ];
-  assert.ok(sources.length >= 51);
-  const allIds = sources.map((source) => source.id);
-  for (const id of ids) assert.ok(allIds.includes(id), `missing source ${id}`);
-  let cursor = 0;
-  for (const id of ids) {
-    const index = allIds.indexOf(id, cursor);
-    assert.ok(index >= cursor, `${id} is out of order`);
-    cursor = index + 1;
-  }
-  assert.equal(new Set(ids).size, ids.length);
+  assert.equal(sources.length, 75);
+  assert.deepEqual(
+    sources.map((source) => source.id),
+    ids,
+  );
   assert.equal(getSource('met').name, 'The Met');
   assert.equal(getSource('x'), null);
 
