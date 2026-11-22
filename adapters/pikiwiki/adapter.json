@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "pikiwiki",
+  "name": "PikiWiki Israel (via Wikimedia Commons)",
+  "homepage": "https://www.pikiwiki.org.il",
+  "group": "aggregators",
+  "order": 131,
+  "description": "PikiWiki Israel images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_the_Pikiwiki_project\""
+  }
+}

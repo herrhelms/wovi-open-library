@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "ims",
+  "name": "Instituto Moreira Salles (via Wikimedia Commons)",
+  "homepage": "https://ims.com.br",
+  "group": "libraries",
+  "order": 416,
+  "description": "Instituto Moreira Salles images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"PD-Instituto_Moreira_Salles\""
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "nli",
+  "name": "National Library of Israel (via Wikimedia Commons)",
+  "homepage": "https://www.nli.org.il",
+  "group": "libraries",
+  "order": 414,
+  "description": "National Library of Israel images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Files_from_the_National_Library_of_Israel\""
+  }
+}

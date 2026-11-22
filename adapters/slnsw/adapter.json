@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "slnsw",
+  "name": "State Library of NSW (via Wikimedia Commons)",
+  "homepage": "https://www.sl.nsw.gov.au",
+  "group": "libraries",
+  "order": 418,
+  "description": "State Library of NSW images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_the_State_Library_of_NSW\""
+  }
+}

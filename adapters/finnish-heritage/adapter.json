@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "finnish-heritage",
+  "name": "Finnish Heritage Agency (via Wikimedia Commons)",
+  "homepage": "https://www.museovirasto.fi",
+  "group": "libraries",
+  "order": 420,
+  "description": "Finnish Heritage Agency images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Historical_Picture_Collection_of_The_Finnish_Heritage_Agency|JOKA_Press_Photo_Archive\""
+  }
+}

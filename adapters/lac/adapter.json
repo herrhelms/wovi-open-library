@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "lac",
+  "name": "Library and Archives Canada (via Wikimedia Commons)",
+  "homepage": "https://library-archives.canada.ca",
+  "group": "libraries",
+  "order": 422,
+  "description": "Library and Archives Canada images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_Library_and_Archives_Canada\""
+  }
+}

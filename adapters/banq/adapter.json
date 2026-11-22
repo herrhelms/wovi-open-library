@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "banq",
+  "name": "BAnQ (Québec) (via Wikimedia Commons)",
+  "homepage": "https://www.banq.qc.ca",
+  "group": "libraries",
+  "order": 421,
+  "description": "BAnQ (Québec) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_Bibliothèque_et_Archives_nationales_du_Québec\""
+  }
+}

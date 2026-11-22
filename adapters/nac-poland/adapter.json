@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "nac-poland",
+  "name": "Narodowe Archiwum Cyfrowe (Poland) (via Wikimedia Commons)",
+  "homepage": "https://www.nac.gov.pl",
+  "group": "libraries",
+  "order": 424,
+  "description": "Narodowe Archiwum Cyfrowe (Poland) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_Narodowe_Archiwum_Cyfrowe\""
+  }
+}

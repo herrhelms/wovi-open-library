@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "awm",
+  "name": "Australian War Memorial (via Wikimedia Commons)",
+  "homepage": "https://www.awm.gov.au",
+  "group": "museums",
+  "order": 284,
+  "description": "Australian War Memorial images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"Images_from_the_Australian_War_Memorial\""
+  }
+}

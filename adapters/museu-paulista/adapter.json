@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "museu-paulista",
+  "name": "Museu Paulista (USP) (via Wikimedia Commons)",
+  "homepage": "https://mp.usp.br",
+  "group": "museums",
+  "order": 282,
+  "description": "Museu Paulista (USP) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"NeuroMat's_partnership_with_Museu_Paulista_USP\""
+  }
+}

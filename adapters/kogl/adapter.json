@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "kogl",
+  "name": "Korean public institutions (KOGL Type 1) (via Wikimedia Commons)",
+  "homepage": "https://www.kogl.or.kr",
+  "group": "aggregators",
+  "order": 132,
+  "description": "Korean public institutions (KOGL Type 1) images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "incategory:\"KOGL_Type_1\""
+  }
+}

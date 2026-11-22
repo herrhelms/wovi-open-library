@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "id": "nationalmuseum",
+  "name": "Nationalmuseum Stockholm (via Wikimedia Commons)",
+  "homepage": "https://www.nationalmuseum.se",
+  "group": "museums",
+  "order": 285,
+  "description": "Nationalmuseum Stockholm images (via Wikimedia Commons).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [],
+  "base": "commons-subset",
+  "options": {
+    "filter": "deepcat:\"Images_from_the_Nationalmuseum_Stockholm\""
+  }
+}
