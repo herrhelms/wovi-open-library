@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "webumenia",
+  "name": "Web umenia (Slovak and Czech galleries)",
+  "homepage": "https://www.webumenia.sk",
+  "group": "museums",
+  "order": 281,
+  "description": "Web umenia: free (public domain) works from Slovak and Czech galleries.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Only free works (public domain). Slovak or Czech search terms work best (for example mesiac, portrét)."
+  ]
+}
