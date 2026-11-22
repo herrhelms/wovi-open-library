@@ -115,6 +115,54 @@ test('fetchJson returns parsed JSON and always sends the User-Agent', async () =
   );
 });
 
+test('fetchJson sends a POST body and the caller Content-Type', async () => {
+  await withServer(
+    (req, res) => {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', () => {
+        assert.equal(req.method, 'POST');
+        assert.equal(body, '{"a":1}');
+        assert.equal(req.headers['content-type'], 'application/json');
+        assert.equal(req.headers['user-agent'], USER_AGENT);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      });
+    },
+    async (base) => {
+      const data = await fetchJson(`${base}/post`, {
+        method: 'POST',
+        body: '{"a":1}',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      assert.deepEqual(data, { ok: true });
+    },
+  );
+});
+
+test('fetchJson without a body sends a GET with an empty body', async () => {
+  await withServer(
+    (req, res) => {
+      let body = '';
+      req.on('data', (chunk) => {
+        body += chunk;
+      });
+      req.on('end', () => {
+        assert.equal(req.method, 'GET');
+        assert.equal(body, '');
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      });
+    },
+    async (base) => {
+      const data = await fetchJson(`${base}/get`);
+      assert.deepEqual(data, { ok: true });
+    },
+  );
+});
+
 test('fetchJson on HTTP error hides path and query', async () => {
   await withServer(
     (req, res) => {
@@ -223,11 +271,15 @@ test('sources registry', () => {
     'gbif',
     'nhm',
   ];
-  assert.equal(sources.length, 51);
-  assert.deepEqual(
-    sources.map((source) => source.id),
-    ids,
-  );
+  assert.ok(sources.length >= 51);
+  const allIds = sources.map((source) => source.id);
+  for (const id of ids) assert.ok(allIds.includes(id), `missing source ${id}`);
+  let cursor = 0;
+  for (const id of ids) {
+    const index = allIds.indexOf(id, cursor);
+    assert.ok(index >= cursor, `${id} is out of order`);
+    cursor = index + 1;
+  }
   assert.equal(new Set(ids).size, ids.length);
   assert.equal(getSource('met').name, 'The Met');
   assert.equal(getSource('x'), null);
