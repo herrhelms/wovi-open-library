@@ -5,13 +5,13 @@
   "homepage": "https://jpsearch.go.jp",
   "group": "aggregators",
   "order": 80,
-  "description": "Japan Search: public domain items with an image.",
+  "description": "Japan Search: public domain, CC0, CC BY and CC BY-SA items with an image.",
   "defaultEnabled": true,
   "openLicenses": true,
   "trustResolvedUrl": true,
   "key": null,
   "docsUrl": null,
   "notes": [
-    "Only public domain (pdm) items with an image."
+    "Public domain, CC0, CC BY and CC BY-SA items with an image. Includes ColBase (Japan's national museums) and the National Diet Library."
   ]
 }
