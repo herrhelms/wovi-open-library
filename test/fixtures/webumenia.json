@@ -1,0 +1,501 @@
+{
+  "current_page": 1,
+  "data": [
+    {
+      "id": "SVK:OGD.O_475",
+      "content": {
+        "id": "SVK:OGD.O_475",
+        "identifier": "O 475",
+        "author": [
+          "Neznámy autor"
+        ],
+        "authors": [
+          {
+            "name": "Neznámy autor",
+            "authority": null,
+            "name_formatted": "Neznámy autor"
+          }
+        ],
+        "tag": [],
+        "date_earliest": 1801,
+        "date_latest": 1850,
+        "updated_at": "2026-07-13 10:42:33",
+        "created_at": "2015-05-29 18:01:22",
+        "has_image": true,
+        "has_iip": true,
+        "has_text": false,
+        "is_free": true,
+        "is_for_reproduction": false,
+        "authority_id": [],
+        "view_count": 2583,
+        "work_type": [
+          "maliarstvo"
+        ],
+        "object_type": [],
+        "image_ratio": 0.2925,
+        "title": "Mesiac",
+        "description": "",
+        "topic": [],
+        "place": [],
+        "measurement": [
+          "výška 103.5 cm, šírka 29.0 cm "
+        ],
+        "dating": "19. storočie, 1. polovica",
+        "medium": [
+          "drevo"
+        ],
+        "technique": [
+          "tempera"
+        ],
+        "gallery": "Oravská galéria, OGD",
+        "credit": null,
+        "contributor": "",
+        "related_work": null,
+        "exhibition": null,
+        "box": null,
+        "location": null,
+        "additionals": null,
+        "images": [
+          "/OGDTMG/X500/OGD--O_475--1_1--2014_05_15--L2_WEB.jp2"
+        ],
+        "hsl": [],
+        "frontend": [
+          "webumenia"
+        ],
+        "authors_formatted": [
+          "Neznámy autor"
+        ]
+      }
+    },
+    {
+      "id": "SVK:SNG.O_2936",
+      "content": {
+        "id": "SVK:SNG.O_2936",
+        "identifier": "O 2936",
+        "author": [
+          "Mitrovský, Milan Thomka"
+        ],
+        "authors": [
+          {
+            "name": "Mitrovský, Milan Thomka",
+            "authority": {
+              "id": "6742"
+            },
+            "name_formatted": "Milan Thomka Mitrovský"
+          }
+        ],
+        "tag": [],
+        "date_earliest": 1900,
+        "date_latest": 1910,
+        "updated_at": "2026-07-13 14:07:44",
+        "created_at": "2015-05-18 14:24:15",
+        "has_image": true,
+        "has_iip": true,
+        "has_text": false,
+        "is_free": true,
+        "is_for_reproduction": true,
+        "authority_id": [
+          "6742"
+        ],
+        "view_count": 2970,
+        "work_type": [
+          "maliarstvo"
+        ],
+        "object_type": [
+          "závesný obraz"
+        ],
+        "image_ratio": 0.7625,
+        "title": "Pri mesiačku",
+        "description": "",
+        "topic": [
+          "figurálna štafáž",
+          "krajina"
+        ],
+        "place": [],
+        "measurement": [
+          "výška 46.1 cm, šírka 35.0 cm "
+        ],
+        "dating": "20. storočie, začiatok, 1900 po",
+        "medium": [
+          "plátno"
+        ],
+        "technique": [
+          "olej"
+        ],
+        "gallery": "Slovenská národná galéria, SNG",
+        "credit": null,
+        "contributor": "",
+        "related_work": null,
+        "exhibition": null,
+        "box": null,
+        "location": null,
+        "additionals": null,
+        "images": [
+          "/SNGTMG/X3000/SNG--O_2936--1_1--2014_01_20--L2_WEB.jp2"
+        ],
+        "hsl": [],
+        "frontend": [
+          "webumenia"
+        ],
+        "authors_formatted": [
+          "Milan Thomka Mitrovský"
+        ]
+      }
+    },
+    {
+      "id": "SVK:SNG.G_8743",
+      "content": {
+        "id": "SVK:SNG.G_8743",
+        "identifier": "G 8743",
+        "author": [
+          "Neurčený nizozemský rytec"
+        ],
+        "authors": [
+          {
+            "name": "Neurčený nizozemský rytec",
+            "authority": null,
+            "name_formatted": "Neurčený nizozemský rytec"
+          }
+        ],
+        "tag": [],
+        "date_earliest": 1580,
+        "date_latest": 1600,
+        "updated_at": "2026-07-11 23:14:25",
+        "created_at": "2015-05-18 10:55:36",
+        "has_image": true,
+        "has_iip": true,
+        "has_text": false,
+        "is_free": true,
+        "is_for_reproduction": true,
+        "authority_id": [],
+        "view_count": 1647,
+        "work_type": [
+          "grafika/voľná"
+        ],
+        "object_type": [],
+        "image_ratio": 1.3377926421405,
+        "title": "Mesiac marec",
+        "description": "",
+        "topic": [
+          "figurálna kompozícia"
+        ],
+        "place": [],
+        "measurement": [
+          "výška 21.8 cm, šírka 28.8 cm "
+        ],
+        "dating": "16. storočie, 2. polovica, 1580-1600",
+        "medium": [
+          "žltý podlepený ručný papier"
+        ],
+        "technique": [
+          "rytina"
+        ],
+        "gallery": "Slovenská národná galéria, SNG",
+        "credit": null,
+        "contributor": "",
+        "related_work": "Dvanásť mesiacov",
+        "exhibition": null,
+        "box": null,
+        "location": null,
+        "additionals": null,
+        "images": [
+          "/SNGBA/X8800/SNG--G_8743--1_1--_2012_10_01_--L2_WEB.jp2"
+        ],
+        "hsl": [],
+        "frontend": [
+          "webumenia"
+        ],
+        "authors_formatted": [
+          "Neurčený nizozemský rytec"
+        ]
+      }
+    },
+    {
+      "id": "SVK:SNG.O_348",
+      "content": {
+        "id": "SVK:SNG.O_348",
+        "identifier": "O 348",
+        "author": [
+          "Barrera, Francisco"
+        ],
+        "authors": [
+          {
+            "name": "Barrera, Francisco",
+            "authority": {
+              "id": "479"
+            },
+            "name_formatted": "Francisco Barrera"
+          }
+        ],
+        "tag": [
+          "pes",
+          "ovocie",
+          "kvety",
+          "zbraň"
+        ],
+        "date_earliest": 1640,
+        "date_latest": 1640,
+        "updated_at": "2026-07-12 22:58:42",
+        "created_at": "2014-12-15 11:13:23",
+        "has_image": true,
+        "has_iip": true,
+        "has_text": true,
+        "is_free": true,
+        "is_for_reproduction": true,
+        "authority_id": [
+          "479"
+        ],
+        "view_count": 6678,
+        "work_type": [
+          "maliarstvo/obraz závesný"
+        ],
+        "object_type": [
+          "závesný obraz"
+        ],
+        "image_ratio": 1.5267175572519,
+        "title": "Alegória mesiaca máj",
+        "description": "Zosilnen&yacute; z&aacute;ujem o naturalistick&eacute; ľudov&eacute; t&eacute;my zlat&eacute;ho veku &scaron;panielskeho baroka bol vedomou reakciou na exaltovanosť manierizmu dvorsk&eacute;ho umenia. Veľk&yacute; vplyv na tento v&yacute;voj mala nizozemsk&aacute; ž&aacute;nrov&aacute; maľba a stv&aacute;rnenia dokonale napodobuj&uacute;ce skutočnosť, tzv. bodeg&oacute;ny. Tento pojem sa preniesol okolo polovice 17. storočia aj na osamostatnen&eacute; z&aacute;ti&scaron;ia. Ich maľba sa stala prest&iacute;žnou z&aacute;ležitosťou.\r\n\r\nAj Francisco Barrera bol vyhľad&aacute;van&yacute;m &scaron;pecialistom na z&aacute;ti&scaron;ia. V prameňoch sa spom&iacute;na, že pracoval pre &scaron;panielsky kr&aacute;ľovsk&yacute; dvor a okrem dnes zn&aacute;mych z&aacute;ti&scaron;&iacute; maľoval n&aacute;božensk&eacute; obrazy, portr&eacute;ty sv&auml;tcov a krajiny. O Barrerovom živote sa temer nič nevie, dobre zar&aacute;bal, bol akt&iacute;vnym členom Gildy sv. Luk&aacute;&scaron;a a v centre Madridu mal dva obchody.\r\n\r\nPozoruhodn&uacute; kolekciu Barrerovho cyklu nadobudla SNG postupne, August (O 272) z&iacute;skala prevodom z b&yacute;val&eacute;ho Slovensk&eacute;ho vlastivedn&eacute;ho m&uacute;zea v Bratislave roku 1950, M&aacute;j (O 348) prostredn&iacute;ctvom pol&iacute;cie v rovnakom roku a J&uacute;l k&uacute;pou od s&uacute;kromn&eacute;ho vlastn&iacute;ka. Ďal&scaron;ie aleg&oacute;rie mesiacov Febru&aacute;r, Apr&iacute;l, J&uacute;n, Okt&oacute;ber a December s&uacute; v s&uacute;kromn&yacute;ch zbierkach a Febru&aacute;r v &Scaron;panielsku. Ostatn&eacute; obrazy\r\ncyklu zatiaľ nie s&uacute; zn&aacute;me.",
+        "topic": [
+          "zátišie",
+          "animálny motív",
+          "krajina",
+          "vegetatívny motív"
+        ],
+        "place": [],
+        "measurement": [
+          "výška 102.0 cm, šírka 155.5 cm "
+        ],
+        "dating": "1640",
+        "medium": [
+          "plátno"
+        ],
+        "technique": [
+          "olej"
+        ],
+        "gallery": "Slovenská národná galéria, SNG",
+        "credit": null,
+        "contributor": "",
+        "related_work": null,
+        "exhibition": null,
+        "box": null,
+        "location": null,
+        "additionals": null,
+        "images": [
+          "/SNGZV/X400/SNG--O_348--1_1--_2013_10_08_--L2_WEB.jp2"
+        ],
+        "hsl": [],
+        "frontend": [
+          "webumenia"
+        ],
+        "authors_formatted": [
+          "Francisco Barrera"
+        ]
+      }
+    },
+    {
+      "id": "SVK:SNG.O_272",
+      "content": {
+        "id": "SVK:SNG.O_272",
+        "identifier": "O 272",
+        "author": [
+          "Barrera, Francisco"
+        ],
+        "authors": [
+          {
+            "name": "Barrera, Francisco",
+            "authority": {
+              "id": "479"
+            },
+            "name_formatted": "Francisco Barrera"
+          }
+        ],
+        "tag": [
+          "ovocie",
+          "ryba",
+          "vták"
+        ],
+        "date_earliest": 1640,
+        "date_latest": 1640,
+        "updated_at": "2026-07-12 22:58:13",
+        "created_at": "2014-12-15 11:11:21",
+        "has_image": true,
+        "has_iip": true,
+        "has_text": true,
+        "is_free": true,
+        "is_for_reproduction": true,
+        "authority_id": [
+          "479"
+        ],
+        "view_count": 6816,
+        "work_type": [
+          "maliarstvo/obraz závesný"
+        ],
+        "object_type": [
+          "závesný obraz"
+        ],
+        "image_ratio": 1.5414258188825,
+        "title": "Alegória mesiaca august",
+        "description": "Zosilnen&yacute; z&aacute;ujem o naturalistick&eacute; ľudov&eacute; t&eacute;my zlat&eacute;ho veku &scaron;panielskeho baroka bol vedomou reakciou na exaltovanosť manierizmu dvorsk&eacute;ho umenia. Veľk&yacute; vplyv na tento v&yacute;voj mala nizozemsk&aacute; ž&aacute;nrov&aacute; maľba a stv&aacute;rnenia dokonale napodobuj&uacute;ce skutočnosť, tzv. bodeg&oacute;ny. Tento pojem sa preniesol okolo polovice 17. storočia aj na osamostatnen&eacute; z&aacute;ti&scaron;ia. Ich maľba sa stala prest&iacute;žnou z&aacute;ležitosťou.\r\n\r\nAj Francisco Barrera bol vyhľad&aacute;van&yacute;m &scaron;pecialistom na z&aacute;ti&scaron;ia. V prameňoch sa spom&iacute;na, že pracoval pre &scaron;panielsky kr&aacute;ľovsk&yacute; dvor a okrem dnes zn&aacute;mych z&aacute;ti&scaron;&iacute; maľoval n&aacute;božensk&eacute; obrazy, portr&eacute;ty sv&auml;tcov a krajiny. O Barrerovom živote sa temer nič nevie, dobre zar&aacute;bal, bol akt&iacute;vnym členom Gildy sv. Luk&aacute;&scaron;a a v centre Madridu mal dva obchody.\r\n\r\nPozoruhodn&uacute; kolekciu Barrerovho cyklu nadobudla SNG postupne, August (O 272) z&iacute;skala prevodom z b&yacute;val&eacute;ho Slovensk&eacute;ho vlastivedn&eacute;ho m&uacute;zea v Bratislave roku 1950, M&aacute;j (O 348) prostredn&iacute;ctvom pol&iacute;cie v rovnakom roku a J&uacute;l k&uacute;pou od s&uacute;kromn&eacute;ho vlastn&iacute;ka. Ďal&scaron;ie aleg&oacute;rie mesiacov Febru&aacute;r, Apr&iacute;l, J&uacute;n, Okt&oacute;ber a December s&uacute; v s&uacute;kromn&yacute;ch zbierkach a Febru&aacute;r v &Scaron;panielsku. Ostatn&eacute; obrazy\r\ncyklu zatiaľ nie s&uacute; zn&aacute;me.",
+        "topic": [
+          "zátišie"
+        ],
+        "place": [],
+        "measurement": [
+          "výška 102.0 cm, šírka 155.0 cm "
+        ],
+        "dating": "1640",
+        "medium": [
+          "plátno"
+        ],
+        "technique": [
+          "olej"
+        ],
+        "gallery": "Slovenská národná galéria, SNG",
+        "credit": null,
+        "contributor": "",
+        "related_work": null,
+        "exhibition": null,
+        "box": null,
+        "location": null,
+        "additionals": null,
+        "images": [
+          "/SNGZV/X300/SNG--O_272--1_1--_2013_10_07_--L2_WEB.jp2"
+        ],
+        "hsl": [],
+        "frontend": [
+          "webumenia"
+        ],
+        "authors_formatted": [
+          "Francisco Barrera"
+        ]
+      }
+    },
+    {
+      "id": "SVK:SNG.O_5451",
+      "content": {
+        "id": "SVK:SNG.O_5451",
+        "identifier": "O 5451",
+        "author": [
+          "Barrera, Francisco"
+        ],
+        "authors": [
+          {
+            "name": "Barrera, Francisco",
+            "authority": {
+              "id": "479"
+            },
+            "name_formatted": "Francisco Barrera"
+          }
+        ],
+        "tag": [
+          "zelenina",
+          "ryba"
+        ],
+        "date_earliest": 1640,
+        "date_latest": 1640,
+        "updated_at": "2026-07-12 22:58:12",
+        "created_at": "2014-12-15 11:13:18",
+        "has_image": true,
+        "has_iip": true,
+        "has_text": true,
+        "is_free": true,
+        "is_for_reproduction": true,
+        "authority_id": [
+          "479"
+        ],
+        "view_count": 6309,
+        "work_type": [
+          "maliarstvo/obraz závesný"
+        ],
+        "object_type": [
+          "závesný obraz"
+        ],
+        "image_ratio": 1.5355086372361,
+        "title": "Alegória mesiaca júl",
+        "description": "Zosilnen&yacute; z&aacute;ujem o naturalistick&eacute; ľudov&eacute; t&eacute;my zlat&eacute;ho veku &scaron;panielskeho baroka bol vedomou reakciou na exaltovanosť manierizmu dvorsk&eacute;ho umenia. Veľk&yacute; vplyv na tento v&yacute;voj mala nizozemsk&aacute; ž&aacute;nrov&aacute; maľba a stv&aacute;rnenia dokonale napodobuj&uacute;ce skutočnosť, tzv. bodeg&oacute;ny. Tento pojem sa preniesol okolo polovice 17. storočia aj na osamostatnen&eacute; z&aacute;ti&scaron;ia. Ich maľba sa stala prest&iacute;žnou z&aacute;ležitosťou.\r\n\r\nAj Francisco Barrera bol vyhľad&aacute;van&yacute;m &scaron;pecialistom na z&aacute;ti&scaron;ia. V prameňoch sa spom&iacute;na, že pracoval pre &scaron;panielsky kr&aacute;ľovsk&yacute; dvor a okrem dnes zn&aacute;mych z&aacute;ti&scaron;&iacute; maľoval n&aacute;božensk&eacute; obrazy, portr&eacute;ty sv&auml;tcov a krajiny. O Barrerovom živote sa temer nič nevie, dobre zar&aacute;bal, bol akt&iacute;vnym členom Gildy sv. Luk&aacute;&scaron;a a v centre Madridu mal dva obchody.\r\n\r\nSignovan&aacute; maľba J&uacute;l je s&uacute;časťou cyklu dvan&aacute;stich mesiacov. Vzhľadom na veľk&yacute; form&aacute;t a zložit&uacute; kompoz&iacute;ciu jednotliv&yacute;ch diel vznikla t&aacute;to s&eacute;ria na individu&aacute;lnu objedn&aacute;vku. Jednotliv&eacute; obrazy predstavuj&uacute; poľnohospod&aacute;rske plody naukladan&eacute; na kamenn&eacute; stupienky a v hornom rohu v&yacute;hľad do krajiny pon&uacute;ka pestr&uacute; panor&aacute;mu typick&yacute;ch pr&aacute;c a kratochv&iacute;ľ dan&eacute;ho mesiaca. Tieto obrazy s&uacute; pres&yacute;ten&eacute; mnohoznačn&yacute;mi nar&aacute;žkami, substit&uacute;ciami. Obratne var&iacute;rovan&eacute; kombin&aacute;cie pozorovan&yacute;ch, vymyslen&yacute;ch a z in&yacute;ch diel vypožičan&yacute;ch predmetov a plod&iacute;n v životnej veľkosti Barrerov&yacute;ch z&aacute;ti&scaron;&iacute; s&uacute; n&aacute;hodil&eacute; a naturalistick&eacute;, podan&eacute; bez emočn&eacute;ho p&aacute;tosu a bez hierarchie akademickej doktr&iacute;ny.\r\n\r\nMnohovravnosť &scaron;panielskych z&aacute;ti&scaron;&iacute; nekonč&iacute; pri veľkolepej pastve oč&iacute;, množen&iacute;m pl&aacute;nov a objektov je vyl&iacute;čen&aacute; aj transcendent&aacute;lna funkcia neviditeľn&eacute;ho symbolizmu ako duchovn&aacute; potrava. Preto namiesto kompletnej tabule alebo vymenovania plod&iacute;n spojen&yacute;ch s jednotliv&yacute;mi mesiacmi sa prezentuje oslava aktu hodovania a okrem aranžovan&yacute;ch pokrmov s&uacute; zaznamen&aacute;van&eacute; potraviny aj v stave ich konzervovania či skladovania.\r\n&nbsp;",
+        "topic": [
+          "alegorická kompozícia",
+          "zátišie",
+          "animálny motív",
+          "figurálna štafáž"
+        ],
+        "place": [],
+        "measurement": [
+          "výška 105.0 cm, šírka 155.0 cm "
+        ],
+        "dating": "1640",
+        "medium": [
+          "plátno"
+        ],
+        "technique": [
+          "olej"
+        ],
+        "gallery": "Slovenská národná galéria, SNG",
+        "credit": null,
+        "contributor": "",
+        "related_work": null,
+        "exhibition": null,
+        "box": null,
+        "location": null,
+        "additionals": null,
+        "images": [
+          "/SNGZV/X5500/SNG--O_5451--1_1--_2013_10_08_--L2_WEB.jp2"
+        ],
+        "hsl": [],
+        "frontend": [
+          "webumenia"
+        ],
+        "authors_formatted": [
+          "Francisco Barrera"
+        ]
+      }
+    }
+  ],
+  "first_page_url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=1",
+  "from": 1,
+  "last_page": 5,
+  "last_page_url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=5",
+  "links": [
+    {
+      "url": null,
+      "label": "&laquo; Predchádzajúca",
+      "active": false
+    },
+    {
+      "url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=1",
+      "label": "1",
+      "active": true
+    },
+    {
+      "url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=2",
+      "label": "2",
+      "active": false
+    },
+    {
+      "url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=3",
+      "label": "3",
+      "active": false
+    },
+    {
+      "url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=4",
+      "label": "4",
+      "active": false
+    },
+    {
+      "url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=5",
+      "label": "5",
+      "active": false
+    },
+    {
+      "url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=2",
+      "label": "Nasledujúca &raquo;",
+      "active": false
+    }
+  ],
+  "next_page_url": "https://www.webumenia.sk/api/v1/items?q=mesiac&filter%5Bis_free%5D=true&filter%5Bhas_image%5D=true&size=6&page=2",
+  "path": "https://www.webumenia.sk/api/v1/items",
+  "per_page": 6,
+  "prev_page_url": null,
+  "to": 6,
+  "total": 29
+}

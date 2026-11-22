@@ -1,0 +1,688 @@
+{
+  "took": 2,
+  "timed_out": false,
+  "_shards": {
+    "total": 5,
+    "successful": 5,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 210,
+      "relation": "eq"
+    },
+    "max_score": 1.0,
+    "hits": [
+      {
+        "_index": "elasticsearch_index_fortepandrupalmain_hd64t_media",
+        "_type": "_doc",
+        "_id": "entity:media/107309:hu",
+        "_score": 1.0,
+        "_source": {
+          "_language": "hu",
+          "adomanyozo": [
+            81765
+          ],
+          "adomanyozo_en": [
+            "Hunyady József"
+          ],
+          "adomanyozo_en_search": [
+            "hunyady jozsef"
+          ],
+          "adomanyozo_name": [
+            "Hunyady József"
+          ],
+          "adomanyozo_search": [
+            "hunyady jozsef"
+          ],
+          "cimke": [
+            51428
+          ],
+          "cimke_en": [
+            "Budapest"
+          ],
+          "cimke_en_search": [
+            "budapest"
+          ],
+          "cimke_name": [
+            "Budapest"
+          ],
+          "cimke_search": [
+            "budapest"
+          ],
+          "created": [
+            1476489600
+          ],
+          "description": [
+            "Dutka Ákos költő máriaremetei otthona. Az asztalon Juhász Gyula nagyváradi portréja, a családnak dedikálva."
+          ],
+          "description_search": [
+            "dutka akos kolto mariaremetei otthona. az asztalon juhasz gyula nagyvaradi portreja, a csaladnak dedikalva."
+          ],
+          "gps_alt": [
+            0
+          ],
+          "gps_dir": [
+            0
+          ],
+          "gps_lat": [
+            47.4984
+          ],
+          "gps_lng": [
+            19.0405
+          ],
+          "gps_type": [
+            12
+          ],
+          "langcode": [
+            "hu"
+          ],
+          "mid": [
+            107309
+          ],
+          "old_id": [
+            107309
+          ],
+          "orszag": [
+            103
+          ],
+          "orszag_en": [
+            "Hungary"
+          ],
+          "orszag_en_search": [
+            "hungary"
+          ],
+          "orszag_name": [
+            "Magyarország"
+          ],
+          "orszag_search": [
+            "magyarorszag"
+          ],
+          "uid": [
+            0
+          ],
+          "uuid": [
+            "e7f59f34-0c2f-11ea-a870-0242ac140002"
+          ],
+          "varos": [
+            264
+          ],
+          "varos_en": [
+            "Budapest II."
+          ],
+          "varos_en_search": [
+            "budapest ii."
+          ],
+          "varos_name": [
+            "Budapest II."
+          ],
+          "varos_search": [
+            "array",
+            "budapest ii."
+          ],
+          "year": [
+            1964
+          ]
+        }
+      },
+      {
+        "_index": "elasticsearch_index_fortepandrupalmain_hd64t_media",
+        "_type": "_doc",
+        "_id": "entity:media/122277:hu",
+        "_score": 1.0,
+        "_source": {
+          "_language": "hu",
+          "adomanyozo": [
+            100708
+          ],
+          "adomanyozo_en": [
+            "Magyar Műszaki és Közlekedési Múzeum / Történeti Fényképek Gyűjteménye / Óbudai Hajógyár gyűjteménye"
+          ],
+          "adomanyozo_en_search": [
+            "magyar muszaki es kozlekedesi muzeum / torteneti fenykepek gyujtemenye / obudai hajogyar gyujtemenye"
+          ],
+          "adomanyozo_name": [
+            "Magyar Műszaki és Közlekedési Múzeum / Történeti Fényképek Gyűjteménye / Óbudai Hajógyár gyűjteménye"
+          ],
+          "adomanyozo_search": [
+            "",
+            "magyar muszaki es kozlekedesi muzeum / torteneti fenykepek gyujtemenye / obudai hajogyar gyujtemenye"
+          ],
+          "cimke": [
+            2009
+          ],
+          "cimke_en": [
+            "swastica"
+          ],
+          "cimke_en_search": [
+            "swastica"
+          ],
+          "cimke_name": [
+            "horogkereszt"
+          ],
+          "cimke_search": [
+            "hakenkreutz",
+            "szvasztika",
+            "horogkereszt"
+          ],
+          "created": [
+            1498780800
+          ],
+          "description": [
+            "»DDSG dolgozó 40 éves jubileumának ünneplése az Óbudai Hajógyárban, portrékép.« Leltári jelzet: MMKM TFGY 2017.2.575."
+          ],
+          "description_search": [
+            ">>ddsg dolgozo 40 eves jubileumanak unneplese az obudai hajogyarban, portrekep.<< leltari jelzet: mmkm tfgy 2017.2.575."
+          ],
+          "gps_alt": [
+            0
+          ],
+          "gps_dir": [
+            0
+          ],
+          "gps_lat": [
+            47.1818
+          ],
+          "gps_lng": [
+            19.5061
+          ],
+          "gps_type": [
+            8
+          ],
+          "langcode": [
+            "hu"
+          ],
+          "mid": [
+            122277
+          ],
+          "old_id": [
+            122277
+          ],
+          "orszag": [
+            103
+          ],
+          "orszag_en": [
+            "Hungary"
+          ],
+          "orszag_en_search": [
+            "hungary"
+          ],
+          "orszag_name": [
+            "Magyarország"
+          ],
+          "orszag_search": [
+            "magyarorszag"
+          ],
+          "uid": [
+            0
+          ],
+          "uuid": [
+            "e84b0d27-0c2f-11ea-a870-0242ac140002"
+          ],
+          "year": [
+            1940
+          ]
+        }
+      },
+      {
+        "_index": "elasticsearch_index_fortepandrupalmain_hd64t_media",
+        "_type": "_doc",
+        "_id": "entity:media/122280:hu",
+        "_score": 1.0,
+        "_source": {
+          "_language": "hu",
+          "adomanyozo": [
+            100708
+          ],
+          "adomanyozo_en": [
+            "Magyar Műszaki és Közlekedési Múzeum / Történeti Fényképek Gyűjteménye / Óbudai Hajógyár gyűjteménye"
+          ],
+          "adomanyozo_en_search": [
+            "magyar muszaki es kozlekedesi muzeum / torteneti fenykepek gyujtemenye / obudai hajogyar gyujtemenye"
+          ],
+          "adomanyozo_name": [
+            "Magyar Műszaki és Közlekedési Múzeum / Történeti Fényképek Gyűjteménye / Óbudai Hajógyár gyűjteménye"
+          ],
+          "adomanyozo_search": [
+            "",
+            "magyar muszaki es kozlekedesi muzeum / torteneti fenykepek gyujtemenye / obudai hajogyar gyujtemenye"
+          ],
+          "cimke": [
+            2009
+          ],
+          "cimke_en": [
+            "swastica"
+          ],
+          "cimke_en_search": [
+            "swastica"
+          ],
+          "cimke_name": [
+            "horogkereszt"
+          ],
+          "cimke_search": [
+            "hakenkreutz",
+            "szvasztika",
+            "horogkereszt"
+          ],
+          "created": [
+            1498780800
+          ],
+          "description": [
+            "»Szakmunkás 50 éves jubileumának ünneplése az Óbudai Hajógyárban/50. évforduló alkalmából készült portré.« Leltári jelzet: MMKM TFGY 2017.2.580."
+          ],
+          "description_search": [
+            ">>szakmunkas 50 eves jubileumanak unneplese az obudai hajogyarban/50. evfordulo alkalmabol keszult portre.<< leltari jelzet: mmkm tfgy 2017.2.580."
+          ],
+          "gps_alt": [
+            0
+          ],
+          "gps_dir": [
+            0
+          ],
+          "gps_lat": [
+            47.1818
+          ],
+          "gps_lng": [
+            19.5061
+          ],
+          "gps_type": [
+            8
+          ],
+          "langcode": [
+            "hu"
+          ],
+          "mid": [
+            122280
+          ],
+          "old_id": [
+            122280
+          ],
+          "orszag": [
+            103
+          ],
+          "orszag_en": [
+            "Hungary"
+          ],
+          "orszag_en_search": [
+            "hungary"
+          ],
+          "orszag_name": [
+            "Magyarország"
+          ],
+          "orszag_search": [
+            "magyarorszag"
+          ],
+          "uid": [
+            0
+          ],
+          "uuid": [
+            "e84b1121-0c2f-11ea-a870-0242ac140002"
+          ],
+          "year": [
+            1941
+          ]
+        }
+      },
+      {
+        "_index": "elasticsearch_index_fortepandrupalmain_hd64t_media",
+        "_type": "_doc",
+        "_id": "entity:media/122341:hu",
+        "_score": 1.0,
+        "_source": {
+          "_language": "hu",
+          "adomanyozo": [
+            100708
+          ],
+          "adomanyozo_en": [
+            "Magyar Műszaki és Közlekedési Múzeum / Történeti Fényképek Gyűjteménye / Óbudai Hajógyár gyűjteménye"
+          ],
+          "adomanyozo_en_search": [
+            "magyar muszaki es kozlekedesi muzeum / torteneti fenykepek gyujtemenye / obudai hajogyar gyujtemenye"
+          ],
+          "adomanyozo_name": [
+            "Magyar Műszaki és Közlekedési Múzeum / Történeti Fényképek Gyűjteménye / Óbudai Hajógyár gyűjteménye"
+          ],
+          "adomanyozo_search": [
+            "",
+            "magyar muszaki es kozlekedesi muzeum / torteneti fenykepek gyujtemenye / obudai hajogyar gyujtemenye"
+          ],
+          "cimke": [
+            2628,
+            4006,
+            15487,
+            1329
+          ],
+          "cimke_en": [
+            "resort",
+            "interior",
+            "Joseph Stalin portrayal",
+            "tile stove"
+          ],
+          "cimke_en_search": [
+            "resort",
+            "interior",
+            "joseph stalin portrayal",
+            "tile stove"
+          ],
+          "cimke_name": [
+            "üdülőhely",
+            "enteriőr",
+            "Sztálin ábrázolás",
+            "cserépkályha"
+          ],
+          "cimke_search": [
+            "lakasbelso",
+            "udulohely",
+            "enterior",
+            "sztalin abrazolas",
+            "cserepkalyha"
+          ],
+          "created": [
+            1498780800
+          ],
+          "description": [
+            "»Feltehetően a hajógyárhoz köthető üdülőépület belső tere Sztálin portréjával.« Leltári jelzet: MMKM TFGY 2017.2.691."
+          ],
+          "description_search": [
+            ">>feltehetoen a hajogyarhoz kotheto uduloepulet belso tere sztalin portrejaval.<< leltari jelzet: mmkm tfgy 2017.2.691."
+          ],
+          "gps_alt": [
+            0
+          ],
+          "gps_dir": [
+            0
+          ],
+          "gps_lat": [
+            47.1818
+          ],
+          "gps_lng": [
+            19.5061
+          ],
+          "gps_type": [
+            8
+          ],
+          "langcode": [
+            "hu"
+          ],
+          "mid": [
+            122341
+          ],
+          "old_id": [
+            122341
+          ],
+          "orszag": [
+            103
+          ],
+          "orszag_en": [
+            "Hungary"
+          ],
+          "orszag_en_search": [
+            "hungary"
+          ],
+          "orszag_name": [
+            "Magyarország"
+          ],
+          "orszag_search": [
+            "magyarorszag"
+          ],
+          "uid": [
+            0
+          ],
+          "uuid": [
+            "e84b69cd-0c2f-11ea-a870-0242ac140002"
+          ],
+          "year": [
+            1951
+          ]
+        }
+      },
+      {
+        "_index": "elasticsearch_index_fortepandrupalmain_hd64t_media",
+        "_type": "_doc",
+        "_id": "entity:media/129306:hu",
+        "_score": 1.0,
+        "_source": {
+          "_language": "hu",
+          "adomanyozo": [
+            105612
+          ],
+          "adomanyozo_en": [
+            "Horváth Miklós dr"
+          ],
+          "adomanyozo_en_search": [
+            "horvath miklos dr"
+          ],
+          "adomanyozo_name": [
+            "Horváth Miklós dr"
+          ],
+          "adomanyozo_search": [
+            "",
+            "horvath miklos dr"
+          ],
+          "cimke": [
+            1545,
+            3116,
+            51428
+          ],
+          "cimke_en": [
+            "wicker chair",
+            "folk costume",
+            "Budapest"
+          ],
+          "cimke_en_search": [
+            "wicker chair",
+            "folk costume",
+            "budapest"
+          ],
+          "cimke_name": [
+            "fonott szék",
+            "népviselet",
+            "Budapest"
+          ],
+          "cimke_search": [
+            "fonott szek",
+            "nepviselet",
+            "budapest"
+          ],
+          "created": [
+            1512950400
+          ],
+          "description": [
+            "a portré egy mátyásföldi ház kertjében készült."
+          ],
+          "description_search": [
+            "a portre egy matyasfoldi haz kertjeben keszult."
+          ],
+          "gps_alt": [
+            0
+          ],
+          "gps_dir": [
+            0
+          ],
+          "gps_lat": [
+            0
+          ],
+          "gps_lng": [
+            0
+          ],
+          "gps_type": [
+            0
+          ],
+          "langcode": [
+            "hu"
+          ],
+          "mid": [
+            129306
+          ],
+          "old_id": [
+            129306
+          ],
+          "orszag": [
+            103
+          ],
+          "orszag_en": [
+            "Hungary"
+          ],
+          "orszag_en_search": [
+            "hungary"
+          ],
+          "orszag_name": [
+            "Magyarország"
+          ],
+          "orszag_search": [
+            "magyarorszag"
+          ],
+          "uid": [
+            0
+          ],
+          "uuid": [
+            "e87cbf77-0c2f-11ea-a870-0242ac140002"
+          ],
+          "varos": [
+            310
+          ],
+          "varos_en": [
+            "Budapest XVI."
+          ],
+          "varos_en_search": [
+            "budapest xvi."
+          ],
+          "varos_name": [
+            "Budapest XVI."
+          ],
+          "varos_search": [
+            "array",
+            "budapest xvi."
+          ],
+          "year": [
+            1930
+          ]
+        }
+      },
+      {
+        "_index": "elasticsearch_index_fortepandrupalmain_hd64t_media",
+        "_type": "_doc",
+        "_id": "entity:media/129019:hu",
+        "_score": 1.0,
+        "_source": {
+          "_language": "hu",
+          "adomanyozo": [
+            105608
+          ],
+          "adomanyozo_en": [
+            "Gyimesi Kinga"
+          ],
+          "adomanyozo_en_search": [
+            "gyimesi kinga"
+          ],
+          "adomanyozo_name": [
+            "Gyimesi Kinga"
+          ],
+          "adomanyozo_search": [
+            "",
+            "gyimesi kinga"
+          ],
+          "cimke": [
+            4879
+          ],
+          "cimke_name": [
+            "díszmagyar"
+          ],
+          "cimke_search": [
+            "mente",
+            "diszmagyar"
+          ],
+          "created": [
+            1512950400
+          ],
+          "description": [
+            "a Vármegyeháza díszterme, a felvételt Bánovszky Miklós festőművész portréfestéshez készitette."
+          ],
+          "description_search": [
+            "a varmegyehaza diszterme, a felvetelt banovszky miklos festomuvesz portrefesteshez keszitette."
+          ],
+          "gps_alt": [
+            0
+          ],
+          "gps_dir": [
+            0
+          ],
+          "gps_lat": [
+            48.1035
+          ],
+          "gps_lng": [
+            20.7784
+          ],
+          "gps_type": [
+            12
+          ],
+          "langcode": [
+            "hu"
+          ],
+          "mid": [
+            129019
+          ],
+          "old_id": [
+            129019
+          ],
+          "orszag": [
+            103
+          ],
+          "orszag_en": [
+            "Hungary"
+          ],
+          "orszag_en_search": [
+            "hungary"
+          ],
+          "orszag_name": [
+            "Magyarország"
+          ],
+          "orszag_search": [
+            "magyarorszag"
+          ],
+          "szerzo": [
+            105609
+          ],
+          "szerzo_en": [
+            "Bánovszky Miklós"
+          ],
+          "szerzo_en_search": [
+            "banovszky miklos"
+          ],
+          "szerzo_name": [
+            "Bánovszky Miklós"
+          ],
+          "szerzo_search": [
+            "banovszky miklos"
+          ],
+          "uid": [
+            0
+          ],
+          "uuid": [
+            "e87abde9-0c2f-11ea-a870-0242ac140002"
+          ],
+          "varos": [
+            579
+          ],
+          "varos_en": [
+            "Miskolc"
+          ],
+          "varos_en_search": [
+            "miskolc"
+          ],
+          "varos_name": [
+            "Miskolc"
+          ],
+          "varos_search": [
+            "array",
+            "miskolc"
+          ],
+          "year": [
+            1940
+          ]
+        }
+      }
+    ]
+  }
+}

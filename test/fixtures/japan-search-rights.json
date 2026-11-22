@@ -1,0 +1,2324 @@
+{
+  "pdm": {
+    "facets": [
+      {
+        "counts": {
+          "edu": 5924,
+          "noncom": 5924,
+          "com": 5924,
+          "pdm": 5924
+        },
+        "key": "rights"
+      },
+      {
+        "counts": {
+          "internet": 5920,
+          "iiif": 5144,
+          "thumb": 5924,
+          "image": 1165,
+          "pdf": 42,
+          "description": 511
+        },
+        "key": "contents"
+      },
+      {
+        "counts": {
+          "media": 1601,
+          "book": 842,
+          "ancdoc": 444,
+          "paint": 352,
+          "craft": 69,
+          "sculpture": 24,
+          "offdoc": 16,
+          "map": 10,
+          "photo": 4,
+          "periodical": 4,
+          "mscore": 3,
+          "arts": 1,
+          "weaponry": 1
+        },
+        "key": "type"
+      },
+      {
+        "counts": {
+          "dignl": 4630,
+          "uryukyu": 418,
+          "apmoa_mapps": 391,
+          "tokyomuseumcolection": 283,
+          "kyudai": 61,
+          "nier_mode": 42,
+          "niigata_banbi_db": 37,
+          "gakugei_archive": 24,
+          "fukui": 23,
+          "ukobe_s": 7,
+          "meiji_u": 3,
+          "bunka": 2,
+          "tokyo": 2,
+          "ukansai": 1
+        },
+        "key": "db"
+      },
+      {
+        "counts": {
+          "book": 5211,
+          "art": 711,
+          "cultural": 309,
+          "regional": 283,
+          "humanities": 24,
+          "official": 24
+        },
+        "key": "cm"
+      },
+      {
+        "counts": {
+          "showa": 3918,
+          "edo": 483,
+          "meiji": 443,
+          "taisyo": 378,
+          "muromachi": 35,
+          "kamakura": 26,
+          "aduchi": 8,
+          "heian": 7,
+          "nara": 2,
+          "asuka": 1
+        },
+        "key": "tempo"
+      }
+    ],
+    "from": 0,
+    "hit": 5924,
+    "list": [
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-13437516",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/13437516/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/13437516",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1944.5",
+            "1944"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/13437516/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Sunrise, Sunset, Moonrise and Moonset Tables"
+        },
+        "id": "dignl-13437516",
+        "dignl-rdf:RDF": {
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000039",
+            "dcndl:bibRecordSubCategory-s": [
+              "A00076",
+              "A00016",
+              "A00000"
+            ]
+          },
+          "dcndl:BibResource": {
+            "rdfs:seeAlso_rdf:resource-u": [
+              "http://id.ndl.go.jp/digimeta/13437516",
+              "https://dl.ndl.go.jp/pid/13437516",
+              "https://dl.ndl.go.jp/api/iiif/13437516/manifest.json"
+            ],
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLBibID-s": "033354654",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLJP-s": "info:ndljp/pid/13437516",
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "Sunrise, Sunset, Moonrise and Moonset Tables"
+              }
+            },
+            "dcndl:seriesTitle": {
+              "rdf:Description": {
+                "rdf:value-s": "文書名:Records of the U. S. Marine Corps. Captured Japanese Documents, 1942-1945 = 米海兵隊鹵獲日本文書 シリーズ名: Shipping, Naval Matters ボックス番号: 37; フォルダ番号: 9"
+              }
+            },
+            "dcndl:digitizedPublisher-s": "国立国会図書館",
+            "dcterms:date-s": "1944.5",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "1944",
+            "dcterms:issued-s": "1944",
+            "dcterms:available_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": [
+              "2024-05-29",
+              "2024-05-29"
+            ],
+            "dcterms:dateAccepted_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": "2024-03-28T16:18:46+09:00",
+            "dcndl:dateDigitized_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "2024-03-22",
+            "dcndl:partInformation": {
+              "rdf:Description": {
+                "dcterms:title-s": "五月分日出入, 月出入, 薄明時刻及月齢一覧表"
+              }
+            },
+            "dcterms:description-s": [
+              "コレクション : 国立国会図書館デジタルコレクション > デジタル化資料 > 日本占領関係資料 > その他",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "\"Captured at Wakde, 19/May/45\"",
+              "原所蔵機関: 米国国立公文書館 (RG127)"
+            ],
+            "dcterms:language_rdf:datatype_http://purl_org/dc/terms/ISO639_2-s": "eng",
+            "dcterms:format_rdf:datatype_http://purl_org/dc/terms/IMT-s": "image/jp2",
+            "dcterms:accessRights-s": "インターネット公開",
+            "dcterms:rights-s": [
+              "pdm",
+              "PDM"
+            ],
+            "dcterms:audience-s": "一般",
+            "dcterms:source_rdf:resource-u": "https://id.ndl.go.jp/bib/033354654",
+            "foaf:thumbnail_rdf:resource-u": "https://www.dl.ndl.go.jp/api/iiif/13437516/R0000001/full/256,/0/default.jpg"
+          },
+          "iiifmanifest-u": "https://dl.ndl.go.jp/api/iiif/13437516/manifest.json",
+          "digicoreurl-u": "http://dl.ndl.go.jp/info:ndljp/pid/13437516"
+        }
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-14945844",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/14945844/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/14945844",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1947.06-1947.06",
+            "1947"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/14945844/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Hommon Kyoo Sect"
+        },
+        "id": "dignl-14945844",
+        "dignl-rdf:RDF": {
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000039",
+            "dcndl:bibRecordSubCategory-s": [
+              "A00189",
+              "A00105",
+              "A00016",
+              "A00000"
+            ]
+          },
+          "dcndl:Item": {
+            "dcndl:callNumber-s": "CIE(C) 05928"
+          },
+          "dcndl:BibResource": {
+            "rdfs:seeAlso_rdf:resource-u": [
+              "http://id.ndl.go.jp/digimeta/14945844",
+              "https://dl.ndl.go.jp/pid/14945844",
+              "https://dl.ndl.go.jp/api/iiif/14945844/manifest.json"
+            ],
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLBibID-s": "000006765685",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLJP-s": "info:ndljp/pid/14945844",
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "Hommon Kyoo Sect"
+              }
+            },
+            "dcndl:seriesTitle": {
+              "rdf:Description": {
+                "rdf:value-s": "文書名:GHQ/SCAP Records, Civil Information and Education Section = 連合国最高司令官総司令部民間情報教育局文書 課係名等:Religion & Cultural Resources Division ; Special Project Branch シリーズ名:Religious Research Data, 1945-51 ボックス番号:5820 ; フォルダ番号:9"
+              }
+            },
+            "dcndl:digitizedPublisher-s": "国立国会図書館",
+            "dcterms:date-s": "1947.06-1947.06",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "1947",
+            "dcterms:issued-s": "1947",
+            "dcterms:available_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": [
+              "2026-07-22",
+              "2026-07-22"
+            ],
+            "dcterms:dateAccepted_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": "2026-06-05T21:47:34+09:00",
+            "dcndl:dateDigitized_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "2026-03-19",
+            "dcterms:description-s": [
+              "コレクション : 国立国会図書館デジタルコレクション > デジタル化資料 > 日本占領関係資料 > GHQ/SCAP文書 (RG331) > 民間情報教育局文書 (CIE)",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "資料種別 : [マイクロ資料]",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "原所蔵機関: 米国国立公文書館 (RG331)",
+              "コレクションタイトル: 日本占領関係資料",
+              "コレクションタイトル: General Headquarters/Supreme Commander for Allied Powers",
+              "原資料の出版事項: 1947/06-1947/06"
+            ],
+            "dcterms:subject": [
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "Reports of the Japanese Government to SCAP"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "SCAPに対する日本政府の報告書"
+                }
+              }
+            ],
+            "dc:subject_rdf:datatype_http://ndl_go_jp/dcndl/terms/GHQSCAP-s": "820",
+            "dcterms:extent-s": "マイクロフィッシュ : File",
+            "dcterms:format_rdf:datatype_http://purl_org/dc/terms/IMT-s": "image/jp2",
+            "dcterms:accessRights-s": "インターネット公開",
+            "dcterms:rights-s": [
+              "pdm",
+              "PDM"
+            ],
+            "dcterms:source_rdf:resource-u": "https://id.ndl.go.jp/bib/000006765685",
+            "foaf:thumbnail_rdf:resource-u": "https://www.dl.ndl.go.jp/api/iiif/14945844/R0000001/full/256,/0/default.jpg"
+          },
+          "iiifmanifest-u": "https://dl.ndl.go.jp/api/iiif/14945844/manifest.json",
+          "digicoreurl-u": "http://dl.ndl.go.jp/info:ndljp/pid/14945844"
+        }
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "contributor": [
+            "Ootomo Propaganda Officejo"
+          ],
+          "database": "dignl",
+          "dclass": "367",
+          "id": "dignl-1138582",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/1138582/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/1138582",
+          "location": [
+            "Kameoka (Koito-hu)"
+          ],
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1928.10",
+            "1928"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/1138582/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Oomoto monata organo esperanta N-ro38",
+          "titleYomi": "Oomoto monata organo esperanta"
+        },
+        "id": "dignl-1138582",
+        "rdfindex": {
+          "spatial": [
+            "日本 > 京都府"
+          ],
+          "temporal": [
+            "昭和"
+          ],
+          "type": [
+            "図書"
+          ]
+        },
+        "dignl-rdf:RDF": {
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000039",
+            "dcndl:bibRecordSubCategory-s": [
+              "A00001",
+              "A00000"
+            ]
+          },
+          "dcndl:Item": {
+            "dcndl:callNumber-s": "特501-126"
+          },
+          "dcndl:BibResource": {
+            "rdfs:seeAlso_rdf:resource-u": [
+              "http://id.ndl.go.jp/digimeta/1138582",
+              "https://doi.org/10.11501/1138582",
+              "https://dl.ndl.go.jp/pid/1138582",
+              "https://dl.ndl.go.jp/api/iiif/1138582/manifest.json"
+            ],
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/JPNO-s": "46034697",
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLBibID-s": "000000695649",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/DOI-s": "10.11501/1138582",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLJP-s": "info:ndljp/pid/1138582",
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "Oomoto monata organo esperanta",
+                "dcndl:transcription-s": "Oomoto monata organo esperanta"
+              }
+            },
+            "dcndl:volume": {
+              "rdf:Description": {
+                "rdf:value-s": "N-ro38",
+                "dcndl:transcription-s": "38"
+              }
+            },
+            "dcterms:creator": {
+              "foaf:Agent": {
+                "foaf:name-s": "大本"
+              }
+            },
+            "dcterms:publisher": {
+              "foaf:Agent": {
+                "foaf:name-s": "Ootomo Propaganda Officejo",
+                "dcndl:location-s": "Kameoka (Koito-hu)"
+              }
+            },
+            "dcndl:digitizedPublisher-s": "国立国会図書館",
+            "dcterms:date-s": "1928.10",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "1928",
+            "dcterms:issued-s": "1928",
+            "dcndl:dateDigitized_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "2010-03-31",
+            "dcterms:tableOfContents": {
+              "rdf:Description": [
+                {
+                  "dcterms:title-s": "標題"
+                },
+                {
+                  "dcterms:title-s": "目次"
+                },
+                {
+                  "dcterms:title-s": "Devizoj/2"
+                },
+                {
+                  "dcterms:title-s": "NunaMomento/3"
+                },
+                {
+                  "dcterms:title-s": "MicinoSiori/4"
+                },
+                {
+                  "dcterms:title-s": "PromenodePlumo/6"
+                },
+                {
+                  "dcterms:title-s": "La４７‐avolumode≪RakontojellaSpiritaMondo≫/10"
+                },
+                {
+                  "dcterms:title-s": "Auroro/19"
+                },
+                {
+                  "dcterms:title-s": "EpizodoelPi‐vivo/21"
+                },
+                {
+                  "dcterms:title-s": "Jugo/25"
+                },
+                {
+                  "dcterms:title-s": "Japanujo/26"
+                }
+              ]
+            },
+            "dcterms:description-s": [
+              "資料形態 : テキストデータ プレーンテキスト",
+              "コレクション : 国立国会図書館デジタルコレクション > デジタル化資料 > 図書",
+              "発行所: 第二天声社"
+            ],
+            "dc:subject_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDC-s": "169",
+            "dcterms:language_rdf:datatype_http://purl_org/dc/terms/ISO639_2-s": "epo",
+            "dcterms:extent-s": "30p ; 19cm",
+            "dcterms:format_rdf:datatype_http://purl_org/dc/terms/IMT-s": "image/jp2",
+            "dcndl:materialType_rdf:resource-u": "http://ndl.go.jp/ndltype/Book",
+            "dcndl:materialType_rdfs:label-s": "図書",
+            "dcterms:accessRights-s": "インターネット公開",
+            "dcterms:rights-s": [
+              "pdm",
+              "PDM"
+            ],
+            "dcterms:audience-s": "一般",
+            "dcterms:source_rdf:resource-u": [
+              "https://id.ndl.go.jp/bib/000000695649",
+              "http://id.ndl.go.jp/jpno/46034697"
+            ],
+            "foaf:thumbnail_rdf:resource-u": "https://www.dl.ndl.go.jp/api/iiif/1138582/R0000001/full/256,/0/default.jpg"
+          },
+          "iiifmanifest-u": "https://dl.ndl.go.jp/api/iiif/1138582/manifest.json",
+          "digicoreurl-u": "http://dl.ndl.go.jp/info:ndljp/pid/1138582"
+        }
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-12904124",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/12904124/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/12904124",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1944.05-1944.05",
+            "1944"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/12904124/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Sunrise and Sunset Tables; Moonrise and Moonset Tables"
+        },
+        "id": "dignl-12904124",
+        "dignl-rdf:RDF": {
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000039",
+            "dcndl:bibRecordSubCategory-s": [
+              "A00076",
+              "A00016",
+              "A00000"
+            ]
+          },
+          "dcndl:Item": {
+            "dcndl:callNumber-s": "YF-A41 R32: 122-161"
+          },
+          "dcndl:BibResource": {
+            "rdfs:seeAlso_rdf:resource-u": [
+              "http://id.ndl.go.jp/digimeta/12904124",
+              "https://dl.ndl.go.jp/pid/12904124",
+              "https://dl.ndl.go.jp/api/iiif/12904124/manifest.json"
+            ],
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLBibID-s": "025160720",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLJP-s": "info:ndljp/pid/12904124",
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "Sunrise and Sunset Tables; Moonrise and Moonset Tables"
+              }
+            },
+            "dcndl:alternative": {
+              "rdf:Description": {
+                "rdf:value-s": "艦營需品消耗品供給集計表/ 第百三海軍軍需部"
+              }
+            },
+            "dcndl:seriesTitle": {
+              "rdf:Description": {
+                "rdf:value-s": "文書名:Records of the U. S. Marine Corps. Captured Japanese Documents, 1942-1945 = 米海兵隊鹵獲日本文書 シリーズ名: Guadalcanal ボックス番号:21 ; フォルダ番号:9"
+              }
+            },
+            "dcndl:digitizedPublisher-s": "国立国会図書館",
+            "dcterms:date-s": "1944.05-1944.05",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "1944",
+            "dcterms:issued-s": "1944",
+            "dcterms:available_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": [
+              "2023-08-29",
+              "2023-08-29"
+            ],
+            "dcterms:dateAccepted_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": "2023-07-06T13:18:17+09:00",
+            "dcndl:dateDigitized_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "2022-03-01",
+            "dcterms:description-s": [
+              "コレクション : 国立国会図書館デジタルコレクション > デジタル化資料 > 日本占領関係資料 > その他",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "原所蔵機関: 米国国立公文書館 (RG127)",
+              "コレクションタイトル: 日本占領関係資料",
+              "コレクションタイトル: Records of the U. S. Marine Corps",
+              "Folder Title: Logistics?",
+              "原資料の出版事項: 1944/05-1944/05"
+            ],
+            "dcterms:language_rdf:datatype_http://purl_org/dc/terms/ISO639_2-s": "jpn",
+            "dcterms:extent-s": "File",
+            "dcterms:format_rdf:datatype_http://purl_org/dc/terms/IMT-s": "image/jp2",
+            "dcndl:materialType_rdf:resource-u": [
+              "http://ndl.go.jp/ndltype/Book",
+              "http://ndl.go.jp/ndltype/OnlineResource"
+            ],
+            "dcndl:materialType_rdfs:label-s": [
+              "図書",
+              "オンライン資料"
+            ],
+            "dcterms:accessRights-s": "インターネット公開",
+            "dcterms:rights-s": [
+              "pdm",
+              "PDM"
+            ],
+            "dcterms:source_rdf:resource-u": "https://id.ndl.go.jp/bib/025160720",
+            "foaf:thumbnail_rdf:resource-u": "https://www.dl.ndl.go.jp/api/iiif/12904124/R0000001/full/256,/0/default.jpg"
+          },
+          "iiifmanifest-u": "https://dl.ndl.go.jp/api/iiif/12904124/manifest.json",
+          "digicoreurl-u": "http://dl.ndl.go.jp/info:ndljp/pid/12904124"
+        }
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-12880168",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/12880168/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/12880168",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1949.07-1950.03",
+            "1949",
+            "1950"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/12880168/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Demonstration School"
+        },
+        "id": "dignl-12880168",
+        "dignl-rdf:RDF": {
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000039",
+            "dcndl:bibRecordSubCategory-s": [
+              "A00147",
+              "A00105",
+              "A00016",
+              "A00000"
+            ]
+          },
+          "dcndl:Item": {
+            "dcndl:callNumber-s": "CAS(D) 05973"
+          },
+          "dcndl:BibResource": {
+            "rdfs:seeAlso_rdf:resource-u": [
+              "http://id.ndl.go.jp/digimeta/12880168",
+              "https://dl.ndl.go.jp/pid/12880168",
+              "https://dl.ndl.go.jp/api/iiif/12880168/manifest.json"
+            ],
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLBibID-s": "000006718622",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLJP-s": "info:ndljp/pid/12880168",
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "Demonstration School"
+              }
+            },
+            "dcndl:alternative": {
+              "rdf:Description": {
+                "rdf:value-s": "Shikoku"
+              }
+            },
+            "dcndl:seriesTitle": {
+              "rdf:Description": {
+                "rdf:value-s": "文書名:GHQ/SCAP Records, Civil Affairs Section = 連合国最高司令官総司令部民事局文書 課係名等:Shikoku Civil Affairs Region シリーズ名:Miscellaneous Subject File, 1946-51 ボックス番号:3071 ; フォルダ番号:6"
+              }
+            },
+            "dcndl:digitizedPublisher-s": "国立国会図書館",
+            "dcterms:date-s": "1949.07-1950.03",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": [
+              "1949",
+              "1950"
+            ],
+            "dcterms:issued-s": [
+              "1949",
+              "1950"
+            ],
+            "dcterms:available_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": [
+              "2023-06-28",
+              "2023-06-28"
+            ],
+            "dcterms:dateAccepted_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": "2023-05-29T09:11:14+09:00",
+            "dcndl:dateDigitized_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "2022-03-24",
+            "dcterms:description-s": [
+              "コレクション : 国立国会図書館デジタルコレクション > デジタル化資料 > 日本占領関係資料 > GHQ/SCAP文書 (RG331) > 民事局 (CAS)",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "原所蔵機関: 米国国立公文書館 (RG331)",
+              "コレクションタイトル: 日本占領関係資料",
+              "コレクションタイトル: General Headquarters/Supreme Commander for Allied Powers",
+              "資料種別 : [マイクロ資料]",
+              "原資料の出版事項: 1949/07-1950/03"
+            ],
+            "dcterms:subject": [
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "Reports of the Japanese Government to SCAP"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "Directory and Biography"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "SCAPに対する日本政府の報告書"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "人事簿、履歴"
+                }
+              }
+            ],
+            "dc:subject_rdf:datatype_http://ndl_go_jp/dcndl/terms/GHQSCAP-s": "9811",
+            "dcterms:extent-s": "マイクロフィッシュ : File",
+            "dcterms:format_rdf:datatype_http://purl_org/dc/terms/IMT-s": "image/jp2",
+            "dcndl:materialType_rdf:resource-u": [
+              "http://ndl.go.jp/ndltype/Book",
+              "http://ndl.go.jp/ndltype/MicroForm"
+            ],
+            "dcndl:materialType_rdfs:label-s": [
+              "図書",
+              "マイクロ資料"
+            ],
+            "dcterms:accessRights-s": "インターネット公開",
+            "dcterms:rights-s": [
+              "pdm",
+              "PDM"
+            ],
+            "dcterms:source_rdf:resource-u": "https://id.ndl.go.jp/bib/000006718622",
+            "foaf:thumbnail_rdf:resource-u": "https://www.dl.ndl.go.jp/api/iiif/12880168/R0000001/full/256,/0/default.jpg"
+          },
+          "iiifmanifest-u": "https://dl.ndl.go.jp/api/iiif/12880168/manifest.json",
+          "digicoreurl-u": "http://dl.ndl.go.jp/info:ndljp/pid/12880168"
+        }
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "pdm",
+          "database": "dignl",
+          "dclass": "210",
+          "id": "dignl-14945131",
+          "iiifUrl": "https://dl.ndl.go.jp/api/iiif/14945131/manifest.json",
+          "lastUpdatedDate": 1785773619137,
+          "linkUrl": "http://dl.ndl.go.jp/info:ndljp/pid/14945131",
+          "ownerOrg": "ndl",
+          "provider": "ndl",
+          "temporal": [
+            "1949.07-1950.02",
+            "1949",
+            "1950"
+          ],
+          "thumbnailUrl": [
+            "https://www.dl.ndl.go.jp/api/iiif/14945131/R0000001/full/256,/0/default.jpg"
+          ],
+          "title": "Demonstration Schools"
+        },
+        "id": "dignl-14945131",
+        "dignl-rdf:RDF": {
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000039",
+            "dcndl:bibRecordSubCategory-s": [
+              "A00189",
+              "A00105",
+              "A00016",
+              "A00000"
+            ]
+          },
+          "dcndl:Item": {
+            "dcndl:callNumber-s": "CIE(C) 05088-05090"
+          },
+          "dcndl:BibResource": {
+            "rdfs:seeAlso_rdf:resource-u": [
+              "http://id.ndl.go.jp/digimeta/14945131",
+              "https://dl.ndl.go.jp/pid/14945131",
+              "https://dl.ndl.go.jp/api/iiif/14945131/manifest.json"
+            ],
+            "dcndl:sourceIdentifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLBibID-s": "000006764343",
+            "dcterms:identifier_rdf:datatype_http://ndl_go_jp/dcndl/terms/NDLJP-s": "info:ndljp/pid/14945131",
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "Demonstration Schools"
+              }
+            },
+            "dcndl:seriesTitle": {
+              "rdf:Description": {
+                "rdf:value-s": "文書名:GHQ/SCAP Records, Civil Information and Education Section = 連合国最高司令官総司令部民間情報教育局文書 課係名等:Education Division ; Vocational Education Branch シリーズ名:General Subject File, 1945-51 ボックス番号:5758 ; フォルダ番号:16"
+              }
+            },
+            "dcndl:digitizedPublisher-s": "国立国会図書館",
+            "dcterms:date-s": "1949.07-1950.02",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": [
+              "1949",
+              "1950"
+            ],
+            "dcterms:issued-s": [
+              "1949",
+              "1950"
+            ],
+            "dcterms:available_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": [
+              "2026-07-22",
+              "2026-07-22"
+            ],
+            "dcterms:dateAccepted_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": "2026-06-05T17:28:40+09:00",
+            "dcndl:dateDigitized_rdf:datatype_http://purl_org/dc/terms/W3CDTF-s": "2026-03-19",
+            "dcterms:description-s": [
+              "コレクション : 国立国会図書館デジタルコレクション > デジタル化資料 > 日本占領関係資料 > GHQ/SCAP文書 (RG331) > 民間情報教育局文書 (CIE)",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "資料種別 : [マイクロ資料]",
+              "コレクション : 国立国会図書館 > 日本占領関係資料",
+              "原所蔵機関: 米国国立公文書館 (RG331)",
+              "コレクションタイトル: 日本占領関係資料",
+              "コレクションタイトル: General Headquarters/Supreme Commander for Allied Powers",
+              "原資料の出版事項: 1949/07-1950/02"
+            ],
+            "dcterms:subject": [
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "Reports of the Japanese Government to SCAP"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "Directory and Biography"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "SCAPに対する日本政府の報告書"
+                }
+              },
+              {
+                "rdf:Description": {
+                  "rdf:value-s": "人事簿、履歴"
+                }
+              }
+            ],
+            "dc:subject_rdf:datatype_http://ndl_go_jp/dcndl/terms/GHQSCAP-s": "811",
+            "dcterms:extent-s": "マイクロフィッシュ : File",
+            "dcterms:format_rdf:datatype_http://purl_org/dc/terms/IMT-s": "image/jp2",
+            "dcterms:accessRights-s": "インターネット公開",
+            "dcterms:rights-s": [
+              "pdm",
+              "PDM"
+            ],
+            "dcterms:source_rdf:resource-u": "https://id.ndl.go.jp/bib/000006764343",
+            "foaf:thumbnail_rdf:resource-u": "https://www.dl.ndl.go.jp/api/iiif/14945131/R0000001/full/256,/0/default.jpg"
+          },
+          "iiifmanifest-u": "https://dl.ndl.go.jp/api/iiif/14945131/manifest.json",
+          "digicoreurl-u": "http://dl.ndl.go.jp/info:ndljp/pid/14945131"
+        }
+      }
+    ]
+  },
+  "cc0": {
+    "facets": [
+      {
+        "counts": {
+          "edu": 827,
+          "noncom": 827,
+          "com": 827,
+          "cc0": 827
+        },
+        "key": "rights"
+      },
+      {
+        "counts": {
+          "internet": 827,
+          "iiif": 2,
+          "thumb": 827,
+          "image": 824,
+          "pdf": 1,
+          "description": 465
+        },
+        "key": "contents"
+      },
+      {
+        "counts": {
+          "paint": 324,
+          "lacquer": 88,
+          "craft": 9,
+          "weaponry": 14,
+          "book": 6,
+          "ancdoc": 6,
+          "sculpture": 1,
+          "arts": 1
+        },
+        "key": "type"
+      },
+      {
+        "counts": {
+          "tfam_art_db": 771,
+          "hdm": 52,
+          "gunma": 2,
+          "mmc_mingu": 1,
+          "sdcommons_npl": 1
+        },
+        "key": "db"
+      },
+      {
+        "counts": {
+          "cultural": 824,
+          "art": 823,
+          "humanities": 53,
+          "regional": 53,
+          "book": 3
+        },
+        "key": "cm"
+      },
+      {
+        "counts": {
+          "edo": 173,
+          "showa": 50,
+          "meiji": 47,
+          "taisyo": 25,
+          "muromachi": 21,
+          "kamakura": 9,
+          "aduchi": 3,
+          "heian": 1,
+          "reiwa": 1
+        },
+        "key": "tempo"
+      }
+    ],
+    "from": 0,
+    "hit": 827,
+    "list": [
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "book"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "cc0",
+          "contentsUrl": [
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/001.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/002.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/003.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/004.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/005.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/006.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/007.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/008.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/009.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/010.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/011.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/012.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/013.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/014.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/015.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/016.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/017.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/018.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/019.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/020.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/021.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/022.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/023.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/024.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/025.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/026.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/027.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/028.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/029.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/030.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/031.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/032.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/033.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/034.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/035.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/036.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/037.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/038.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/039.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/040.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/041.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/042.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/043.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/044.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/045.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/046.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/047.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/048.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/049.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/050.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/051.jpg",
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/052.jpg"
+          ],
+          "contributor": [
+            "鈴木重陽",
+            "鈴木重陽"
+          ],
+          "database": "gunma",
+          "dclass": "213",
+          "description": "群馬県立文書館所蔵資料（デジタル）",
+          "id": "gunma-R100000104_I1112065972",
+          "iiifUrl": "https://jpsearch.go.jp/api/iiif/gunma-R100000104_I1112065972/manifest.json",
+          "lastUpdatedDate": 1787673621084,
+          "linkUrl": "https://www1.library.pref.gunma.jp/winj/opac/switch-detail-iccap.do?bibid=1112065972",
+          "ownerOrg": "ndl",
+          "provider": "libgunma",
+          "temporal": [
+            "1886",
+            "1886"
+          ],
+          "thumbnailUrl": [
+            "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/thumbs/001.jpg"
+          ],
+          "title": "SPELER FOR THE USE OF CHYU-SHO GAKKO AND OTHER COMMON SCHOOLS TOKYO"
+        },
+        "id": "gunma-R100000104_I1112065972",
+        "gunma-rdf:RDF": {
+          "dcndl:BibAdminResource_rdf:about-u": "https://ndlsearch.ndl.go.jp/books/R100000104-I1112065972",
+          "dcndl:BibAdminResource": {
+            "dcndl:bibRecordCategory-s": "R100000104"
+          },
+          "dcndl:BibResource": {
+            "dc:title": {
+              "rdf:Description": {
+                "rdf:value-s": "SPELER FOR THE USE OF CHYU-SHO GAKKO AND OTHER COMMON SCHOOLS TOKYO"
+              }
+            },
+            "dcndl:uniformTitle": {
+              "rdf:Description": {
+                "rdf:value-s": "SPELER FOR THE USE OF CHYU-SHO GAKKO AND OTHER COMMON SCHOOLS TOKYO"
+              }
+            },
+            "dcterms:creator": {
+              "foaf:Agent": {
+                "foaf:name-s": "鈴木重陽"
+              }
+            },
+            "dc:creator-s": "鈴木重陽",
+            "dcterms:publisher": {
+              "foaf:Agent": {
+                "foaf:name-s": "鈴木重陽"
+              }
+            },
+            "dcterms:date-s": "1886",
+            "dcterms:issued_rdf:datatype_http://purl_org/dc/terms/W3CDTF-d": "1886",
+            "dcterms:issued-s": "1886",
+            "dcterms:abstract-s": "群馬県立文書館所蔵資料（デジタル）",
+            "dcterms:extent-s": "89p ; 17.1×12.0cm",
+            "dcndl:materialType_rdf:resource-u": "http://ndl.go.jp/ndltype/Book",
+            "dcndl:materialType_rdfs:label-s": "図書",
+            "dcterms:audience-s": "一般",
+            "rdfs:seeAlso_rdf:resource-u": "https://www1.library.pref.gunma.jp/winj/opac/switch-detail-iccap.do?bibid=1112065972",
+            "foaf:thumbnail_rdf:resource-u": "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/thumbs/001.jpg",
+            "dcterms:source_rdf:resource-u": [
+              "https://www1.library.pref.gunma.jp/winj/archive/jpeg/1112065972/album00001.html",
+              "https://www1.library.pref.gunma.jp/winj/archive/pdf/1112065972.pdf"
+            ]
+          }
+        },
+        "gunma-provider-s": "群馬県立図書館デジタルライブラリー",
+        "gunma-providerurl-u": "https://www.library.pref.gunma.jp/?page_id=650"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art",
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "cc0",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06578_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06578_02.jpg.webp"
+          ],
+          "contributor": [
+            "長谷川派",
+            "Hasegawa School"
+          ],
+          "database": "tfam_art_db",
+          "dclass": "721",
+          "description": "垣根の周囲を覆い尽くすように咲き誇った大ぶりの白菊に花の持つ強い生命力を感じる。六曲一双という金地の大画面に白菊と垣根、土坡、水流のみを描く豪快な表現様式は桃山時代全体の障屏画における大きな特長といえる。中でも自然そのものが持つ美しさを単純かつ明快に表現した大らかな作風は長谷川派のそれに近いものを感じさせる。垣根や水流に変化を持たせながら、主題である白菊の端正な美しさを見事に伝えた桃山障屏画の品格溢れる名品。",
+          "id": "tfam_art_db-6578",
+          "lastUpdatedDate": 1793323131277,
+          "linkUrl": "https://www.fujibi.or.jp/collection/artwork/06578/",
+          "ownerOrg": "ZENBI",
+          "provider": "fujibi",
+          "subCategory": [
+            "西洋美術",
+            "東洋美術",
+            "日本美術"
+          ],
+          "temporal": [
+            "桃山時代（16世紀）",
+            "Momoyama Period (16th c.)"
+          ],
+          "thumbnailUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06578_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06578_02.jpg.webp"
+          ],
+          "title": "白菊図屏風",
+          "titleEn": "Folding Screen with Design of White Chrysanthemums",
+          "titleYomi": "しらぎくずびょうぶ"
+        },
+        "id": "tfam_art_db-6578",
+        "rdfindex": {
+          "spatial": [
+            "日本"
+          ],
+          "temporal": [
+            "安土桃山時代"
+          ],
+          "type": [
+            "絵画"
+          ]
+        },
+        "tfam_art_db-0-s": "6578",
+        "tfam_art_db-1-s": "長谷川派",
+        "tfam_art_db-2-s": "Hasegawa School",
+        "tfam_art_db-3-s": "はせがわは",
+        "tfam_art_db-6-s": "日本",
+        "tfam_art_db-7-s": "Japanese",
+        "tfam_art_db-8-s": "桃山時代の長谷川等伯を始祖とする画派。等伯の画風を受け継ぎ、水墨画、障壁画等に腕を振るった。大ぶりで豪華な金碧障屏画は、伸びやかなフォルムと金地による明快な色彩が、町衆に受け入れられ人気を博した。公家や武家からも注文を得、幅広い画作は、狩野派と並び称された。等伯とその子久蔵が一門を率いて制作した、京都・智積院の障壁画が残る。江戸初期までは画家名、作品とも知られているが、中期以降のことは明らかでない。",
+        "tfam_art_db-9-s": "The Hasegawa school is a painting group that was centered around Tohaku Hasegawa in the Momoyama era. Working from Tohaku’s style, the artists of the school were active in the creation of suiboku-ga ink paintings and also worked on partitions such as sliding doors and panels. Their large and splendid paintings on partitions had free and extended form, and the vivid colors of pigment on gold bases, called kinpeki-shoheiga, were popular amongst local officials. They received commissions from courtiers and samurai families. A wide range of paintings by the Hasegawa school contributed to its reputation equaling that of the Kano school. In Chishaku-in temple in Kyoto a panel painting that was led by Tohaku and his son Kyuzo remains to this day. Up to the early Edo era the names of the painters and their works are known, but from the middle of the era onwards the traces become unclear.",
+        "tfam_art_db-10-s": "白菊図屏風",
+        "tfam_art_db-11-s": "Folding Screen with Design of White Chrysanthemums",
+        "tfam_art_db-12-s": "しらぎくずびょうぶ",
+        "tfam_art_db-13-s": "2",
+        "tfam_art_db-14-s": "桃山時代（16世紀）",
+        "tfam_art_db-15-s": "Momoyama Period (16th c.)",
+        "tfam_art_db-16-s": "紙本金地着色　屏風装（六曲一双）",
+        "tfam_art_db-17-s": "Color on gold-leaf paper, pair of six-fold screens",
+        "tfam_art_db-18-s": "161.0×350.0cm（各）",
+        "tfam_art_db-19-s": "161.0 x 350.0 cm (each)",
+        "tfam_art_db-20-s": "垣根の周囲を覆い尽くすように咲き誇った大ぶりの白菊に花の持つ強い生命力を感じる。六曲一双という金地の大画面に白菊と垣根、土坡、水流のみを描く豪快な表現様式は桃山時代全体の障屏画における大きな特長といえる。中でも自然そのものが持つ美しさを単純かつ明快に表現した大らかな作風は長谷川派のそれに近いものを感じさせる。垣根や水流に変化を持たせながら、主題である白菊の端正な美しさを見事に伝えた桃山障屏画の品格溢れる名品。",
+        "tfam_art_db-21-s": "The large white chrysanthemums in full bloom, almost seeming to cover the fences around them, convey a strong sense of the life of flowers. Although it is a large piece, being a six-segmented screen, this gold-based work depicts only the white chrysanthemums and the fences, earthen slopes and streaming water; its dynamic expression is a major characteristic of paintings on screens and sliding doors in the Momoyama era. The generous style, expressing the beauty of nature simply and clearly, exemplifies the Hasegawa school. While the fences and the water display some variety the main theme of chrysanthemums maintains its grace. This is a masterpiece of Momoyama era screen door painting elegance.",
+        "tfam_art_db-22-s": "日本画",
+        "tfam_art_db-23-u": "https://www.fujibi.or.jp/collection/artwork/06578/",
+        "tfam_art_db-24-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06578_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06578_02.jpg.webp"
+        ],
+        "tfam_art_db-25-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06578_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06578_02.jpg.webp"
+        ]
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art",
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "cc0",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06900_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06900_02.jpg.webp"
+          ],
+          "contributor": [
+            "葛飾北斎",
+            "Katsushika Hokusai"
+          ],
+          "database": "tfam_art_db",
+          "dclass": "914",
+          "id": "tfam_art_db-6900",
+          "lastUpdatedDate": 1793323131277,
+          "linkUrl": "https://www.fujibi.or.jp/collection/artwork/06900/",
+          "ownerOrg": "ZENBI",
+          "provider": "fujibi",
+          "subCategory": [
+            "西洋美術",
+            "東洋美術",
+            "日本美術"
+          ],
+          "temporal": [
+            "初編：天保5年（1834）、二編：天保6年（1835）",
+            "1st vol.: 1834, 2nd vol.: 1835"
+          ],
+          "thumbnailUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06900_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06900_02.jpg.webp"
+          ],
+          "title": "冨嶽百景　初編、二編",
+          "titleEn": "One Hundred Views of Mount Fuji",
+          "titleYomi": "ふがくひゃっけい　しょへん、にへん"
+        },
+        "id": "tfam_art_db-6900",
+        "rdfindex": {
+          "spatial": [
+            "日本"
+          ],
+          "temporal": [
+            "江戸時代",
+            "朝鮮・李氏朝鮮時代",
+            "中国・清時代"
+          ],
+          "type": [
+            "版画"
+          ]
+        },
+        "tfam_art_db-0-s": "6900",
+        "tfam_art_db-1-s": "葛飾北斎",
+        "tfam_art_db-2-s": "Katsushika Hokusai",
+        "tfam_art_db-3-s": "かつしかほくさい",
+        "tfam_art_db-4-s": "宝暦10（1760）-嘉永2（1849）",
+        "tfam_art_db-5-s": "1760-1849",
+        "tfam_art_db-6-s": "日本",
+        "tfam_art_db-7-s": "Japanese",
+        "tfam_art_db-8-s": "19歳の時に勝川春章に入門し、春朗と名乗る。師春章没後、勝川派を離れ、俵屋宗理を襲名。以後、戴斗、北斎、画狂人、為一、卍老人など30余り画号を使った。40歳半ばから曲亭馬琴著の『椿説弓張月』など、当時流行した読本挿絵を多く手がける。文化11年（1814）、絵手本をまとめた《北斎漫画》を発表。70歳代に入り、代表作《冨嶽三十六景》をはじめ錦絵の揃物を次々と版行。最晩年は肉筆画にも筆を揮った。",
+        "tfam_art_db-9-s": "At age 19, he became a disciple of Katsukawa Shunsho and took on the name Shunro. After his teacher Shunsho’s death, he left the Katsukawa school and adopted the name Tawaraya Sori. From then on, he used more than 30 artist names, including Taito, Hokusai, Gakyojin, Iitsu, and Manji Rojin. From his mid-40s he worked on many illustrations for popular literature at the time, such as Takizawa Bakin’s Strange Tales of the Crescent Moon. In 1814, he released Hokusai Manga, a compilation of illustrated models. Entering his 70s, he published series of color prints one after another, including his masterpiece, Thirty-six Views of Mount Fuji. In his later years, he also took up the brush and painted.",
+        "tfam_art_db-10-s": "冨嶽百景　初編、二編",
+        "tfam_art_db-11-s": "One Hundred Views of Mount Fuji",
+        "tfam_art_db-12-s": "ふがくひゃっけい　しょへん、にへん",
+        "tfam_art_db-13-s": "2",
+        "tfam_art_db-14-s": "初編：天保5年（1834）、二編：天保6年（1835）",
+        "tfam_art_db-15-s": "1st vol.: 1834, 2nd vol.: 1835",
+        "tfam_art_db-16-s": "木版刷　冊子本",
+        "tfam_art_db-17-s": "Woodblock print on paper, book",
+        "tfam_art_db-18-s": "22.5×15.7cm（各）",
+        "tfam_art_db-19-s": "22.5 x 15.7 cm (each)",
+        "tfam_art_db-22-s": "版画",
+        "tfam_art_db-23-u": "https://www.fujibi.or.jp/collection/artwork/06900/",
+        "tfam_art_db-24-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06900_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/06900_02.jpg.webp"
+        ],
+        "tfam_art_db-25-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06900_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/06900_02.jpg.webp"
+        ]
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art",
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "cc0",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_02.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_03.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_04.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_05.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_06.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_07.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_08.jpg.webp"
+          ],
+          "contributor": [
+            "勝川春章、北尾重政",
+            "Katsukawa Shunsho (1726-1793), Kitao Shigemasa (1739-1820)"
+          ],
+          "database": "tfam_art_db",
+          "dclass": "726",
+          "id": "tfam_art_db-1259",
+          "lastUpdatedDate": 1793323131277,
+          "linkUrl": "https://www.fujibi.or.jp/collection/artwork/01259/",
+          "ownerOrg": "ZENBI",
+          "provider": "fujibi",
+          "subCategory": [
+            "西洋美術",
+            "東洋美術",
+            "日本美術"
+          ],
+          "temporal": [
+            "天明6年（1786）",
+            "1786"
+          ],
+          "thumbnailUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_02.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_03.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_04.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_05.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_06.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_07.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_08.jpg.webp"
+          ],
+          "title": "画本宝能縷",
+          "titleEn": "Sericulture",
+          "titleYomi": "えほんたからのいとすじ"
+        },
+        "id": "tfam_art_db-1259",
+        "rdfindex": {
+          "spatial": [
+            "日本"
+          ],
+          "temporal": [
+            "江戸時代",
+            "朝鮮・李氏朝鮮時代",
+            "中国・清時代"
+          ],
+          "type": [
+            "図書"
+          ]
+        },
+        "tfam_art_db-0-s": "1259",
+        "tfam_art_db-1-s": "勝川春章、北尾重政",
+        "tfam_art_db-2-s": "Katsukawa Shunsho (1726-1793), Kitao Shigemasa (1739-1820)",
+        "tfam_art_db-3-s": "かつかわしゅんしょう、きたおしげまさ",
+        "tfam_art_db-6-s": "日本",
+        "tfam_art_db-7-s": "Japanese",
+        "tfam_art_db-10-s": "画本宝能縷",
+        "tfam_art_db-11-s": "Sericulture",
+        "tfam_art_db-12-s": "えほんたからのいとすじ",
+        "tfam_art_db-13-s": "1",
+        "tfam_art_db-14-s": "天明6年（1786）",
+        "tfam_art_db-15-s": "1786",
+        "tfam_art_db-16-s": "木版多色刷　冊子本",
+        "tfam_art_db-17-s": "Color woodblock print on paper, book",
+        "tfam_art_db-18-s": "29.5×20.4cm",
+        "tfam_art_db-19-s": "29.5 x 20.4 cm",
+        "tfam_art_db-22-s": "書籍",
+        "tfam_art_db-23-u": "https://www.fujibi.or.jp/collection/artwork/01259/",
+        "tfam_art_db-24-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_02.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_03.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_04.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_05.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_06.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_07.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/01259_08.jpg.webp"
+        ],
+        "tfam_art_db-25-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_02.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_03.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_04.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_05.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_06.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_07.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/01259_08.jpg.webp"
+        ]
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art",
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "cc0",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_04.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_05.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_06.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_28.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_29.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_30.jpg.webp"
+          ],
+          "contributor": [
+            "葛飾北斎",
+            "Katsushika Hokusai"
+          ],
+          "database": "tfam_art_db",
+          "dclass": "721",
+          "description": "北斎は、その生涯に、確認されているだけでも東海道のシリーズの浮世絵版画を7種類手がけている。この展示の版図はその中の最も大きなサイズのもの。文化7年（1810）、北斎が50歳の時刊行されたものと思われ、版元については「掛川」「見附」などの画中に伊勢屋利兵衛の商標があることから伊勢屋版とされている。十返舎一九の『東海道中膝栗毛』の主人公である弥次郎兵衛、喜多八のような二人の旅人が描かれていたり、宿駅や旅人の風俗を中心に描かれている。",
+          "id": "tfam_art_db-623",
+          "lastUpdatedDate": 1793323131277,
+          "linkUrl": "https://www.fujibi.or.jp/collection/artwork/00623/",
+          "ownerOrg": "ZENBI",
+          "provider": "fujibi",
+          "subCategory": [
+            "西洋美術",
+            "東洋美術",
+            "日本美術"
+          ],
+          "temporal": [
+            "文化年間中期（1810年）頃",
+            "c. 1810"
+          ],
+          "thumbnailUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_01.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_04.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_05.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_06.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_28.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_29.jpg.webp",
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_30.jpg.webp"
+          ],
+          "title": "東海道五十三次　絵本駅路鈴",
+          "titleEn": "Fifty-three Stations on the Tokaido: Illustrated Book of Ekiro-no-Suzu",
+          "titleYomi": "とうかいどうごじゅうさんつぎ　えほんえきろのすず"
+        },
+        "id": "tfam_art_db-623",
+        "rdfindex": {
+          "spatial": [
+            "日本"
+          ],
+          "temporal": [
+            "江戸時代",
+            "朝鮮・李氏朝鮮時代",
+            "中国・清時代"
+          ],
+          "type": [
+            "版画"
+          ]
+        },
+        "tfam_art_db-0-s": "623",
+        "tfam_art_db-1-s": "葛飾北斎",
+        "tfam_art_db-2-s": "Katsushika Hokusai",
+        "tfam_art_db-3-s": "かつしかほくさい",
+        "tfam_art_db-4-s": "宝暦10（1760）-嘉永2（1849）",
+        "tfam_art_db-5-s": "1760-1849",
+        "tfam_art_db-6-s": "日本",
+        "tfam_art_db-7-s": "Japanese",
+        "tfam_art_db-8-s": "19歳の時に勝川春章に入門し、春朗と名乗る。師春章没後、勝川派を離れ、俵屋宗理を襲名。以後、戴斗、北斎、画狂人、為一、卍老人など30余り画号を使った。40歳半ばから曲亭馬琴著の『椿説弓張月』など、当時流行した読本挿絵を多く手がける。文化11年（1814）、絵手本をまとめた《北斎漫画》を発表。70歳代に入り、代表作《冨嶽三十六景》をはじめ錦絵の揃物を次々と版行。最晩年は肉筆画にも筆を揮った。",
+        "tfam_art_db-9-s": "At age 19, he became a disciple of Katsukawa Shunsho and took on the name Shunro. After his teacher Shunsho’s death, he left the Katsukawa school and adopted the name Tawaraya Sori. From then on, he used more than 30 artist names, including Taito, Hokusai, Gakyojin, Iitsu, and Manji Rojin. From his mid-40s he worked on many illustrations for popular literature at the time, such as Takizawa Bakin’s Strange Tales of the Crescent Moon. In 1814, he released Hokusai Manga, a compilation of illustrated models. Entering his 70s, he published series of color prints one after another, including his masterpiece, Thirty-six Views of Mount Fuji. In his later years, he also took up the brush and painted.",
+        "tfam_art_db-10-s": "東海道五十三次　絵本駅路鈴",
+        "tfam_art_db-11-s": "Fifty-three Stations on the Tokaido: Illustrated Book of Ekiro-no-Suzu",
+        "tfam_art_db-12-s": "とうかいどうごじゅうさんつぎ　えほんえきろのすず",
+        "tfam_art_db-13-s": "2",
+        "tfam_art_db-14-s": "文化年間中期（1810年）頃",
+        "tfam_art_db-15-s": "c. 1810",
+        "tfam_art_db-16-s": "木版多色刷　画帖",
+        "tfam_art_db-17-s": "Color woodblock print on paper, book illustrations",
+        "tfam_art_db-18-s": "23.3×17.3cm（各）",
+        "tfam_art_db-19-s": "23.3 x 17.3 cm (each)",
+        "tfam_art_db-20-s": "北斎は、その生涯に、確認されているだけでも東海道のシリーズの浮世絵版画を7種類手がけている。この展示の版図はその中の最も大きなサイズのもの。文化7年（1810）、北斎が50歳の時刊行されたものと思われ、版元については「掛川」「見附」などの画中に伊勢屋利兵衛の商標があることから伊勢屋版とされている。十返舎一九の『東海道中膝栗毛』の主人公である弥次郎兵衛、喜多八のような二人の旅人が描かれていたり、宿駅や旅人の風俗を中心に描かれている。",
+        "tfam_art_db-22-s": "版画",
+        "tfam_art_db-23-u": "https://www.fujibi.or.jp/collection/artwork/00623/",
+        "tfam_art_db-24-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_04.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_05.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_06.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_28.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_29.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/source/00623_30.jpg.webp"
+        ],
+        "tfam_art_db-25-u": [
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_01.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_04.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_05.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_06.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_28.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_29.jpg.webp",
+          "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/00623_30.jpg.webp"
+        ]
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "art",
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "cc0",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/source/07189.jpg.webp"
+          ],
+          "database": "tfam_art_db",
+          "dclass": "754",
+          "description": "提重は重箱の一種で、花見遊山など屋外での酒宴等に便利なように、携帯用重箱として工夫されたもの。提鐶（さげわ）のついた全体に竹が貼られた枠型の中に重箱、竹製の酒瓶、杯、銘々皿などを一具として組み入れている。竹の生地に、源氏物語の車争いの場面が蒔絵の高度な技術を施して描かれている。手提げ部分に用いられた七宝金具なども質の高い優品。幕末から明治期の富裕層の注文によって作られたものと考えられる。",
+          "id": "tfam_art_db-7189",
+          "lastUpdatedDate": 1793323131277,
+          "linkUrl": "https://www.fujibi.or.jp/collection/artwork/07189/",
+          "ownerOrg": "ZENBI",
+          "provider": "fujibi",
+          "subCategory": [
+            "西洋美術",
+            "東洋美術",
+            "日本美術"
+          ],
+          "temporal": [
+            "江戸-明治時代（19世紀）",
+            "Edo-Meiji Period (19th c.)"
+          ],
+          "thumbnailUrl": [
+            "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/07189.jpg.webp"
+          ],
+          "title": "竹貼源氏蒔絵提重",
+          "titleEn": "Picnic Box with Design of the Scene from the Tale of Genji in Maki-e Lacquer",
+          "titleYomi": "たけはりげんじまきえさげじゅう"
+        },
+        "id": "tfam_art_db-7189",
+        "rdfindex": {
+          "temporal": [
+            "江戸～明治時代"
+          ],
+          "type": [
+            "漆工"
+          ]
+        },
+        "tfam_art_db-0-s": "7189",
+        "tfam_art_db-10-s": "竹貼源氏蒔絵提重",
+        "tfam_art_db-11-s": "Picnic Box with Design of the Scene from the Tale of Genji in Maki-e Lacquer",
+        "tfam_art_db-12-s": "たけはりげんじまきえさげじゅう",
+        "tfam_art_db-13-s": "1",
+        "tfam_art_db-14-s": "江戸-明治時代（19世紀）",
+        "tfam_art_db-15-s": "Edo-Meiji Period (19th c.)",
+        "tfam_art_db-16-s": "木製漆塗",
+        "tfam_art_db-17-s": "Lacquered wood",
+        "tfam_art_db-18-s": "高30.2cm、幅34.7cm、奥行20.6cm",
+        "tfam_art_db-19-s": "H 30.2 cm, W 34.7 cm, D 20.6 cm",
+        "tfam_art_db-20-s": "提重は重箱の一種で、花見遊山など屋外での酒宴等に便利なように、携帯用重箱として工夫されたもの。提鐶（さげわ）のついた全体に竹が貼られた枠型の中に重箱、竹製の酒瓶、杯、銘々皿などを一具として組み入れている。竹の生地に、源氏物語の車争いの場面が蒔絵の高度な技術を施して描かれている。手提げ部分に用いられた七宝金具なども質の高い優品。幕末から明治期の富裕層の注文によって作られたものと考えられる。",
+        "tfam_art_db-21-s": "A Japanese picnic box is a nest of smaller containers, held in a portable lunch box, so that the users can take it to an outdoor feast, such as a flower-viewing picnic. In this case, with a handle and bamboo panels, the nest of boxes is held together as a set along with a bamboo alcohol container, drinking cups and small plates for individual serving. The bamboo frame has a painting of the Rivalry of the Carriages from The Tale of Genji, depicted with a high level of the maki-e gold lacquer techniques of its time. The cloisonne metal fittings in the handle are also of great quality. It is thought to have been order-made for a wealthy person at end of the Edo era or start of the Meiji era.",
+        "tfam_art_db-22-s": "漆工",
+        "tfam_art_db-23-u": "https://www.fujibi.or.jp/collection/artwork/07189/",
+        "tfam_art_db-24-u": "https://www.fujibi.or.jp/webp/assets/images/artwork/source/07189.jpg.webp",
+        "tfam_art_db-25-u": "https://www.fujibi.or.jp/webp/assets/images/artwork/500x500/07189.jpg.webp"
+      }
+    ]
+  },
+  "ccby": {
+    "facets": [
+      {
+        "counts": {
+          "edu": 10856,
+          "noncom": 10856,
+          "com": 10856,
+          "ccby": 10856
+        },
+        "key": "rights"
+      },
+      {
+        "counts": {
+          "internet": 10854,
+          "iiif": 817,
+          "thumb": 10856,
+          "image": 10016,
+          "video": 460,
+          "text": 34,
+          "pdf": 5,
+          "description": 8015
+        },
+        "key": "contents"
+      },
+      {
+        "counts": {
+          "paint": 1513,
+          "lacquer": 875,
+          "arts": 815,
+          "archeology": 1284,
+          "ancdoc": 766,
+          "sculpture": 544,
+          "daw": 404,
+          "ceramic": 377,
+          "metal": 194,
+          "weaponry": 159,
+          "dataset": 131,
+          "craft": 64,
+          "media": 15,
+          "docs": 11,
+          "architecture": 2
+        },
+        "key": "type"
+      },
+      {
+        "counts": {
+          "cobas": 6369,
+          "cb1": 3047,
+          "keioobjecthub": 790,
+          "adeac": 200,
+          "a12345": 140,
+          "jiyugakuen_np": 111,
+          "jomon_archives": 62,
+          "hdm": 38,
+          "moco_od": 26,
+          "moco_cs": 24,
+          "sf004": 21,
+          "uryukyu": 9,
+          "musee_gsj": 7,
+          "Open_OKURAIRI": 4,
+          "bunka": 2,
+          "kyoto": 2,
+          "nda01": 2,
+          "fukui": 1,
+          "jiyugakuen": 1
+        },
+        "key": "db"
+      },
+      {
+        "counts": {
+          "cultural": 10364,
+          "art": 6457,
+          "regional": 3091,
+          "book": 1002,
+          "humanities": 961,
+          "dataset": 140,
+          "science": 7
+        },
+        "key": "cm"
+      },
+      {
+        "counts": {
+          "edo": 3305,
+          "kamakura": 885,
+          "heian": 745,
+          "muromachi": 615,
+          "ancient": 468,
+          "nara": 421,
+          "asuka": 325,
+          "meiji": 305,
+          "aduchi": 262,
+          "showa": 139,
+          "heisei": 129,
+          "taisyo": 60,
+          "reiwa": 12
+        },
+        "key": "tempo"
+      }
+    ],
+    "from": 0,
+    "hit": 10856,
+    "list": [
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccby",
+          "contentsType": "text",
+          "contentsUrl": [
+            "https://jomon-japan.jp/assets/main/F200c000006a-main.png"
+          ],
+          "contributor": [
+            "青森県企画政策部世界文化遺産登録推進室"
+          ],
+          "coordinates": {
+            "lat": 40.82442855834961,
+            "lon": 140.74017333984375
+          },
+          "database": "jomon_archives",
+          "dclass": "212",
+          "id": "jomon_archives-F200c000006a",
+          "lastUpdatedDate": 1662044400000,
+          "linkUrl": "https://jomon-japan.jp/archives#/asset/799",
+          "location": [
+            "青森県",
+            "ＪＯＭＯＮ ＢＯＯＫ－北海道・北東北の縄文遺跡群－"
+          ],
+          "ownerOrg": "jomon_japan",
+          "provider": "jomon_japan",
+          "providerUrl": "http://www.pref.aomori.lg.jp/bunka/culture/aomori_jomon.html",
+          "subCategory": [
+            "考古学",
+            "遺跡",
+            "縄文",
+            "世界遺産"
+          ],
+          "thumbnailUrl": [
+            "https://jomon-japan.jp/assets/thumbnail/F200c000006a-thumbnail.png"
+          ],
+          "title": "ＪＯＭＯＮ ＢＯＯＫ－北海道・北東北の縄文遺跡群－（日本語）",
+          "titleEn": "JOMON BOOK:Jomon Archaeological Sites in Hokkaido and Northern Tohoku (in Japanese)",
+          "titleYomi": "じょうもんぶっく ほっかいどう・きたとうほくのじょうもんいせきぐん"
+        },
+        "id": "jomon_archives-F200c000006a",
+        "rdfindex": {
+          "spatial": [
+            "日本 > 青森県"
+          ],
+          "type": [
+            "文書資料"
+          ]
+        },
+        "jomon_archives-0-s": "F200c000006a",
+        "jomon_archives-1-s": "ＪＯＭＯＮ ＢＯＯＫ－北海道・北東北の縄文遺跡群－（日本語）",
+        "jomon_archives-2-s": "JOMON BOOK:Jomon Archaeological Sites in Hokkaido and Northern Tohoku (in Japanese)",
+        "jomon_archives-3-s": "じょうもんぶっく ほっかいどう・きたとうほくのじょうもんいせきぐん",
+        "jomon_archives-4-s": "2022/09/02 05:58",
+        "jomon_archives-5-u": "https://jomon-japan.jp/archives#/asset/799",
+        "jomon_archives-6-u": "https://jomon-japan.jp/assets/thumbnail/F200c000006a-thumbnail.png",
+        "jomon_archives-7-u": "https://jomon-japan.jp/assets/main/F200c000006a-main.png",
+        "jomon_archives-8-c": "text",
+        "jomon_archives-9-c": "ccby",
+        "jomon_archives-10-c": "internet",
+        "jomon_archives-13-s": "青森県",
+        "jomon_archives-14-s": "ＪＯＭＯＮ ＢＯＯＫ－北海道・北東北の縄文遺跡群－",
+        "jomon_archives-16-s": "青森県企画政策部世界文化遺産登録推進室",
+        "jomon_archives-19-u": "http://www.pref.aomori.lg.jp/bunka/culture/aomori_jomon.html"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "cultural"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccby",
+          "contentsType": "text",
+          "contentsUrl": [
+            "https://jomon-japan.jp/assets/main/F200c000006b-main.png"
+          ],
+          "contributor": [
+            "青森県企画政策部世界文化遺産登録推進室"
+          ],
+          "coordinates": {
+            "lat": 40.82442855834961,
+            "lon": 140.74017333984375
+          },
+          "database": "jomon_archives",
+          "dclass": "211",
+          "id": "jomon_archives-F200c000006b",
+          "lastUpdatedDate": 1662044400000,
+          "linkUrl": "https://jomon-japan.jp/archives#/asset/800",
+          "location": [
+            "青森県",
+            "ＪＯＭＯＮ ＢＯＯＫ－北海道・北東北の縄文遺跡群－"
+          ],
+          "ownerOrg": "jomon_japan",
+          "provider": "jomon_japan",
+          "providerUrl": "http://www.pref.aomori.lg.jp/bunka/culture/aomori_jomon.html",
+          "subCategory": [
+            "考古学",
+            "遺跡",
+            "縄文",
+            "世界遺産"
+          ],
+          "thumbnailUrl": [
+            "https://jomon-japan.jp/assets/thumbnail/F200c000006b-thumbnail.png"
+          ],
+          "title": "ＪＯＭＯＮ ＢＯＯＫ:Jomon Archaeological Sites in Hokkaido and Northern Tohoku",
+          "titleEn": "JOMON BOOK:Jomon Archaeological Sites in Hokkaido and Northern Tohoku (in English)"
+        },
+        "id": "jomon_archives-F200c000006b",
+        "rdfindex": {
+          "spatial": [
+            "日本 > 青森県"
+          ],
+          "type": [
+            "文書資料"
+          ]
+        },
+        "jomon_archives-0-s": "F200c000006b",
+        "jomon_archives-1-s": "ＪＯＭＯＮ ＢＯＯＫ:Jomon Archaeological Sites in Hokkaido and Northern Tohoku",
+        "jomon_archives-2-s": "JOMON BOOK:Jomon Archaeological Sites in Hokkaido and Northern Tohoku (in English)",
+        "jomon_archives-4-s": "2022/09/02 05:58",
+        "jomon_archives-5-u": "https://jomon-japan.jp/archives#/asset/800",
+        "jomon_archives-6-u": "https://jomon-japan.jp/assets/thumbnail/F200c000006b-thumbnail.png",
+        "jomon_archives-7-u": "https://jomon-japan.jp/assets/main/F200c000006b-main.png",
+        "jomon_archives-8-c": "text",
+        "jomon_archives-9-c": "ccby",
+        "jomon_archives-10-c": "internet",
+        "jomon_archives-13-s": "青森県",
+        "jomon_archives-14-s": "ＪＯＭＯＮ ＢＯＯＫ－北海道・北東北の縄文遺跡群－",
+        "jomon_archives-16-s": "青森県企画政策部世界文化遺産登録推進室",
+        "jomon_archives-19-u": "http://www.pref.aomori.lg.jp/bunka/culture/aomori_jomon.html"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "cultural",
+            "art"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccby",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://colbase.nich.go.jp/media/tnm/G-4853/image/slideshow_s/G-4853_C0011434.jpg"
+          ],
+          "contributor": [
+            "蒲生氏郷作",
+            "By Gamō Ujisato (1556–95)",
+            "松永安左エ門氏寄贈",
+            "Gift of Mr. Matsunaga Yasuzaemon",
+            "東京国立博物館",
+            "Tokyo National Museum"
+          ],
+          "database": "cobas",
+          "dclass": "914",
+          "description": "<p>　茶の湯で、抹茶をすくうさじのことを茶杓（ちゃしゃく）といいます。金属や象の牙で作ったものもありますが、多くは竹で作られています。今回ご紹介する作品は、戦国時代から安土桃山時代にかけての武将、蒲生氏郷（がもううじさと）が自ら削り上げたものです。氏郷は茶人・千利休の教えを受け、茶の湯にも精通していました。この茶杓は、のちに昭和を代表する茶人、松永安左エ門（やすざえもん）のコレクションとなり、東京国立博物館に寄贈されました。<br />　茶杓を見るときのポイントをご紹介します。まず、節に注目しましょう。節がどの位置にくるかで全体の印象が変わります。節がないものや茶杓の下のほうにあるものもありますが、この作品では茶杓の中央に節がきています。次は、表情です。表情とは皮目の模様などのことで、まだら模様があったり、「虫食い」と呼ばれる穴があいていたり、あえて変化に富んだ竹が好まれる場合もあります。この作品は節から下に凹凸がり、表情が豊かです。そして、茶杓の先端です。抹茶をすくうために曲がっている部分を櫂先（かいさき）といいますが、ここは作り手の特徴がよく表れる部分です。氏郷の茶杓は櫂先の幅が広く、さらに横から見ると急な角度で折れ曲がっています。とても豪快な印象です。武将・氏郷の気質が感じられます。<br />　茶杓を納める筒の下のほうには、サインがあります。これが、氏郷の作であるという証です。<br />　武将であり、茶人でもあった氏郷の手による茶杓を、ぜひご堪能ください。</p>",
+          "descriptionEn": "<p>The tea ceremony is a traditional part of Japanese culture. Practitioners prepare powdered green tea for invited guests using utensils like this tea scoop. Some tea scoops are made of metal or elephant tusk, though most are made of bamboo. This tea scoop was crafted by Gamo Ujisato, a military commander during the Warring States and Azuchi-Momoyama periods. Gamo mastered the art of tea under instruction from the tea master Sen no Rikyu.<br /><br />There are several things to consider when appreciating tea scoops. The first is how the character of a tea scoop changes markedly depending on where the node is located. Some have no node, while others have one toward the end of the scoop. Others have a node in the middle, like this tea scoop.<br /><br />The next thing to consider is the “expressiveness” of the scoop, as revealed by the wood grain, for example. Some scoops have mottled appearances and others are pocked with small holes, for instance, while some practitioners prefer bamboo with varying textures. With a rough, irregular surface from the node downwards, this scoop is richly expressive.<br /><br />Next is the tip of the scoop. The kaisaki is the section that bends to form the small paddle that scoops up the tea. The idiosyncrasies of each maker are on full display in this section. Ujisato's tea scoops have wide kaisaki tips that also bend sharply when viewed from the side. This dynamism seems to represent Ujisato's warrior spirit. Ujisato has signed his name near the bottom of the scoop's tubular case. The tea scoop has been shaped by Ujisato's experiences as both a military commander and a tea master.</p><br /><p>Deceptively simple in appearance, tea scoops are thought to reflect the personalities of their makers. This scoop was carved by the samurai warlord Gamō Ujisato (1556–95), a leading pupil of the tea master Sen no Rikyū (1522–91). The tip has a sharp bend, which some believe is a reflection of Ujisato's steely warrior spirit.</p>",
+          "id": "cobas-80501",
+          "lastUpdatedDate": 1784564090464,
+          "linkUrl": "https://colbase.nich.go.jp/collection_items/tnm/G-4853",
+          "ownerOrg": "nich",
+          "provider": "tnm",
+          "temporal": [
+            "安土桃山時代・16世紀",
+            "Azuchi-Momoyama period, 16th century"
+          ],
+          "thumbnailUrl": [
+            "https://colbase.nich.go.jp/media/tnm/G-4853/image/slideshow_s/G-4853_C0011434.jpg"
+          ],
+          "title": "竹茶杓",
+          "titleEn": "Tea Scoop",
+          "titleYomi": "たけちゃしゃく"
+        },
+        "id": "cobas-80501",
+        "rdfindex": {
+          "temporal": [
+            "安土桃山時代"
+          ],
+          "type": [
+            "陶磁"
+          ]
+        },
+        "cobas-0-s": "80501",
+        "cobas-1-u": "https://colbase.nich.go.jp/collection_items/tnm/G-4853",
+        "cobas-2-s": "G-4853",
+        "cobas-4-s": "陶磁",
+        "cobas-5-s": "竹茶杓",
+        "cobas-6-s": "たけちゃしゃく",
+        "cobas-7-s": "1本",
+        "cobas-8-s": "蒲生氏郷作",
+        "cobas-11-s": "安土桃山時代・16世紀",
+        "cobas-12-s": "竹製",
+        "cobas-13-s": "長17.8",
+        "cobas-15-s": "松永安左エ門氏寄贈",
+        "cobas-16-s": "東京国立博物館",
+        "cobas-17-h": "<p>　茶の湯で、抹茶をすくうさじのことを茶杓（ちゃしゃく）といいます。金属や象の牙で作ったものもありますが、多くは竹で作られています。今回ご紹介する作品は、戦国時代から安土桃山時代にかけての武将、蒲生氏郷（がもううじさと）が自ら削り上げたものです。氏郷は茶人・千利休の教えを受け、茶の湯にも精通していました。この茶杓は、のちに昭和を代表する茶人、松永安左エ門（やすざえもん）のコレクションとなり、東京国立博物館に寄贈されました。<br />　茶杓を見るときのポイントをご紹介します。まず、節に注目しましょう。節がどの位置にくるかで全体の印象が変わります。節がないものや茶杓の下のほうにあるものもありますが、この作品では茶杓の中央に節がきています。次は、表情です。表情とは皮目の模様などのことで、まだら模様があったり、「虫食い」と呼ばれる穴があいていたり、あえて変化に富んだ竹が好まれる場合もあります。この作品は節から下に凹凸がり、表情が豊かです。そして、茶杓の先端です。抹茶をすくうために曲がっている部分を櫂先（かいさき）といいますが、ここは作り手の特徴がよく表れる部分です。氏郷の茶杓は櫂先の幅が広く、さらに横から見ると急な角度で折れ曲がっています。とても豪快な印象です。武将・氏郷の気質が感じられます。<br />　茶杓を納める筒の下のほうには、サインがあります。これが、氏郷の作であるという証です。<br />　武将であり、茶人でもあった氏郷の手による茶杓を、ぜひご堪能ください。</p>",
+        "cobas-18-u": "https://colbase.nich.go.jp/media/tnm/G-4853/image/slideshow_s/G-4853_C0011434.jpg",
+        "cobas-19-s": "tnm",
+        "cobas-20-s": "12f08f3c06a62af80737925634848303",
+        "cobas-21-s": "59697",
+        "cobas-22-s": "80501",
+        "cobas-29-s": "工芸:芸能・芸道:茶道具",
+        "cobas-31-s": "Ceramics",
+        "cobas-32-s": "Tea Scoop",
+        "cobas-34-s": "By Gamō Ujisato (1556–95)",
+        "cobas-37-s": "Azuchi-Momoyama period, 16th century",
+        "cobas-38-s": "Bamboo",
+        "cobas-41-s": "Gift of Mr. Matsunaga Yasuzaemon",
+        "cobas-42-s": "Tokyo National Museum",
+        "cobas-43-h": "<p>The tea ceremony is a traditional part of Japanese culture. Practitioners prepare powdered green tea for invited guests using utensils like this tea scoop. Some tea scoops are made of metal or elephant tusk, though most are made of bamboo. This tea scoop was crafted by Gamo Ujisato, a military commander during the Warring States and Azuchi-Momoyama periods. Gamo mastered the art of tea under instruction from the tea master Sen no Rikyu.<br /><br />There are several things to consider when appreciating tea scoops. The first is how the character of a tea scoop changes markedly depending on where the node is located. Some have no node, while others have one toward the end of the scoop. Others have a node in the middle, like this tea scoop.<br /><br />The next thing to consider is the “expressiveness” of the scoop, as revealed by the wood grain, for example. Some scoops have mottled appearances and others are pocked with small holes, for instance, while some practitioners prefer bamboo with varying textures. With a rough, irregular surface from the node downwards, this scoop is richly expressive.<br /><br />Next is the tip of the scoop. The kaisaki is the section that bends to form the small paddle that scoops up the tea. The idiosyncrasies of each maker are on full display in this section. Ujisato's tea scoops have wide kaisaki tips that also bend sharply when viewed from the side. This dynamism seems to represent Ujisato's warrior spirit. Ujisato has signed his name near the bottom of the scoop's tubular case. The tea scoop has been shaped by Ujisato's experiences as both a military commander and a tea master.</p><br /><p>Deceptively simple in appearance, tea scoops are thought to reflect the personalities of their makers. This scoop was carved by the samurai warlord Gamō Ujisato (1556–95), a leading pupil of the tea master Sen no Rikyū (1522–91). The tip has a sharp bend, which some believe is a reflection of Ujisato's steely warrior spirit.</p>",
+        "cobas-46-s": "Applied arts:Performing arts:Tea ceremony implements"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "cultural",
+            "art"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccby",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://colbase.nich.go.jp/media/tnm/G-5376/image/slideshow_s/G-5376_C0084649.jpg"
+          ],
+          "contributor": [
+            "古田織部作",
+            "By Furuta Oribe (1543–1614)",
+            "広田松繁氏寄贈",
+            "Gift of Mr. Hirota Matsushige",
+            "東京国立博物館",
+            "Tokyo National Museum"
+          ],
+          "database": "cobas",
+          "dclass": "751",
+          "descriptionEn": "<p>Tea masters often say that the shape of a tea scoop reflects the personality of its maker. This  bamboo scoop was carved by Furuta Oribe, a samurai lord and leading tea master.<br /></p>",
+          "id": "cobas-80828",
+          "lastUpdatedDate": 1784564090464,
+          "linkUrl": "https://colbase.nich.go.jp/collection_items/tnm/G-5376",
+          "ownerOrg": "nich",
+          "provider": "tnm",
+          "temporal": [
+            "安土桃山～江戸時代・16～17世紀",
+            "Azuchi-Momoyama–Edo period, 16th–17th century"
+          ],
+          "thumbnailUrl": [
+            "https://colbase.nich.go.jp/media/tnm/G-5376/image/slideshow_s/G-5376_C0084649.jpg"
+          ],
+          "title": "竹茶杓",
+          "titleEn": "Tea Scoop",
+          "titleYomi": "たけちゃしゃく"
+        },
+        "id": "cobas-80828",
+        "rdfindex": {
+          "temporal": [
+            "安土桃山～江戸時代"
+          ],
+          "type": [
+            "陶磁"
+          ]
+        },
+        "cobas-0-s": "80828",
+        "cobas-1-u": "https://colbase.nich.go.jp/collection_items/tnm/G-5376",
+        "cobas-2-s": "G-5376",
+        "cobas-4-s": "陶磁",
+        "cobas-5-s": "竹茶杓",
+        "cobas-6-s": "たけちゃしゃく",
+        "cobas-7-s": "1本",
+        "cobas-8-s": "古田織部作",
+        "cobas-11-s": "安土桃山～江戸時代・16～17世紀",
+        "cobas-12-s": "竹製",
+        "cobas-13-s": "長17.9",
+        "cobas-15-s": "広田松繁氏寄贈",
+        "cobas-16-s": "東京国立博物館",
+        "cobas-18-u": "https://colbase.nich.go.jp/media/tnm/G-5376/image/slideshow_s/G-5376_C0084649.jpg",
+        "cobas-19-s": "tnm",
+        "cobas-20-s": "12f08f3c06a62af80737925634848303",
+        "cobas-21-s": "60292",
+        "cobas-22-s": "80828",
+        "cobas-29-s": "工芸:芸能・芸道:茶道具",
+        "cobas-31-s": "Ceramics",
+        "cobas-32-s": "Tea Scoop",
+        "cobas-34-s": "By Furuta Oribe (1543–1614)",
+        "cobas-37-s": "Azuchi-Momoyama–Edo period, 16th–17th century",
+        "cobas-38-s": "Bamboo",
+        "cobas-41-s": "Gift of Mr. Hirota Matsushige",
+        "cobas-42-s": "Tokyo National Museum",
+        "cobas-43-h": "<p>Tea masters often say that the shape of a tea scoop reflects the personality of its maker. This  bamboo scoop was carved by Furuta Oribe, a samurai lord and leading tea master.<br /></p>",
+        "cobas-46-s": "Applied arts:Performing arts:Tea ceremony implements"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "cultural",
+            "art"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccby",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://colbase.nich.go.jp/media/tnm/G-5379/image/slideshow_s/G-5379_C0084642.jpg"
+          ],
+          "contributor": [
+            "杉木普斎作",
+            "By Sugiki Fusai (1628–1706)",
+            "広田松繁氏寄贈",
+            "Gift of Mr. Hirota Matsushige",
+            "東京国立博物館",
+            "Tokyo National Museum"
+          ],
+          "database": "cobas",
+          "dclass": "791",
+          "description": "<p>杉木普斎は伊勢神宮の御師の家に生まれ、千宗旦＠せんのそうたん＠に茶を学びました。千利休から宗旦に受け継がれた茶風を継承し、自作の道具には侘びた趣をもつものが伝わります。幅広の櫂先が特徴的なこの茶杓は、実業家、茶人として知られる原三溪＠はらさんけい＠（富太郎）がかつて所有していました。<br /></p><br /><p>　茶の湯で、抹茶をすくうさじのことを茶杓（ちゃしゃく）といい、多くは竹で作られています。茶杓は、お茶会などに合わせて茶人自らが作りました。茶杓を納める筒には、作者によって自身の名（な）や銘（めい）などが記されます。<br />　今回ご紹介する作品は、江戸時代前期の茶人、杉木普斎（すぎきふさい）が作ったものです。普斎は、千利休の孫で利休のお茶を継承した千宗旦（せんそうたん）の弟子の一人です。<br />　茶杓を見るときは節・表情・櫂先（かいさき）に注目してください。<br />　まず、「節」ですが、この位置で全体の印象が変わります。この茶杓では節は真ん中に近い位置にあり、つぶれたような印象です。<br />　つぎに、「表情」ですが、表情とは皮目の模様や質感などのことで、あえて変化に富んだ竹が好まれます。この茶杓では節から下には凹凸があり、節から上との表情の違いを楽しむことができます。また、長年使いこんだことによる色の変化も趣を見せています。<br />　そして「櫂先」とは、茶杓の先端、抹茶をすくうために曲がっている部分のことで、ここは作り手の特徴がよく表れます。この茶杓を見てみると、櫂先は幅が広く、たっぷりと抹茶をすくうことができそうです。<br />　銘の「亀」のいわれはわかっていませんが、おめでたい意味を込めたのでしょうか。普斎が茶杓に込めた思いを想像しながらご覧ください。</p>",
+          "descriptionEn": "<p>For centuries, tea masters have carved their own tea scoops from bamboo, using them to transfer powdered green tea into tea bowls. Each scoop is believed to embody the spirit of its maker. This scoop was carved by Sugiki Fusai (1628–1706), the son of a Shinto priest, who conducted tea gatherings in the minimalist [wabi] style.</p><br /><p>Most scoops used for scooping matcha, or powdered green tea, in the tea ceremony are made of bamboo. A tea master would make their own tea scoops to suit the occasion. The maker might inscribe their own name or signature on the tube used to store the scoop.<br /><br />This piece was made by the 17th-century tea master Sugiki Fusai. Fusai was an apprentice of Sen no Sotan, a grandson of the renowned tea master Sen no Rikyu, who inherited Rikyu’s school of tea. When you look at a tea scoop, please pay attention to its knuckle, expression, and tip. To begin with, the position of the knuckle alters the overall impression of the scoop. Next, the “expression” refers to the pattern and texture of the wood, where variation-rich bamboo is preferred. Finally, the tip of the scoop is the bent end used to scoop tea. The maker’s idiosyncrasies are often visible in the tip.<br /><br />The knuckle of this scoop is positioned near its middle, and has a somewhat flattened look. The surface below the knuckle is uneven, creating a pleasing contrast with the expression of the bamboo above it. Discoloration due to long years of use is also an expression of refinement. The tip is broad and looks as if it could hold a heaping scoop of powdered tea.<br /><br />The origin of the signature “Kame (turtle)” is unknown, but it likely had an auspicious significance. Try to imagine the feelings that Fusai put into this tea scoop as you view it.</p>",
+          "id": "cobas-80831",
+          "lastUpdatedDate": 1784564090464,
+          "linkUrl": "https://colbase.nich.go.jp/collection_items/tnm/G-5379",
+          "ownerOrg": "nich",
+          "provider": "tnm",
+          "temporal": [
+            "江戸時代・17世紀",
+            "Edo period, 17th century"
+          ],
+          "thumbnailUrl": [
+            "https://colbase.nich.go.jp/media/tnm/G-5379/image/slideshow_s/G-5379_C0084642.jpg"
+          ],
+          "title": "竹茶杓 銘 亀",
+          "titleEn": "Tea Scoop, Named Kame (Turtle)",
+          "titleYomi": "たけちゃしゃく かめ"
+        },
+        "id": "cobas-80831",
+        "rdfindex": {
+          "temporal": [
+            "江戸時代"
+          ],
+          "type": [
+            "陶磁"
+          ]
+        },
+        "cobas-0-s": "80831",
+        "cobas-1-u": "https://colbase.nich.go.jp/collection_items/tnm/G-5379",
+        "cobas-2-s": "G-5379",
+        "cobas-4-s": "陶磁",
+        "cobas-5-s": "竹茶杓 銘 亀",
+        "cobas-6-s": "たけちゃしゃく かめ",
+        "cobas-7-s": "1本",
+        "cobas-8-s": "杉木普斎作",
+        "cobas-11-s": "江戸時代・17世紀",
+        "cobas-12-s": "竹製",
+        "cobas-13-s": "長18.2",
+        "cobas-15-s": "広田松繁氏寄贈",
+        "cobas-16-s": "東京国立博物館",
+        "cobas-17-h": "<p>杉木普斎は伊勢神宮の御師の家に生まれ、千宗旦＠せんのそうたん＠に茶を学びました。千利休から宗旦に受け継がれた茶風を継承し、自作の道具には侘びた趣をもつものが伝わります。幅広の櫂先が特徴的なこの茶杓は、実業家、茶人として知られる原三溪＠はらさんけい＠（富太郎）がかつて所有していました。<br /></p><br /><p>　茶の湯で、抹茶をすくうさじのことを茶杓（ちゃしゃく）といい、多くは竹で作られています。茶杓は、お茶会などに合わせて茶人自らが作りました。茶杓を納める筒には、作者によって自身の名（な）や銘（めい）などが記されます。<br />　今回ご紹介する作品は、江戸時代前期の茶人、杉木普斎（すぎきふさい）が作ったものです。普斎は、千利休の孫で利休のお茶を継承した千宗旦（せんそうたん）の弟子の一人です。<br />　茶杓を見るときは節・表情・櫂先（かいさき）に注目してください。<br />　まず、「節」ですが、この位置で全体の印象が変わります。この茶杓では節は真ん中に近い位置にあり、つぶれたような印象です。<br />　つぎに、「表情」ですが、表情とは皮目の模様や質感などのことで、あえて変化に富んだ竹が好まれます。この茶杓では節から下には凹凸があり、節から上との表情の違いを楽しむことができます。また、長年使いこんだことによる色の変化も趣を見せています。<br />　そして「櫂先」とは、茶杓の先端、抹茶をすくうために曲がっている部分のことで、ここは作り手の特徴がよく表れます。この茶杓を見てみると、櫂先は幅が広く、たっぷりと抹茶をすくうことができそうです。<br />　銘の「亀」のいわれはわかっていませんが、おめでたい意味を込めたのでしょうか。普斎が茶杓に込めた思いを想像しながらご覧ください。</p>",
+        "cobas-18-u": "https://colbase.nich.go.jp/media/tnm/G-5379/image/slideshow_s/G-5379_C0084642.jpg",
+        "cobas-19-s": "tnm",
+        "cobas-20-s": "12f08f3c06a62af80737925634848303",
+        "cobas-21-s": "60295",
+        "cobas-22-s": "80831",
+        "cobas-29-s": "工芸:芸能・芸道:茶道具",
+        "cobas-31-s": "Ceramics",
+        "cobas-32-s": "Tea Scoop, Named Kame (Turtle)",
+        "cobas-34-s": "By Sugiki Fusai (1628–1706)",
+        "cobas-37-s": "Edo period, 17th century",
+        "cobas-38-s": "Bamboo",
+        "cobas-41-s": "Gift of Mr. Hirota Matsushige",
+        "cobas-42-s": "Tokyo National Museum",
+        "cobas-43-h": "<p>For centuries, tea masters have carved their own tea scoops from bamboo, using them to transfer powdered green tea into tea bowls. Each scoop is believed to embody the spirit of its maker. This scoop was carved by Sugiki Fusai (1628–1706), the son of a Shinto priest, who conducted tea gatherings in the minimalist [wabi] style.</p><br /><p>Most scoops used for scooping matcha, or powdered green tea, in the tea ceremony are made of bamboo. A tea master would make their own tea scoops to suit the occasion. The maker might inscribe their own name or signature on the tube used to store the scoop.<br /><br />This piece was made by the 17th-century tea master Sugiki Fusai. Fusai was an apprentice of Sen no Sotan, a grandson of the renowned tea master Sen no Rikyu, who inherited Rikyu’s school of tea. When you look at a tea scoop, please pay attention to its knuckle, expression, and tip. To begin with, the position of the knuckle alters the overall impression of the scoop. Next, the “expression” refers to the pattern and texture of the wood, where variation-rich bamboo is preferred. Finally, the tip of the scoop is the bent end used to scoop tea. The maker’s idiosyncrasies are often visible in the tip.<br /><br />The knuckle of this scoop is positioned near its middle, and has a somewhat flattened look. The surface below the knuckle is uneven, creating a pleasing contrast with the expression of the bamboo above it. Discoloration due to long years of use is also an expression of refinement. The tip is broad and looks as if it could hold a heaping scoop of powdered tea.<br /><br />The origin of the signature “Kame (turtle)” is unknown, but it likely had an auspicious significance. Try to imagine the feelings that Fusai put into this tea scoop as you view it.</p>",
+        "cobas-46-s": "Applied arts:Performing arts:Tea ceremony implements"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "cultural",
+            "art"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccby",
+          "contentsType": "image",
+          "contentsUrl": [
+            "https://colbase.nich.go.jp/media/tnm/H-2807/image/slideshow_s/H-2807_C0021113.jpg"
+          ],
+          "contributor": [
+            "東京国立博物館",
+            "Tokyo National Museum"
+          ],
+          "database": "cobas",
+          "dclass": "752",
+          "id": "cobas-83303",
+          "lastUpdatedDate": 1784564090464,
+          "linkUrl": "https://colbase.nich.go.jp/collection_items/tnm/H-2807",
+          "ownerOrg": "nich",
+          "provider": "tnm",
+          "temporal": [
+            "江戸時代・文化13年(1816)",
+            "Edo Period, 1816"
+          ],
+          "thumbnailUrl": [
+            "https://colbase.nich.go.jp/media/tnm/H-2807/image/slideshow_s/H-2807_C0021113.jpg"
+          ],
+          "title": "竹菱葵紋散蒔絵歯黒道具",
+          "titleEn": "Tooth-Dyeing Set with Bamboo, Wild-Ginger Crests, and Diamonds",
+          "titleYomi": "たけびしあおいもんちらしまきえはぐろどうぐ"
+        },
+        "id": "cobas-83303",
+        "rdfindex": {
+          "temporal": [
+            "江戸時代"
+          ],
+          "type": [
+            "漆工"
+          ]
+        },
+        "cobas-0-s": "83303",
+        "cobas-1-u": "https://colbase.nich.go.jp/collection_items/tnm/H-2807",
+        "cobas-2-s": "H-2807",
+        "cobas-4-s": "漆工",
+        "cobas-5-s": "竹菱葵紋散蒔絵歯黒道具",
+        "cobas-6-s": "たけびしあおいもんちらしまきえはぐろどうぐ",
+        "cobas-7-s": "1具",
+        "cobas-11-s": "江戸時代・文化13年(1816)",
+        "cobas-12-s": "木製漆塗",
+        "cobas-16-s": "東京国立博物館",
+        "cobas-18-u": "https://colbase.nich.go.jp/media/tnm/H-2807/image/slideshow_s/H-2807_C0021113.jpg",
+        "cobas-19-s": "tnm",
+        "cobas-20-s": "12f08f3c06a62af80737925634848303",
+        "cobas-21-s": "64360",
+        "cobas-22-s": "83303",
+        "cobas-31-s": "Lacquerware",
+        "cobas-32-s": "Tooth-Dyeing Set with Bamboo, Wild-Ginger Crests, and Diamonds",
+        "cobas-37-s": "Edo Period, 1816",
+        "cobas-38-s": "Lacquered wood with [maki-e]",
+        "cobas-42-s": "Tokyo National Museum"
+      }
+    ]
+  },
+  "ccbysa": {
+    "facets": [
+      {
+        "counts": {
+          "edu": 3,
+          "noncom": 3,
+          "com": 3,
+          "ccbysa": 3
+        },
+        "key": "rights"
+      },
+      {
+        "counts": {
+          "internet": 3,
+          "iiif": 0,
+          "image": 3,
+          "thumb": 3,
+          "description": 2
+        },
+        "key": "contents"
+      },
+      {
+        "counts": {
+          "media": 3
+        },
+        "key": "type"
+      },
+      {
+        "counts": {
+          "nij21": 3
+        },
+        "key": "db"
+      },
+      {
+        "counts": {
+          "humanities": 3
+        },
+        "key": "cm"
+      },
+      {
+        "counts": {},
+        "key": "tempo"
+      }
+    ],
+    "from": 0,
+    "hit": 3,
+    "list": [
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "humanities"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccbysa",
+          "contentsType": "image",
+          "contentsUrl": [
+            "http://base1.nijl.ac.jp/~collectors_seal/0060433.jpg"
+          ],
+          "contributor": [
+            "［押捺資料著者］歌川芳員"
+          ],
+          "database": "nij21",
+          "dclass": "739",
+          "description": "［備考］序文にあり。中の十二支は別印か。",
+          "id": "nij21-nijl_nijl_nijl_zoushoin_61943",
+          "lastUpdatedDate": 1649910338726,
+          "linkUrl": "https://int.nihu.jp/view/nijl/nijl_nijl_zoushoin_61943",
+          "ownerOrg": "nihu",
+          "provider": "nihu_nij",
+          "thumbnailUrl": [
+            "http://base1.nijl.ac.jp/~collectors_seal/0060433.jpg"
+          ],
+          "title": "［蔵書印文］ＢＯＫＵＳＨＩＳＨＯＯＫＵＳＨＵＪＩＮ　大正　雪散留也穂屋乃芒乃刈利残之"
+        },
+        "id": "nij21-nijl_nijl_nijl_zoushoin_61943",
+        "rdfindex": {
+          "type": [
+            "静止画資料"
+          ]
+        },
+        "nij21-NihuRoot": {
+          "nihuDC": {
+            "FesData": {
+              "URL": [
+                {
+                  "entry-u": "http://base1.nijl.ac.jp/infolib/meta_pub/G0038791ZSI_61943"
+                },
+                {
+                  "entry-u": "http://base1.nijl.ac.jp/~collectors_seal/0060433.jpg"
+                }
+              ],
+              "Title-s": [
+                "［蔵書印文］ＢＯＫＵＳＨＩＳＨＯＯＫＵＳＨＵＪＩＮ　大正　雪散留也穂屋乃芒乃刈利残之",
+                "［押捺資料書名］浮世絵手本",
+                "［書名よみ］うきよえてほん"
+              ],
+              "Creator-s": [
+                "［押捺資料著者］歌川芳員"
+              ],
+              "Description-s": [
+                "［備考］序文にあり。中の十二支は別印か。"
+              ],
+              "Publisher-s": [
+                "［所蔵先］国文研， W",
+                "［請求記号］ヤ８−３１４"
+              ],
+              "Format-s": [
+                "［陰刻・陽刻の別］陽",
+                "［色］緑",
+                "［形状］円形（中に十二支）",
+                "［印文文字数］34文字"
+              ],
+              "Identifier-s": [
+                "［レコードID］61943",
+                "［典籍ID］200016652",
+                "［蔵書印ID］14605"
+              ],
+              "Source-s": [
+                "［典拠資料］国文学研究資料館館蔵和古書目録データベース"
+              ]
+            }
+          }
+        },
+        "nij21-dummy_id-s": "nijl_nijl_nijl_zoushoin_61943",
+        "nij21-nihuINT_URL-u": "https://int.nihu.jp/view/nijl/nijl_nijl_zoushoin_61943"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "humanities"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccbysa",
+          "contentsType": "image",
+          "contentsUrl": [
+            "http://base1.nijl.ac.jp/~collectors_seal/0059579.jpg"
+          ],
+          "contributor": [
+            "［押捺資料著者］石川雅望"
+          ],
+          "database": "nij21",
+          "dclass": "913",
+          "description": "［備考］各巻見返しにあり。中の十二支は別印か。",
+          "id": "nij21-nijl_nijl_nijl_zoushoin_61089",
+          "lastUpdatedDate": 1649910338726,
+          "linkUrl": "https://int.nihu.jp/view/nijl/nijl_nijl_zoushoin_61089",
+          "ownerOrg": "nihu",
+          "provider": "nihu_nij",
+          "thumbnailUrl": [
+            "http://base1.nijl.ac.jp/~collectors_seal/0059579.jpg"
+          ],
+          "title": "［蔵書印文］ＢＯＫＵＳＨＩＳＨＯＯＫＵＳＨＵＪＩＮ　大正　雪散留也穂屋乃芒乃刈利残之"
+        },
+        "id": "nij21-nijl_nijl_nijl_zoushoin_61089",
+        "rdfindex": {
+          "type": [
+            "静止画資料"
+          ]
+        },
+        "nij21-NihuRoot": {
+          "nihuDC": {
+            "FesData": {
+              "URL": [
+                {
+                  "entry-u": "http://base1.nijl.ac.jp/infolib/meta_pub/G0038791ZSI_61089"
+                },
+                {
+                  "entry-u": "http://base1.nijl.ac.jp/~collectors_seal/0059579.jpg"
+                }
+              ],
+              "Title-s": [
+                "［蔵書印文］ＢＯＫＵＳＨＩＳＨＯＯＫＵＳＨＵＪＩＮ　大正　雪散留也穂屋乃芒乃刈利残之",
+                "［押捺資料書名］通俗小説奇事",
+                "［書名よみ］つうぞくしょうせつきじ"
+              ],
+              "Creator-s": [
+                "［押捺資料著者］石川雅望"
+              ],
+              "Description-s": [
+                "［備考］各巻見返しにあり。中の十二支は別印か。"
+              ],
+              "Publisher-s": [
+                "［所蔵先］国文研， W",
+                "［請求記号］ナ４−８１５−１〜３"
+              ],
+              "Format-s": [
+                "［陰刻・陽刻の別］陽",
+                "［サイズ（縦×横）］7.9×7.9cm",
+                "［色］緑",
+                "［形状］円形（中に十二支）",
+                "［印文文字数］34文字"
+              ],
+              "Identifier-s": [
+                "［レコードID］61089",
+                "［典籍ID］200015016",
+                "［蔵書印ID］14605"
+              ],
+              "Source-s": [
+                "［典拠資料］国文学研究資料館館蔵和古書目録データベース"
+              ]
+            }
+          }
+        },
+        "nij21-dummy_id-s": "nijl_nijl_nijl_zoushoin_61089",
+        "nij21-nihuINT_URL-u": "https://int.nihu.jp/view/nijl/nijl_nijl_zoushoin_61089"
+      },
+      {
+        "common": {
+          "access": "PUBLIC",
+          "apiType": "ok",
+          "category": [
+            "humanities"
+          ],
+          "contentsAccess": "internet",
+          "contentsRightsType": "ccbysa",
+          "contentsType": "image",
+          "contentsUrl": [
+            "http://base1.nijl.ac.jp/~collectors_seal/0050160.jpg"
+          ],
+          "contributor": [
+            "［蔵書印主］東京帝国大学",
+            "［蔵書印主よみ］とうきょうていこくだいがく",
+            "［押捺資料著者］本居宣長"
+          ],
+          "database": "nij21",
+          "dclass": "739",
+          "id": "nij21-nijl_nijl_nijl_zoushoin_51670",
+          "lastUpdatedDate": 1649910338726,
+          "linkUrl": "https://int.nihu.jp/view/nijl/nijl_nijl_zoushoin_51670",
+          "ownerOrg": "nihu",
+          "provider": "nihu_nij",
+          "thumbnailUrl": [
+            "http://base1.nijl.ac.jp/~collectors_seal/0050160.jpg"
+          ],
+          "title": "［蔵書印文］閲覧室用　FOR USE IN THE READING ROOM"
+        },
+        "id": "nij21-nijl_nijl_nijl_zoushoin_51670",
+        "rdfindex": {
+          "type": [
+            "静止画資料"
+          ]
+        },
+        "nij21-NihuRoot": {
+          "nihuDC": {
+            "FesData": {
+              "URL": [
+                {
+                  "entry-u": "http://base1.nijl.ac.jp/infolib/meta_pub/G0038791ZSI_51670"
+                },
+                {
+                  "entry-u": "http://base1.nijl.ac.jp/~collectors_seal/0050160.jpg"
+                }
+              ],
+              "Title-s": [
+                "［蔵書印文］閲覧室用　FOR USE IN THE READING ROOM",
+                "［押捺資料書名］真暦考",
+                "［書名よみ］しんれきこう"
+              ],
+              "Creator-s": [
+                "［蔵書印主］東京帝国大学",
+                "［蔵書印主よみ］とうきょうていこくだいがく",
+                "［押捺資料著者］本居宣長"
+              ],
+              "Description-s": [
+                "",
+                "［備考］巻頭にあり。円周に沿って「FOR USE IN THE READING ROOM」の文字あり。"
+              ],
+              "Publisher-s": [
+                "［所蔵先］国文研， W",
+                "［請求記号］ヤ９−２９"
+              ],
+              "Type-s": [
+                "［刊記］刊"
+              ],
+              "Format-s": [
+                "［陰刻・陽刻の別］陽",
+                "［サイズ（縦×横）］2.3×2.3cm",
+                "［色］朱",
+                "［形状］円形",
+                "［印文文字数］26文字"
+              ],
+              "Identifier-s": [
+                "［レコードID］51670",
+                "［典籍ID］200005523",
+                "［蔵書印ID］18469",
+                "［人物ID］7565"
+              ],
+              "Source-s": [
+                "［典拠資料］国文学研究資料館館蔵和古書目録データベース"
+              ]
+            }
+          }
+        },
+        "nij21-dummy_id-s": "nijl_nijl_nijl_zoushoin_51670",
+        "nij21-nihuINT_URL-u": "https://int.nihu.jp/view/nijl/nijl_nijl_zoushoin_51670"
+      }
+    ]
+  }
+}
