@@ -250,6 +250,7 @@ async function handleSources(res, sourceList, settings) {
       keyConfigured,
       keyEnv,
       openLicenses: source.openLicenses !== false,
+      base: source.config?.base ?? null,
     };
   });
   sendJson(res, 200, data);

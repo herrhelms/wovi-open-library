@@ -699,6 +699,16 @@ test('GET /api/sources sends openLicenses', async () => {
   });
 });
 
+test('GET /api/sources sends base', async () => {
+  const subset = fakeSource('sub', { config: { base: 'commons-subset' } });
+  const plain = fakeSource('plain');
+  await withServer([subset.source, plain.source], async (base) => {
+    const data = await (await fetch(`${base}/api/sources`)).json();
+    assert.equal(data.find((entry) => entry.id === 'sub').base, 'commons-subset');
+    assert.equal(data.find((entry) => entry.id === 'plain').base, null);
+  });
+});
+
 test('GET /api/search sets open without the filter', async () => {
   const fake = fakeSource('fake', {
     searchResult: {
