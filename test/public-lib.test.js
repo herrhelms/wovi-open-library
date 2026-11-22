@@ -9,6 +9,7 @@ import {
   commonsLast,
   countActive,
   createRequestQueue,
+  createSearchQueue,
   DEFAULT_GROUPS,
   distribute,
   downloadUrl,
@@ -46,6 +47,7 @@ import {
   removeSave,
   snapshotItem,
   savedViewText,
+  SEARCH_REQUEST_LIMIT,
   clearAllText,
   savesExportJson,
   isShortcut,
@@ -1409,5 +1411,167 @@ test('createRequestQueue clear drops waiting tickets and forgets active ones', (
   queue.request(() => started.push(6));
   assert.deepEqual(started, [1, 2, 6]);
   assert.equal(queue.activeCount(), 1);
+  queue.clear();
+});
+
+// ---------- Two-level search queue ----------
+
+test('SEARCH_REQUEST_LIMIT is 4 and COMMONS_REQUEST_LIMIT is 2', () => {
+  assert.equal(SEARCH_REQUEST_LIMIT, 4);
+  assert.equal(COMMONS_REQUEST_LIMIT, 2);
+});
+
+test('createSearchQueue starts at most 4 requests', () => {
+  const queue = createSearchQueue({ total: 4, commons: 2 });
+  const started = [];
+  for (let i = 1; i <= 6; i += 1) {
+    queue.request(() => started.push(i));
+  }
+  assert.deepEqual(started, [1, 2, 3, 4]);
+  assert.equal(queue.activeCount(), 4);
+  assert.equal(queue.waitingCount(), 2);
+  queue.clear();
+});
+
+test('createSearchQueue starts at most 2 Commons requests', () => {
+  const queue = createSearchQueue({ total: 4, commons: 2 });
+  const started = [];
+  for (let i = 1; i <= 3; i += 1) {
+    queue.request(() => started.push(`C${i}`), { commons: true });
+  }
+  assert.deepEqual(started, ['C1', 'C2']);
+  assert.equal(queue.activeCount(), 2);
+  assert.equal(queue.waitingCount(), 1);
+  queue.clear();
+});
+
+test('createSearchQueue lets a non-Commons request pass a blocked Commons request', () => {
+  const queue = createSearchQueue({ total: 4, commons: 2 });
+  const started = [];
+  queue.request(() => started.push('C1'), { commons: true });
+  queue.request(() => started.push('C2'), { commons: true });
+  queue.request(() => started.push('C3'), { commons: true });
+  queue.request(() => started.push('N1'));
+  assert.deepEqual(started, ['C1', 'C2', 'N1']);
+  assert.equal(queue.activeCount(), 3);
+  assert.equal(queue.waitingCount(), 1);
+  queue.clear();
+});
+
+test('createSearchQueue keeps FIFO order', () => {
+  const queue = createSearchQueue({ total: 1, commons: 1 });
+  const started = [];
+  const n1 = queue.request(() => started.push('N1'));
+  const n2 = queue.request(() => started.push('N2'));
+  queue.request(() => started.push('C1'), { commons: true });
+  queue.request(() => started.push('N3'));
+  assert.deepEqual(started, ['N1']);
+  queue.release(n1);
+  assert.deepEqual(started, ['N1', 'N2']);
+  queue.release(n2);
+  assert.deepEqual(started, ['N1', 'N2', 'C1']);
+  assert.equal(queue.activeCount(), 1);
+  assert.equal(queue.waitingCount(), 1);
+  queue.clear();
+});
+
+test('createSearchQueue release starts the next waiting request', () => {
+  const queue = createSearchQueue({ total: 4, commons: 2 });
+  const started = [];
+  const c1 = queue.request(() => started.push('C1'), { commons: true });
+  queue.request(() => started.push('C2'), { commons: true });
+  queue.request(() => started.push('C3'), { commons: true });
+  assert.deepEqual(started, ['C1', 'C2']);
+  queue.release(c1);
+  assert.deepEqual(started, ['C1', 'C2', 'C3']);
+  assert.equal(queue.activeCount(), 2);
+  assert.equal(queue.waitingCount(), 0);
+  queue.clear();
+});
+
+test('createSearchQueue total limit applies to mixed kinds', () => {
+  const queue = createSearchQueue({ total: 4, commons: 2 });
+  const started = [];
+  const n1 = queue.request(() => started.push('N1'));
+  queue.request(() => started.push('N2'));
+  queue.request(() => started.push('N3'));
+  queue.request(() => started.push('N4'));
+  queue.request(() => started.push('C1'), { commons: true });
+  assert.deepEqual(started, ['N1', 'N2', 'N3', 'N4']);
+  assert.equal(queue.waitingCount(), 1);
+  queue.release(n1);
+  assert.deepEqual(started, ['N1', 'N2', 'N3', 'N4', 'C1']);
+  assert.equal(queue.activeCount(), 4);
+  assert.equal(queue.waitingCount(), 0);
+  queue.clear();
+});
+
+test('createSearchQueue release of a waiting ticket removes it', () => {
+  const queue = createSearchQueue({ total: 1, commons: 1 });
+  const started = [];
+  const n1 = queue.request(() => started.push('N1'));
+  const n2 = queue.request(() => started.push('N2'));
+  queue.release(n2);
+  assert.equal(queue.waitingCount(), 0);
+  queue.release(n1);
+  assert.deepEqual(started, ['N1']);
+  assert.equal(queue.activeCount(), 0);
+  assert.equal(queue.waitingCount(), 0);
+  queue.clear();
+});
+
+test('createSearchQueue ignores a double or unknown release', () => {
+  const queue = createSearchQueue({ total: 1, commons: 1 });
+  const started = [];
+  const n1 = queue.request(() => started.push('N1'));
+  queue.request(() => started.push('N2'));
+  queue.release(n1);
+  assert.deepEqual(started, ['N1', 'N2']);
+  queue.release(n1);
+  assert.deepEqual(started, ['N1', 'N2']);
+  queue.release(9999);
+  assert.deepEqual(started, ['N1', 'N2']);
+  assert.equal(queue.activeCount(), 1);
+  assert.equal(queue.waitingCount(), 0);
+  queue.clear();
+});
+
+test('createSearchQueue clear drops waiting requests', () => {
+  const queue = createSearchQueue({ total: 1, commons: 1 });
+  const started = [];
+  const n1 = queue.request(() => started.push('N1'));
+  const n2 = queue.request(() => started.push('N2'));
+  queue.request(() => started.push('C1'), { commons: true });
+  assert.equal(queue.waitingCount(), 2);
+
+  queue.clear();
+  assert.equal(queue.activeCount(), 0);
+  assert.equal(queue.waitingCount(), 0);
+
+  queue.release(n1);
+  queue.release(n2);
+  assert.deepEqual(started, ['N1']);
+  assert.equal(queue.activeCount(), 0);
+  assert.equal(queue.waitingCount(), 0);
+
+  queue.request(() => started.push('N3'));
+  assert.deepEqual(started, ['N1', 'N3']);
+  assert.equal(queue.activeCount(), 1);
+  queue.clear();
+});
+
+test('createSearchQueue treats bad options as 1', () => {
+  const queue = createSearchQueue({ total: 0, commons: NaN });
+  const started = [];
+  const n1 = queue.request(() => started.push('N1'));
+  queue.request(() => started.push('N2'));
+  queue.request(() => started.push('C1'), { commons: true });
+  assert.deepEqual(started, ['N1']);
+  assert.equal(queue.activeCount(), 1);
+  assert.equal(queue.waitingCount(), 2);
+  queue.release(n1);
+  assert.deepEqual(started, ['N1', 'N2']);
+  assert.equal(queue.activeCount(), 1);
+  assert.equal(queue.waitingCount(), 1);
   queue.clear();
 });
