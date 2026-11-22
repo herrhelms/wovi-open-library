@@ -4,7 +4,10 @@
  */
 import {
   DEFAULT_GROUPS,
+  COMMONS_REQUEST_LIMIT,
   columnCount,
+  commonsLast,
+  createRequestQueue,
   distribute,
   downloadUrl,
   el,
@@ -14,6 +17,7 @@ import {
   groupSources,
   imagesText,
   imagesTotal,
+  isCommonsBacked,
   isSearchable,
   isShortcut,
   isUsable,
@@ -128,6 +132,7 @@ let autoLoadStopped = false;
 
 const states = new Map();
 const controllers = new Map();
+const queue = createRequestQueue(COMMONS_REQUEST_LIMIT);
 const retryTimers = new Map();
 const errors = new Map();
 const chipEls = new Map();
@@ -1133,7 +1138,39 @@ async function loadSource(id, page, token, gen) {
   controllers.set(id, controller);
   activeLoads += 1;
 
+  let ticket = null;
   try {
+    if (isCommonsBacked(registryById.get(id))) {
+      let releaseWait = () => {};
+      const waited = new Promise((resolve) => {
+        releaseWait = resolve;
+      });
+      let started = false;
+      const onAbort = () => {
+        if (ticket !== null) {
+          queue.release(ticket);
+          ticket = null;
+        }
+        releaseWait();
+      };
+      ticket = queue.request(() => {
+        started = true;
+        controller.signal.removeEventListener('abort', onAbort);
+        releaseWait();
+      });
+      if (!started) {
+        controller.signal.addEventListener('abort', onAbort, { once: true });
+        await waited;
+      }
+      if (controller.signal.aborted || !isValidToken(id, token, gen)) {
+        if (ticket !== null) {
+          queue.release(ticket);
+          ticket = null;
+        }
+        return;
+      }
+    }
+
     const params = new URLSearchParams({ source: id, q: query, page: String(page) });
     if (openOnly) params.set('open', '1');
     const response = await fetch(`/api/search?${params.toString()}`, {
@@ -1214,6 +1251,10 @@ async function loadSource(id, page, token, gen) {
       scheduleRetry(id, page, token, gen, delay);
     }
   } finally {
+    if (ticket !== null) {
+      queue.release(ticket);
+      ticket = null;
+    }
     if (controllers.get(id) === controller) controllers.delete(id);
     if (gen === generation) {
       activeLoads = Math.max(0, activeLoads - 1);
@@ -1262,6 +1303,7 @@ function resetAutoLoad() {
 
 function resetSearchState() {
   abortAll();
+  queue.clear();
   cancelAllRetries();
   requestTokens.clear();
   resetAutoLoad();
@@ -1309,7 +1351,7 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
   }
 
   const gen = generation;
-  for (const source of searchableSelected()) {
+  for (const source of commonsLast(searchableSelected())) {
     if (restoreIfCached(source.id)) continue;
     startLoad(source.id, 1, gen);
   }
@@ -1318,7 +1360,7 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
 
 function loadMore() {
   if (!canLoadMore()) return false;
-  const targets = searchableSelected()
+  const targets = commonsLast(searchableSelected())
     .map((source) => ({ source, state: sourceState(source.id) }))
     .filter(({ state }) => state.hasMore && state.status !== 'error' && state.status !== 'loading');
   if (targets.length === 0) return false;
@@ -1481,7 +1523,7 @@ function setAll(isOn) {
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
       const gen = generation;
-      for (const source of added) {
+      for (const source of commonsLast(added)) {
         if (restoreIfCached(source.id)) continue;
         startLoad(source.id, 1, gen);
       }
@@ -1510,7 +1552,7 @@ function setGroupAll(groupId, isOn) {
     for (const source of added) selected.add(source.id);
     if (query && added.length > 0) {
       const gen = generation;
-      for (const source of added) {
+      for (const source of commonsLast(added)) {
         if (restoreIfCached(source.id)) continue;
         startLoad(source.id, 1, gen);
       }
