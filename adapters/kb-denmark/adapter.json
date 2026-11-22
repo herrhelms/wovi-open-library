@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "id": "kb-denmark",
+  "name": "Royal Danish Library",
+  "homepage": "https://www.kb.dk",
+  "group": "libraries",
+  "order": 411,
+  "description": "Royal Danish Library: images free of copyright or CC BY.",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Only items marked free of copyright or CC BY. Danish search terms give the most results."
+  ]
+}
