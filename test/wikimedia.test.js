@@ -115,6 +115,36 @@ test('paused gate answers RATE_LIMIT without a fetch', async () => {
   assert.deepEqual(clock.sleeps, []);
 });
 
+test('fail-fast while paused marks the error as paused', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    throw http429(10);
+  };
+  const deps = {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter: noLimiter,
+  };
+
+  await assert.rejects(fetchCommonsJson(URL_UNDER_TEST, deps), (err) => {
+    assert.equal(err.code, 'RATE_LIMIT');
+    assert.notEqual(err.paused, true);
+    return true;
+  });
+  assert.equal(calls, 1);
+
+  await assert.rejects(fetchCommonsJson(URL_UNDER_TEST, deps), (err) => {
+    assert.equal(err.code, 'RATE_LIMIT');
+    assert.equal(err.paused, true);
+    return true;
+  });
+  assert.equal(calls, 1);
+});
+
 test('429 sets the pause and throws at once', async () => {
   resetCommonsGate();
   const clock = fakeClock();
@@ -305,6 +335,40 @@ test('queued request fails fast when another request sets a pause', async () => 
   await assert.rejects(b, (err) => {
     assert.equal(err.code, 'RATE_LIMIT');
     assert.ok(err.retryAfterSeconds >= 19);
+    return true;
+  });
+
+  assert.equal(calls, 1);
+  assert.deepEqual(clock.sleeps, []);
+});
+
+test('queued fail-fast in waitForGate marks the error as paused', async () => {
+  resetCommonsGate();
+  const clock = fakeClock();
+  const limiter = createLimiter(1);
+  let calls = 0;
+  const fetchJson = async () => {
+    calls += 1;
+    throw http429(20);
+  };
+  const deps = {
+    fetchJson,
+    sleep: clock.sleep,
+    now: clock.now,
+    limiter,
+  };
+
+  const a = fetchCommonsJson(URL_UNDER_TEST, deps);
+  const b = fetchCommonsJson(URL_UNDER_TEST, deps);
+
+  await assert.rejects(a, (err) => {
+    assert.equal(err.code, 'RATE_LIMIT');
+    assert.notEqual(err.paused, true);
+    return true;
+  });
+  await assert.rejects(b, (err) => {
+    assert.equal(err.code, 'RATE_LIMIT');
+    assert.equal(err.paused, true);
     return true;
   });
 

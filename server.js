@@ -374,6 +374,9 @@ async function handleSearch(url, res, sourceList, searchCache, thumbCache, setti
     if (err?.code === 'RATE_LIMIT' && Number.isFinite(err.retryAfterSeconds)) {
       body.retryAfterSeconds = err.retryAfterSeconds;
     }
+    if (err?.code === 'RATE_LIMIT' && err.paused === true) {
+      body.paused = true;
+    }
     sendJson(res, 502, body);
   }
 }

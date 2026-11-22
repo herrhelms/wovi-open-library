@@ -416,6 +416,66 @@ test('GET /api/search sends retryAfterSeconds for a rate limit', async () => {
   });
 });
 
+test('GET /api/search sends paused for a fail-fast rate limit', async () => {
+  const message = 'Wikimedia Commons rate limit reached. Try again in a minute.';
+  const fake = fakeSource('fake', {
+    searchResult: () => {
+      const err = new Error(message);
+      err.code = 'RATE_LIMIT';
+      err.retryAfterSeconds = 12;
+      err.paused = true;
+      throw err;
+    },
+  });
+  await withServer([fake.source], async (base) => {
+    const res = await fetch(`${base}/api/search?source=fake&q=moon`);
+    assert.equal(res.status, 502);
+    assert.deepEqual(await res.json(), {
+      error: message,
+      code: 'RATE_LIMIT',
+      retryAfterSeconds: 12,
+      paused: true,
+    });
+  });
+});
+
+test('GET /api/search sends paused only for a paused rate limit', async () => {
+  const message = 'Wikimedia Commons rate limit reached.';
+  const limited = fakeSource('limited', {
+    searchResult: () => {
+      const err = new Error(message);
+      err.code = 'RATE_LIMIT';
+      err.retryAfterSeconds = 12;
+      throw err;
+    },
+  });
+  const httpError = fakeSource('httperror', {
+    searchResult: () => {
+      const err = new Error('Upstream says HTTP 500');
+      err.code = 'HTTP';
+      err.paused = true;
+      throw err;
+    },
+  });
+  await withServer([limited.source, httpError.source], async (base) => {
+    const limitedRes = await fetch(`${base}/api/search?source=limited&q=moon`);
+    assert.equal(limitedRes.status, 502);
+    const limitedData = await limitedRes.json();
+    assert.deepEqual(limitedData, {
+      error: message,
+      code: 'RATE_LIMIT',
+      retryAfterSeconds: 12,
+    });
+    assert.equal('paused' in limitedData, false);
+
+    const httpRes = await fetch(`${base}/api/search?source=httperror&q=moon`);
+    assert.equal(httpRes.status, 502);
+    const httpData = await httpRes.json();
+    assert.equal(httpData.code, 'HTTP');
+    assert.equal('paused' in httpData, false);
+  });
+});
+
 test('GET /api/search leaves out retryAfterSeconds without a number', async () => {
   const fake = fakeSource('fake', {
     searchResult: () => {
