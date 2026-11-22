@@ -7,7 +7,7 @@ import {
   COMMONS_REQUEST_LIMIT,
   columnCount,
   commonsLast,
-  createRequestQueue,
+  createSearchQueue,
   distribute,
   downloadUrl,
   el,
@@ -24,6 +24,7 @@ import {
   itemKey,
   parseSavedSelection,
   pickColumn,
+  pickLoadTargets,
   placeholderTone,
   pullingText,
   rememberLimited,
@@ -31,6 +32,7 @@ import {
   retryWaitText,
   savesExportJson,
   searchKey,
+  SEARCH_REQUEST_LIMIT,
   searchWithoutItem,
   searchPlaceholder,
   serializeSelection,
@@ -64,6 +66,8 @@ const SOURCES_OPEN_KEY = 'wovi:sources-open:v1';
 const OPEN_DISABLED_TEXT =
   'No licence data. Not searched with Open licences only.';
 const DOWNLOAD_DELAY = 800;
+/** Distance below the viewport at which the sentinel counts as near. */
+const AUTO_LOAD_MARGIN = 800;
 /** The Saved page (one route, served by `GET /saved`). */
 const SAVED_PATH = '/saved';
 const isSavedPage = location.pathname === SAVED_PATH;
@@ -132,7 +136,10 @@ let autoLoadStopped = false;
 
 const states = new Map();
 const controllers = new Map();
-const queue = createRequestQueue(COMMONS_REQUEST_LIMIT);
+const queue = createSearchQueue({
+  total: SEARCH_REQUEST_LIMIT,
+  commons: COMMONS_REQUEST_LIMIT,
+});
 const retryTimers = new Map();
 const errors = new Map();
 const chipEls = new Map();
@@ -1140,35 +1147,36 @@ async function loadSource(id, page, token, gen) {
 
   let ticket = null;
   try {
-    if (isCommonsBacked(registryById.get(id))) {
-      let releaseWait = () => {};
-      const waited = new Promise((resolve) => {
-        releaseWait = resolve;
-      });
-      let started = false;
-      const onAbort = () => {
-        if (ticket !== null) {
-          queue.release(ticket);
-          ticket = null;
-        }
-        releaseWait();
-      };
-      ticket = queue.request(() => {
+    let releaseWait = () => {};
+    const waited = new Promise((resolve) => {
+      releaseWait = resolve;
+    });
+    let started = false;
+    const onAbort = () => {
+      if (ticket !== null) {
+        queue.release(ticket);
+        ticket = null;
+      }
+      releaseWait();
+    };
+    ticket = queue.request(
+      () => {
         started = true;
         controller.signal.removeEventListener('abort', onAbort);
         releaseWait();
-      });
-      if (!started) {
-        controller.signal.addEventListener('abort', onAbort, { once: true });
-        await waited;
+      },
+      { commons: isCommonsBacked(registryById.get(id)) },
+    );
+    if (!started) {
+      controller.signal.addEventListener('abort', onAbort, { once: true });
+      await waited;
+    }
+    if (controller.signal.aborted || !isValidToken(id, token, gen)) {
+      if (ticket !== null) {
+        queue.release(ticket);
+        ticket = null;
       }
-      if (controller.signal.aborted || !isValidToken(id, token, gen)) {
-        if (ticket !== null) {
-          queue.release(ticket);
-          ticket = null;
-        }
-        return;
-      }
+      return;
     }
 
     const params = new URLSearchParams({ source: id, q: query, page: String(page) });
@@ -1260,6 +1268,7 @@ async function loadSource(id, page, token, gen) {
       activeLoads = Math.max(0, activeLoads - 1);
       hasAnswered = true;
       updateUi();
+      autoLoadIfNear();
     }
   }
 }
@@ -1358,19 +1367,45 @@ function runSearch(rawQuery, { urlMode = 'push' } = {}) {
   updateUi();
 }
 
+/**
+ * Candidate entries for `pickLoadTargets`, in load order.
+ * @returns {Array<{id:string,page:number,hasMore:boolean,status:string,retryWaiting:boolean}>}
+ */
+function loadEntries() {
+  return commonsLast(searchableSelected()).map((source) => {
+    const state = sourceState(source.id);
+    return {
+      id: source.id,
+      page: state.page,
+      hasMore: state.hasMore,
+      status: state.status,
+      retryWaiting: retryTimers.has(source.id),
+    };
+  });
+}
+
 function loadMore() {
   if (!canLoadMore()) return false;
-  const targets = commonsLast(searchableSelected())
-    .map((source) => ({ source, state: sourceState(source.id) }))
-    .filter(({ state }) => state.hasMore && state.status !== 'error' && state.status !== 'loading');
+  const targets = pickLoadTargets(loadEntries());
   if (targets.length === 0) return false;
 
   const gen = generation;
-  for (const { source, state } of targets) {
-    startLoad(source.id, state.page + 1, gen);
+  for (const id of targets) {
+    startLoad(id, sourceState(id).page + 1, gen);
   }
   updateUi();
   return true;
+}
+
+/**
+ * Run `autoLoad` when the sentinel sits near the viewport, for a source that
+ * answered while the user is already close to the end of the wall.
+ */
+function autoLoadIfNear() {
+  if (isSavedPage) return;
+  if (sentinelEl.getClientRects().length === 0) return;
+  const distance = sentinelEl.getBoundingClientRect().top - window.innerHeight;
+  if (distance <= AUTO_LOAD_MARGIN) autoLoad();
 }
 
 /**
@@ -1404,16 +1439,12 @@ function autoLoad() {
 
 function canLoadMore() {
   if (!query || selected.size === 0) return false;
-  if (activeLoads > 0 || !hasAnswered) return false;
+  if (!hasAnswered) return false;
   const started =
     Boolean(query) &&
     searchableSelected().some((source) => sourceState(source.id).status !== 'idle');
   if (!started) return false;
-  for (const source of searchableSelected()) {
-    const state = sourceState(source.id);
-    if (state.hasMore && state.status !== 'error' && state.status !== 'loading') return true;
-  }
-  return false;
+  return pickLoadTargets(loadEntries()).length > 0;
 }
 
 // ---------- Source toggles ----------
@@ -1849,7 +1880,7 @@ function updateUi() {
   updateSkeletons();
   updateLoadRow();
 
-  const showMore = !isSavedPage && canLoadMore();
+  const showMore = !isSavedPage && activeLoads === 0 && canLoadMore();
   loadMoreButton.hidden = !showMore;
 
   const count = selection.size;
@@ -2302,7 +2333,7 @@ if (typeof IntersectionObserver === 'function') {
     (entries) => {
       if (entries.some((entry) => entry.isIntersecting)) autoLoad();
     },
-    { rootMargin: '800px' },
+    { rootMargin: `${AUTO_LOAD_MARGIN}px` },
   );
   observer.observe(sentinelEl);
 }

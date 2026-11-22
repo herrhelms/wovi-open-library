@@ -8,7 +8,6 @@ import {
   COMMONS_REQUEST_LIMIT,
   commonsLast,
   countActive,
-  createRequestQueue,
   createSearchQueue,
   DEFAULT_GROUPS,
   distribute,
@@ -1313,107 +1312,6 @@ test('commonsLast puts the Commons sources last and keeps the input', () => {
   assert.deepEqual(commonsLast(input), [m1, m2, c1, c2]);
   assert.deepEqual(input, [c1, m1, c2, m2]);
   assert.equal(COMMONS_REQUEST_LIMIT, 2);
-});
-
-test('createRequestQueue starts up to the limit, then waits', () => {
-  const queue = createRequestQueue(2);
-  const started = [];
-  const t1 = queue.request(() => started.push(1));
-  const t2 = queue.request(() => started.push(2));
-  const t3 = queue.request(() => started.push(3));
-  assert.deepEqual(started, [1, 2]);
-  assert.equal(queue.activeCount(), 2);
-  assert.equal(queue.waitingCount(), 1);
-
-  queue.release(t1);
-  assert.deepEqual(started, [1, 2, 3]);
-  assert.equal(queue.activeCount(), 2);
-  assert.equal(queue.waitingCount(), 0);
-  assert.notEqual(t1, t3);
-  queue.clear();
-});
-
-test('createRequestQueue release of a waiting ticket drops it', () => {
-  const queue = createRequestQueue(1);
-  const started = [];
-  const t1 = queue.request(() => started.push(1));
-  const t2 = queue.request(() => started.push(2));
-  const t3 = queue.request(() => started.push(3));
-  queue.release(t2);
-  assert.deepEqual(started, [1]);
-  assert.equal(queue.activeCount(), 1);
-  assert.equal(queue.waitingCount(), 1);
-  queue.release(t1);
-  assert.deepEqual(started, [1, 3]);
-  assert.equal(queue.activeCount(), 1);
-  assert.equal(queue.waitingCount(), 0);
-  queue.clear();
-  void t3;
-});
-
-test('createRequestQueue release of the same active ticket does nothing twice', () => {
-  const queue = createRequestQueue(1);
-  const started = [];
-  const t1 = queue.request(() => started.push(1));
-  const t2 = queue.request(() => started.push(2));
-  queue.release(t1);
-  assert.deepEqual(started, [1, 2]);
-  queue.release(t1);
-  assert.deepEqual(started, [1, 2]);
-  assert.equal(queue.activeCount(), 1);
-  assert.equal(queue.waitingCount(), 0);
-  queue.clear();
-  void t2;
-});
-
-test('createRequestQueue ignores an unknown ticket', () => {
-  const queue = createRequestQueue(1);
-  const started = [];
-  queue.request(() => started.push(1));
-  queue.release(9999);
-  assert.deepEqual(started, [1]);
-  assert.equal(queue.activeCount(), 1);
-  assert.equal(queue.waitingCount(), 0);
-  queue.clear();
-});
-
-test('createRequestQueue starts waiting tickets first in, first out', () => {
-  const queue = createRequestQueue(1);
-  const started = [];
-  const a = queue.request(() => started.push('A'));
-  queue.request(() => started.push('B'));
-  queue.request(() => started.push('C'));
-  queue.release(a);
-  assert.deepEqual(started, ['A', 'B']);
-  assert.equal(queue.activeCount(), 1);
-  assert.equal(queue.waitingCount(), 1);
-  queue.clear();
-});
-
-test('createRequestQueue clear drops waiting tickets and forgets active ones', () => {
-  const queue = createRequestQueue(2);
-  const started = [];
-  queue.request(() => started.push(1));
-  queue.request(() => started.push(2));
-  const waiting = queue.request(() => started.push(3));
-  queue.request(() => started.push(4));
-  queue.request(() => started.push(5));
-  assert.equal(queue.waitingCount(), 3);
-
-  queue.clear();
-  assert.deepEqual(started, [1, 2]);
-  assert.equal(queue.activeCount(), 0);
-  assert.equal(queue.waitingCount(), 0);
-
-  queue.release(waiting);
-  assert.deepEqual(started, [1, 2]);
-  assert.equal(queue.activeCount(), 0);
-  assert.equal(queue.waitingCount(), 0);
-
-  queue.request(() => started.push(6));
-  assert.deepEqual(started, [1, 2, 6]);
-  assert.equal(queue.activeCount(), 1);
-  queue.clear();
 });
 
 // ---------- Two-level search queue ----------
