@@ -33,6 +33,7 @@ import {
   needsAttribution,
   parseSavedSelection,
   pickColumn,
+  pickLoadTargets,
   placeholderTone,
   pullingText,
   rateLimitWaitText,
@@ -41,6 +42,7 @@ import {
   retryWaitText,
   savedCount,
   makeSnapshot,
+  MAX_PAGE_LEAD,
   parseSaves,
   isSaved,
   addSave,
@@ -1574,4 +1576,149 @@ test('createSearchQueue treats bad options as 1', () => {
   assert.equal(queue.activeCount(), 1);
   assert.equal(queue.waitingCount(), 1);
   queue.clear();
+});
+
+// ---------- Lead rule for page loading ----------
+
+const lead = (id, status, page, hasMore, retryWaiting = false) => ({
+  id,
+  status,
+  page,
+  hasMore,
+  retryWaiting,
+});
+
+test('MAX_PAGE_LEAD is 1', () => {
+  assert.equal(MAX_PAGE_LEAD, 1);
+});
+
+test('pickLoadTargets lets equally placed sources load', () => {
+  const entries = [
+    lead('A', 'done', 1, true),
+    lead('B', 'done', 1, true),
+    lead('C', 'done', 1, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['A', 'B', 'C']);
+});
+
+test('pickLoadTargets holds a source that is already 1 page ahead', () => {
+  const entries = [lead('A', 'done', 2, true), lead('B', 'loading', 1, true)];
+  assert.deepEqual(pickLoadTargets(entries), []);
+});
+
+test('pickLoadTargets ignores a source waiting for a retry', () => {
+  const entries = [
+    lead('A', 'done', 2, true),
+    lead('B', 'error', 1, false, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['A']);
+});
+
+test('pickLoadTargets treats retryWaiting alone as unhealthy', () => {
+  const entries = [
+    lead('A', 'done', 2, true),
+    lead('B', 'error', 1, true, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['A']);
+});
+
+test('pickLoadTargets ignores a finished source when finding the slowest', () => {
+  const entries = [
+    lead('A', 'done', 3, true),
+    lead('B', 'done', 1, false),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['A']);
+});
+
+test('pickLoadTargets only targets the slowest source', () => {
+  const entries = [
+    lead('A', 'done', 2, true),
+    lead('B', 'done', 1, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['B']);
+});
+
+test('pickLoadTargets honours a larger maxLead', () => {
+  const entries = [
+    lead('A', 'done', 2, true),
+    lead('B', 'done', 1, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries, 2), ['A', 'B']);
+});
+
+test('pickLoadTargets returns nothing without a healthy entry', () => {
+  assert.deepEqual(
+    pickLoadTargets([
+      lead('A', 'error', 1, false, true),
+      lead('B', 'error', 2, false),
+    ]),
+    [],
+  );
+  assert.deepEqual(
+    pickLoadTargets([
+      lead('A', 'done', 1, false),
+      lead('B', 'loading', 2, false),
+    ]),
+    [],
+  );
+});
+
+test('pickLoadTargets never targets a loading source', () => {
+  assert.deepEqual(pickLoadTargets([lead('A', 'loading', 1, true)]), []);
+  assert.deepEqual(
+    pickLoadTargets([
+      lead('A', 'loading', 1, true),
+      lead('B', 'done', 1, true),
+    ]),
+    ['B'],
+  );
+});
+
+test('pickLoadTargets ignores an idle source with no more pages', () => {
+  const entries = [
+    lead('A', 'idle', 0, false),
+    lead('B', 'done', 1, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['B']);
+});
+
+test('pickLoadTargets keeps the input order', () => {
+  const entries = [
+    lead('C', 'done', 1, true),
+    lead('A', 'done', 1, true),
+    lead('B', 'done', 1, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries), ['C', 'A', 'B']);
+});
+
+test('pickLoadTargets handles bad input', () => {
+  assert.deepEqual(pickLoadTargets(null), []);
+  assert.deepEqual(pickLoadTargets(undefined), []);
+  assert.deepEqual(pickLoadTargets('nope'), []);
+  assert.deepEqual(
+    pickLoadTargets([
+      null,
+      { id: 'A' },
+      { id: 'B', page: NaN, hasMore: true, status: 'done', retryWaiting: false },
+    ]),
+    [],
+  );
+  const entries = [
+    lead('A', 'done', 2, true),
+    lead('B', 'done', 1, true),
+  ];
+  assert.deepEqual(pickLoadTargets(entries, 0), ['B']);
+  assert.deepEqual(pickLoadTargets(entries, NaN), ['B']);
+  assert.deepEqual(pickLoadTargets(entries, -3), ['B']);
+});
+
+test('pickLoadTargets does not change its input', () => {
+  const entries = [
+    lead('A', 'done', 2, true),
+    lead('B', 'loading', 1, true),
+  ];
+  const copy = entries.map((entry) => ({ ...entry }));
+  pickLoadTargets(entries);
+  assert.deepEqual(entries, copy);
+  assert.notEqual(entries, copy);
 });

@@ -61,6 +61,9 @@ export const COMMONS_REQUEST_LIMIT = 2;
 /** Most search requests of all kinds the app keeps open at once. */
 export const SEARCH_REQUEST_LIMIT = 4;
 
+/** Most pages a healthy source may load ahead of the slowest healthy source. */
+export const MAX_PAGE_LEAD = 1;
+
 /**
  * Whether a source is served by the Wikimedia Commons subtree.
  * @param {object|null|undefined} source
@@ -234,6 +237,46 @@ export function createSearchQueue({ total, commons } = {}) {
       return waiting.length;
     },
   };
+}
+
+/**
+ * Ids of the sources that may load their next page now. A source is healthy
+ * when it `hasMore` pages and is `'done'` or `'loading'` and not waiting for a
+ * retry. Unhealthy sources do not hold the others back. Every healthy `'done'`
+ * source that is less than `maxLead` pages ahead of the slowest healthy source
+ * (by `page`) is a target. The input order is kept. Bad entries are ignored.
+ * Pure function; no DOM, timers or network.
+ * @param {{id: string, page: number, hasMore: boolean, status: 'idle'|'loading'|'done'|'error', retryWaiting: boolean}[]} entries
+ * @param {number} [maxLead]
+ * @returns {string[]}
+ */
+export function pickLoadTargets(entries, maxLead = MAX_PAGE_LEAD) {
+  if (!Array.isArray(entries)) return [];
+  const lead =
+    typeof maxLead === 'number' && Number.isFinite(maxLead) && maxLead >= 1
+      ? maxLead
+      : MAX_PAGE_LEAD;
+  const healthy = [];
+  for (const entry of entries) {
+    if (!entry || typeof entry !== 'object') continue;
+    if (typeof entry.id !== 'string') continue;
+    if (typeof entry.page !== 'number' || !Number.isFinite(entry.page)) continue;
+    if (entry.hasMore !== true) continue;
+    if (entry.status !== 'done' && entry.status !== 'loading') continue;
+    if (entry.retryWaiting === true) continue;
+    healthy.push(entry);
+  }
+  if (healthy.length === 0) return [];
+  let minPage = healthy[0].page;
+  for (const entry of healthy) {
+    if (entry.page < minPage) minPage = entry.page;
+  }
+  const targets = [];
+  for (const entry of healthy) {
+    if (entry.status !== 'done') continue;
+    if (entry.page < minPage + lead) targets.push(entry.id);
+  }
+  return targets;
 }
 
 /**
