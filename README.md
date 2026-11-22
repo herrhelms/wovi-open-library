@@ -1,6 +1,6 @@
 # 🔭 WOVI — World of Visual Inspiration
 
-**Search 51 open image libraries at once — museums, archives, libraries and science collections — in one calm, image-first wall. Open any image in a detail view and download the highest resolution the source offers.**
+**Search 75 open image libraries from around the world at once — museums, archives, libraries and science collections — in one calm, image-first wall. Open any image in a detail view and download the highest resolution the source offers.**
 
 WOVI runs on your own computer: a small Node.js server talks to the library APIs, and your browser shows the results. No account, no build step, no dependencies.
 
@@ -25,7 +25,7 @@ WOVI runs on your own computer: a small Node.js server talks to the library APIs
 
 ## Features
 
-- **One search, 51 sources.** Results arrive as each source answers and are added to a masonry wall that never reshuffles.
+- **One search, 75 sources.** Results arrive as each source answers and are added to a masonry wall that never reshuffles.
 - **Sources you control.** Turn sources on or off per search, or permanently in the Sources window. See hits per source at a glance.
 - **Open licences only.** One switch hides everything that is not public domain or openly licensed.
 - **Detail view.** Dark stage, Fit / Actual size (drag to pan), filmstrip, keyboard ← → / F / Esc, licence meaning ("credit & share alike") and a ready-to-copy attribution line.
@@ -48,7 +48,7 @@ npm start
 
 Open **<http://127.0.0.1:5173/>** and search.
 
-- 42 of the 51 sources work **without any key**. Add keys later to unlock the rest.
+- 66 of the 75 sources work **without any key**. Add keys later to unlock the rest.
 - The server only listens on `127.0.0.1` (your own machine).
 - Stop it with <kbd>Ctrl</kbd>+<kbd>C</kbd>. Use another port with `PORT=8080 npm start`.
 
@@ -103,15 +103,15 @@ Empty values count as "not set".
 
 ✓ = no key needed · 🔑 = key needed · (½) = optional key
 
-**Open-licence aggregators** — Wikimedia Commons ✓ · Openverse ✓ · Flickr Commons 🔑 · Flickr (open licences) 🔑 · Internet Archive ✓ · Europeana (½) · DPLA 🔑 · Japan Search ✓ · Swedish heritage (K-samsök) ✓ · DigitalNZ (½) · Pixabay 🔑 · Pexels 🔑 · Unsplash 🔑
+**Open-licence aggregators** — Wikimedia Commons ✓ · Openverse ✓ · Flickr Commons 🔑 · Flickr (open licences) 🔑 · Internet Archive ✓ · Europeana (½) · DPLA 🔑 · Japan Search ✓ · Swedish heritage (K-samsök) ✓ · DigitalNZ (½) · PikiWiki Israel ✓ · Korean public institutions (KOGL Type 1) ✓ · Pixabay 🔑 · Pexels 🔑 · Unsplash 🔑
 
-**Museums and galleries** — The Met ✓ · Smithsonian Open Access (½) · Rijksmuseum ✓ · National Gallery of Art ✓ · Art Institute of Chicago ✓ · Cleveland Museum of Art ✓ · Getty Museum ✓ · Minneapolis Institute of Art ✓ · SMK – National Gallery of Denmark ✓ · Paris Musées ✓ · Walters Art Museum ✓ · Brooklyn Museum ✓ · Auckland Museum ✓ · Princeton University Art Museum ✓ · Harvard Art Museums 🔑
+**Museums and galleries** — The Met ✓ · Smithsonian Open Access (½) · Rijksmuseum ✓ · National Gallery of Art ✓ · Art Institute of Chicago ✓ · Cleveland Museum of Art ✓ · Getty Museum ✓ · Minneapolis Institute of Art ✓ · SMK – National Gallery of Denmark ✓ · Paris Musées ✓ · Walters Art Museum ✓ · Brooklyn Museum ✓ · Auckland Museum ✓ · Princeton University Art Museum ✓ · Harvard Art Museums 🔑 · Web umenia (Slovak and Czech galleries) ✓ · Museu Paulista (USP) ✓ · National Palace Museum (Taiwan) ✓ · Australian War Memorial ✓ · Nationalmuseum Stockholm ✓ · Helsinki City Museum ✓ · Canadian Museum of History ✓ · McCord Stewart Museum ✓
 
-**Libraries and archives** — Library of Congress (Free to Use) ✓ · New York Public Library 🔑 · British Library ✓ · Gallica (BnF) ✓ · Trove 🔑 · US National Archives ✓ · Nationaal Archief ✓ · German Federal Archive ✓ · ETH Library Zurich ✓ · State Library of Queensland ✓ · National Library of Norway ✓ · Digital Commonwealth ✓ · David Rumsey Map Collection ✓
+**Libraries and archives** — Library of Congress (Free to Use) ✓ · New York Public Library 🔑 · British Library ✓ · Gallica (BnF) ✓ · Trove 🔑 · US National Archives ✓ · Nationaal Archief ✓ · German Federal Archive ✓ · ETH Library Zurich ✓ · State Library of Queensland ✓ · National Library of Norway ✓ · Digital Commonwealth ✓ · David Rumsey Map Collection ✓ · Royal Danish Library ✓ · Fortepan (Hungary) ✓ · Banco de la República (Colombia) ✓ · National Library of Israel ✓ · Arquivo Nacional (Brazil) ✓ · Instituto Moreira Salles ✓ · Archivo General de la Nación (Argentina) ✓ · State Library of NSW ✓ · Archives New Zealand ✓ · Finnish Heritage Agency ✓ · BAnQ (Québec) ✓ · Library and Archives Canada ✓ · City of Toronto Archives ✓ · Narodowe Archiwum Cyfrowe (Poland) ✓
 
 **Science, nature and medicine** — NASA Image Library ✓ · ESA/Hubble ✓ · ESA/Webb ✓ · ESO ✓ · Wellcome Collection ✓ · Biodiversity Heritage Library ✓ · NOAA Photo Library ✓ · iNaturalist ✓ · GBIF ✓ · Natural History Museum, London ✓
 
-Thirteen of these (Paris Musées, Walters, Brooklyn, Auckland, British Library, Gallica, US National Archives, Nationaal Archief, German Federal Archive, ETH Library, State Library of Queensland, BHL, NOAA) are searched **through Wikimedia Commons**, because their own APIs are blocked, need a token, or don't exist.
+33 of these are searched **through Wikimedia Commons**, because their own APIs are blocked, need a token, or don't exist: Paris Musées, Walters, Brooklyn, Auckland, British Library, Gallica, US National Archives, Nationaal Archief, German Federal Archive, ETH Library, State Library of Queensland, BHL, NOAA, and 20 collections from Israel, Latin America, Asia, Australia, New Zealand, the Nordics, Canada and Poland (PikiWiki Israel, KOGL, Museu Paulista, National Palace Museum, Australian War Memorial, Nationalmuseum Stockholm, Helsinki City Museum, Canadian Museum of History, McCord Stewart, National Library of Israel, Arquivo Nacional, Instituto Moreira Salles, Archivo General de la Nación, State Library of NSW, Archives New Zealand, Finnish Heritage Agency, BAnQ, Library and Archives Canada, City of Toronto Archives, Narodowe Archiwum Cyfrowe). Their names end in "(via Wikimedia Commons)" in the app.
 
 ## Good to know
 
@@ -126,7 +126,7 @@ Thirteen of these (Paris Musées, Walters, Brooklyn, Auckland, British Library, 
 <details>
 <summary><b>Rate limits</b></summary>
 
-- **Wikimedia Commons** (14 sources) limits how fast one client may ask. WOVI sends one Commons request at a time, waits as Commons asks (`Retry-After`) and retries; the browser retries too. Commons results arrive one after another over up to ~30 seconds.
+- **Wikimedia Commons** (34 sources) limits how fast one client may ask. WOVI sends one Commons request at a time, waits as Commons asks (`Retry-After`) and retries; the browser keeps at most two Commons searches open and starts the other sources first. Commons results arrive one after another over up to ~30 seconds.
 - **Smithsonian** with `DEMO_KEY`: ~30 requests per hour — add a personal key.
 - **Openverse** without a key: ~20 requests per minute, 200 per day, results stop near 240.
 - **iNaturalist**: max 60 requests per minute.
@@ -146,6 +146,10 @@ Thirteen of these (Paris Musées, Walters, Brooklyn, Auckland, British Library, 
 - **DPLA, Trove, DigitalNZ**: some records only have a thumbnail; the viewer links to the partner page.
 - **Harvard, Trove**: no usable licence data — they are skipped when *Open licences only* is on.
 - **Natural History Museum**: item pages can answer HTTP 403 to scripts; they work in a browser.
+- **Local search terms work best** for Web umenia (Slovak/Czech, e.g. *mesiac*, *portrét*), Banco de la República (Spanish, e.g. *retrato*, *luna*), the Royal Danish Library (Danish, e.g. *portræt*), and many of the Commons collections from Brazil, Argentina, Finland and Poland.
+- **Japan Search** shows public domain, CC0, CC BY and CC BY-SA items, including ColBase (Japan's national museums) and the National Diet Library.
+- **Royal Danish Library**: only items marked free of copyright or CC BY. **Web umenia**: only free works. **Banco de la República**: only public domain items from five historic collections; multi-page objects are skipped.
+- **Fortepan** is CC BY-SA 3.0 and asks for the credit "FORTEPAN / donor name" — the attribution box includes it. WOVI uses the search of the Fortepan website, which is not a documented public API and may change.
 </details>
 
 <details>
@@ -165,7 +169,7 @@ WOVI keeps local state in `data/` (ignored by git): which sources are on (`setti
 <details>
 <summary><b>Root certificates</b></summary>
 
-`certs/` holds two public root certificates (SSL.com TLS RSA Root CA 2022, HARICA TLS RSA Root CA 2021) that Node.js does not ship. They are added to Node's list at start so that `data.getty.edu`, `kulturarvsdata.se` and `data.artmuseum.princeton.edu` pass the TLS check. Certificate checks stay on.
+`certs/` holds two public root certificates (SSL.com TLS RSA Root CA 2022, HARICA TLS RSA Root CA 2021) that Node.js does not ship, and the public GeoTrust EV RSA CA G2 intermediate (issued by DigiCert Global Root G2). They are added to Node's list at start so that `data.getty.edu`, `kulturarvsdata.se`, `data.artmuseum.princeton.edu` and `babel.banrepcultural.org` (which sends no certificate chain) pass the TLS check. Certificate checks stay on.
 </details>
 
 ## Development
