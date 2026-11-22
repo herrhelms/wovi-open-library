@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "id": "fortepan",
+  "name": "Fortepan (Hungary)",
+  "homepage": "https://fortepan.hu",
+  "group": "libraries",
+  "order": 412,
+  "description": "Fortepan: community photo archive from Hungary (CC BY-SA 3.0).",
+  "defaultEnabled": true,
+  "openLicenses": true,
+  "trustResolvedUrl": false,
+  "key": null,
+  "docsUrl": null,
+  "notes": [
+    "Uses the search proxy of the Fortepan website. It is not a documented public API.",
+    "The licence asks for the credit line \"FORTEPAN / <donor name>\"."
+  ]
+}
