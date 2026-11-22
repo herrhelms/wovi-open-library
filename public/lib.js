@@ -58,6 +58,9 @@ export function isSearchable(source, openOnly) {
 /** Most Commons-backed search requests the app keeps open at once. */
 export const COMMONS_REQUEST_LIMIT = 2;
 
+/** Most search requests of all kinds the app keeps open at once. */
+export const SEARCH_REQUEST_LIMIT = 4;
+
 /**
  * Whether a source is served by the Wikimedia Commons subtree.
  * @param {object|null|undefined} source
@@ -121,6 +124,93 @@ export function createRequestQueue(limit) {
         run();
       } else {
         waiting.push({ ticket, start: run });
+      }
+      return ticket;
+    },
+    release(ticket) {
+      if (active.has(ticket)) {
+        active.delete(ticket);
+        startWaiting();
+        return;
+      }
+      const index = waiting.findIndex((entry) => entry.ticket === ticket);
+      if (index >= 0) waiting.splice(index, 1);
+    },
+    clear() {
+      waiting.length = 0;
+      active.clear();
+    },
+    activeCount() {
+      return active.size;
+    },
+    waitingCount() {
+      return waiting.length;
+    },
+  };
+}
+
+/**
+ * First-in, first-out search queue with two limits: `total` active requests of
+ * all kinds, and of these at most `commons` Commons-backed requests.
+ * `request(start, { commons })` gives a ticket and calls `start` at once while
+ * both limits allow it. A waiting Commons ticket that cannot start because of
+ * the Commons limit does not block a non-Commons ticket behind it. `release`
+ * frees an active ticket or removes a waiting one. `clear()` drops all waiting
+ * tickets and forgets the active ones. No DOM, timers, network or Promises.
+ * @param {{total: number, commons: number}} [options]
+ * @returns {{request: (start: () => void, options?: {commons?: boolean}) => number, release: (ticket: number) => void, clear: () => void, activeCount: () => number, waitingCount: () => number}}
+ */
+export function createSearchQueue({ total, commons } = {}) {
+  const maxTotal =
+    typeof total === 'number' && Number.isFinite(total) && total >= 1
+      ? Math.floor(total)
+      : 1;
+  const maxCommons =
+    typeof commons === 'number' && Number.isFinite(commons) && commons >= 1
+      ? Math.floor(commons)
+      : 1;
+  let nextTicket = 1;
+  const active = new Map();
+  const waiting = [];
+
+  const commonsActive = () => {
+    let count = 0;
+    for (const isCommons of active.values()) {
+      if (isCommons) count += 1;
+    }
+    return count;
+  };
+
+  const startWaiting = () => {
+    let commonsActiveCount = commonsActive();
+    let index = 0;
+    while (index < waiting.length && active.size < maxTotal) {
+      const entry = waiting[index];
+      if (entry.commons && commonsActiveCount >= maxCommons) {
+        index += 1;
+        continue;
+      }
+      waiting.splice(index, 1);
+      active.set(entry.ticket, entry.commons);
+      if (entry.commons) commonsActiveCount += 1;
+      entry.start();
+    }
+  };
+
+  return {
+    request(start, { commons: isCommons = false } = {}) {
+      const ticket = nextTicket;
+      nextTicket += 1;
+      const run = typeof start === 'function' ? start : () => {};
+      const wantsCommons = isCommons === true;
+      const fits =
+        active.size < maxTotal &&
+        (!wantsCommons || commonsActive() < maxCommons);
+      if (fits) {
+        active.set(ticket, wantsCommons);
+        run();
+      } else {
+        waiting.push({ ticket, start: run, commons: wantsCommons });
       }
       return ticket;
     },
